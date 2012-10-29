@@ -1,0 +1,17 @@
+name = Backbone
+description = BackboneJS for Drupal!
+dependencies[] = libraries
+dependencies[] = services
+dependencies[] = rest_server
+dependencies[] = jquery_update
+; Until REST endpoint path is configurable, base feature is required.
+; dependencies[] = backbone_base
+package = Backbone
+core = 6.x
+
+; Information added by drupal.org packaging script on 2012-03-16
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "backbone"
+datestamp = "1331856261"
+
