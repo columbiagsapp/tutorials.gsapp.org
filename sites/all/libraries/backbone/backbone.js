@@ -1235,7 +1235,8 @@
         if (selector === '') {
           this.$el.bind(eventName, method);
         } else {
-          this.$el.delegate(selector, eventName, method);
+          //this.$el.delegate(selector, eventName, method);
+          this.$el.find(selector).bind(eventName, method);//tct2003 changed because delegate doesn't search through $(this)
         }
       }
     },
