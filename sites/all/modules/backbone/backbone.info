@@ -3,7 +3,7 @@ description = BackboneJS for Drupal!
 dependencies[] = libraries
 dependencies[] = services
 dependencies[] = rest_server
-dependencies[] = jquery_update
+; dependencies[] = jquery_update ;tct turned this off b/c jquery_update is only 1.3.2
 ; Until REST endpoint path is configurable, base feature is required.
 ; dependencies[] = backbone_base
 package = Backbone
