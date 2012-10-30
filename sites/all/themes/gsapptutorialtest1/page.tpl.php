@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width" />
   <title><?php print $head_title; ?></title>
   <?php print $styles; ?>
+  <script type="text/javascript" src="/sites/all/themes/gsapptutorialtest2/js/jquery-1.6.4.min.js"></script>
   <?php print $scripts; ?>
   <!-- IE Fix for HTML5 Tags -->
   <!--[if lt IE 9]>
@@ -50,14 +51,14 @@
       
       <?php if ($search_box): ?><?php print $search_box ?><?php endif; ?>
       
-	  <?php if ($primary_links || $secondary_links || !empty($navigation)): ?>
+    <?php if ($primary_links || $secondary_links || !empty($navigation)): ?>
         <nav id="navigation" role="navigation" class="clearfix ">
           <?php if (!empty($navigation)): ?> <!--if block in $navigation region, override $primary_links and $secondary_links-->
             <?php print $navigation ?>
           <?php endif; ?>
           <?php if (empty($navigation)): ?> 
             <?php if (isset($primary_links)) : ?>
-			  <?php print theme(array('links__system_main_menu', 'links'), $primary_links,
+        <?php print theme(array('links__system_main_menu', 'links'), $primary_links,
                 array(
                   'id' => 'main-menu',
                   'class' => 'links clearfix',
@@ -70,7 +71,7 @@
               ?>
             <?php endif; ?>
             <?php if (isset($secondary_links)) : ?>
-			  <?php print theme(array('links__system_secondary_menu', 'links'), $secondary_links,
+        <?php print theme(array('links__system_secondary_menu', 'links'), $secondary_links,
                 array(
                   'id' => 'secondary-menu',
                   'class' => 'links clearfix',
