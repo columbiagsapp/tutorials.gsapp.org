@@ -1,4 +1,5 @@
 (function($) {
+  console.log('example app fired');
   Drupal.behaviors.backbone_example = function(context) {
     // ## attach()
     //
