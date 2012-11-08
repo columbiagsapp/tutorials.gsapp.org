@@ -28,8 +28,8 @@ function backbone_example_mod_help($path, $arg) {
  * Our app needs a place to live, so we create a menu callback for it
  */
 function backbone_example_mod_menu() {
-  $items['backbone_example'] = array(
-    'title' => 'Backbone Example',
+  $items['backbone_example_mod'] = array(
+    'title' => 'Backbone Example 2',
     'description' => 'A basic Backbone Drupal app.',
     'page callback' => 'backbone_example_mod_admin_page',
     'access arguments' => array('administer content'),
@@ -83,13 +83,13 @@ function backbone_example_mod_admin_page() {
   backbone_add_template('backbone-example-node-template', theme('backbone_example_mod_node_template'));
   backbone_add_template('backbone-example-app-template', theme('backbone_example_mod_app_template'));
   // Add app js.
-  drupal_add_js(drupal_get_path('module', 'backbone_example') . '/js/backbone_example_mod_app.js');
+  drupal_add_js(drupal_get_path('module', 'backbone_example_mod') . '/js/backbone_example_mod_app.js');
   // Return a container div for the app to anchor itself to.
   return array(
     '#type' => 'html_tag',
     '#tag' => 'div',
     '#attributes' => array(
-      'id' => 'backbone-example-app',
+      'id' => 'backbone-example-mod-app',
     ),
   );
 }
