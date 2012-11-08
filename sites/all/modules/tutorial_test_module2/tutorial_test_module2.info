@@ -1,5 +1,0 @@
-name = tutorial test module 2
-description = An example Backbone.js app showcasing standard design patterns.
-dependencies[] = backbone
-package = tutorial_test
-core = 6.x
