@@ -21,7 +21,30 @@
     hide($content['comments']);
     hide($content['links']);
     hide($content['field_tags']);
+
+
+    
+
     print render($content);
+  
+
+
+    print '<pre>';
+    print_r($node);
+    print '</pre>';
+
+
+
+
+
+
+
+
+
+
+
+
+
   ?>
 
   <?php if (!empty($content['field_tags']) || !empty($content['links'])): ?>
