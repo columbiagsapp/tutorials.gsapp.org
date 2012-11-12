@@ -53,10 +53,10 @@ function backbone_example_menu() {
  */
 function backbone_example_theme($existing, $type, $theme, $path) {
   return array(
-    'backbone_example_node_template' => array(
+    'backbone_example_node_template' => array(  // oddly this doesnt exist as a file. perhaps it needs to be created... -> its a function for now
       'variables' => array(),
     ),
-    'backbone_example_app_template' => array(
+    'backbone_example_app_template' => array( // this exists with the demo app - its a tpl.php file located in this folder. 
       'template' => 'backbone-example-app-template',
       'variables' => array(),
     ),
@@ -100,6 +100,7 @@ function backbone_example_admin_page() {
  * @return String
  *   Return a standard _.template() style template.
  */
-function theme_backbone_example_node_template() {
-  return '<% if (typeof(title) != "undefined" && typeof(body) != "undefined" ) { %><h2><%= title %></h2><div><%= body.und[0].safe_value %></div><% } %>';
+function theme_backbone_example_node_template() { // ok so its just a function for now...
+
+  return '<% if (typeof(title) != "undefined" && typeof(body) != "undefined" ) { %><h2 class="mod2"><%= title %></h2><div><div>node</div><%= title<br/>body<body.und[0].safe_value %></div><% } %>';
 }
