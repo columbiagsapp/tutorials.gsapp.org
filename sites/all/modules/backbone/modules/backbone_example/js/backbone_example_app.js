@@ -115,22 +115,83 @@
         // event will be called, triggering a re-render of the node view thanks
         // to our earlier binding of the view render function to change.
         doLoadNode: function() {
-          var nid = this.$('#nid').val();
-          this.nodeModel.set('nid', nid);
-          this.nodeModel.fetch();
           
 
+          var nid = this.$('#nid').val();
+          
+          this.nodeModel.set('nid', nid); // its breaking on this now... not sure why - it wasnt breaking on this yesterday... hmmm
+          this.nodeModel.fetch();
+          
           console.log(this.nodeModel);
           console.dir(this.nodeModel.attributes);
 
-          console.dir(this.nodeModel.attributes.title); // this does not work.
+          //console.dir(this.nodeModel.attributes.title); // this does not work.
+          //console.dir(this.nodeModel.get('title'));     // neither does this - even though this is how they show it in the slides...
           
-          console.dir(this.nodeModel.get('title'));     // neither does this - even though this is how they show it in the slides...
-          
+          //console.log('nv');
+          //console.log(this.nodeView); // just rendered html ... 
+
+          /*
+          // try to get a collection w multiple nodes --> fails
+          // Load a collection for a (Drupal) view:
+          var myViewCollection = Drupal.Backbone.Collections.NodeView({
+            model: Drupal.Backbone.Models.Node, // breaks without the viewName param... ok lets try to follow the example verbatum
+            viewName: "test_view"               // ok created this view - this also breaks
+                                                // so this example doesnt work either: http://eethann.github.com/Drupal-Backbone/drupalcon-munich-backbone-slides/index.html#slide-32
+          });
 
 
-          console.log('nv');
-          console.log(this.nodeView); // just rendered html ... 
+
+
+          console.log(myViewCollection);
+          myViewCollection.fetch();
+          console.log('fetched');
+          console.log(myViewCollection);
+
+          */
+
+          // test using nodeviewcollection -- fails also
+          /*
+          var myViewCollection = Drupal.Backbone.NodeViewCollection({
+             model: Drupal.Backbone.Models.Node, 
+            viewName: "test_view"
+
+          });
+
+
+          myViewCollection.fetch();
+          console.log(myViewCollection);
+          */
+
+          // create collection to hold comments?
+          /*
+          console.log('making new node');
+          
+          // --- test creating a node -> fails
+          var newNode = //Drupal.Backbone.Models.Node({   // it breaks in the init of the new model function... line 203 in backbone.js . ...
+                        Drupal.Backbone.NodeModel({       // ---same shit - also breaks...
+                                                          // so this documentation is outdated:
+                                                          // http://eethann.github.com/Drupal-Backbone/drupalcon-munich-backbone-slides/index.html#slide-11
+
+                                                        //    this.set(attributes, {silent: true});
+                                                        //    --> Uncaught TypeError: Object #<Object> has no method 'set'
+                                                        //    perhaps its not reading this as a new model? could be outdated code...
+                                                        //    checking latest src
+
+              type: "page",
+              title: "This is a new page made w backbone",
+              body: "That's it, really."
+          });
+
+
+
+          console.log(newNode.save());
+          console.dir(newNode.attributes);
+          console.log('done making new node');
+          */
+
+
+
 
           // now maybe fetch the comments.
           var comment_nids = new Array();
