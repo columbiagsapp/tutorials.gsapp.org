@@ -6,7 +6,7 @@
     // be sure that our settings and required libraries have already been
     // loaded.
     //
-    // This app consists of 2 views and one model: views for displaying the app
+    // This app consists of 2 views and on model: views for displaying the app
     // ui and an individual node, and a model to hold the node data.  Note that
     // in Backbone views function much like controlers in more conventional MVC
     // architecture, binding actions to events.
@@ -29,7 +29,7 @@
         // the id of the template you specified in your `backbone_add_template`
         // call (if you're using the Backbone module's standard template
         // management functions).
-        templateSelector: '#backbone-example-node-template', 
+        templateSelector: '#backbone-example-node-template',
 
         // #### NodeView.initialize()
         //
@@ -62,10 +62,6 @@
       // view is mainly a form, with bindings for the submit button that request
       // the node data from the server, and an initialize function that sets
       // everything up for us.
-
-
-      // form as entry point
-
       var AppView = Drupal.Backbone.View.extend({
 
         // #### AppView.templateSelector
@@ -85,7 +81,7 @@
         //
         // TODO integrate Backbone forms with the Drupal Form API.
         events: {
-          'submit form[name=backbone-example-form]': 'doLoadNode'   // this is the main dispatch.
+          'submit form[name=backbone-example-form]': 'doLoadNode'
         },
 
         // #### AppView.initialize()
@@ -99,25 +95,11 @@
         // model, then render the main app itself and attach it to the correct
         // location on the page.
         initialize: function() {
-          console.log('in initialize');
           Drupal.Backbone.View.prototype.initialize.apply(this);
           _.bindAll(this, 'doLoadNode');
           this.nodeModel = new Drupal.Backbone.NodeModel();
           this.nodeView = new NodeView({model: this.nodeModel});
-          console.log('nodeModel:');
-          console.log(this.nodeModel);
-          console.log('nodeView:');
-          console.log(this.nodeView);
-
-
-          console.log('getting ready to append the this.render() result which is');
-          console.log(this.render().el);
-
-
           $('#backbone-example-app').append(this.render().el);
-          
-
-
           this.$('#backbone-example-node-container').append(this.nodeView.render().el);
         },
 
@@ -133,17 +115,32 @@
         // event will be called, triggering a re-render of the node view thanks
         // to our earlier binding of the view render function to change.
         doLoadNode: function() {
-          console.log('in doLoadNode function');
           var nid = this.$('#nid').val();
           this.nodeModel.set('nid', nid);
-          
-          console.log('set nid on model');
-          
-          this.nodeModel.fetch(); 
+          this.nodeModel.fetch();
           
 
-          console.log('done fetching model, model is');
           console.log(this.nodeModel);
+          console.dir(this.nodeModel.attributes);
+
+          console.dir(this.nodeModel.attributes.title); // this does not work.
+          
+          console.dir(this.nodeModel.get('title'));     // neither does this - even though this is how they show it in the slides...
+          
+
+
+          console.log('nv');
+          console.log(this.nodeView); // just rendered html ... 
+
+          // now maybe fetch the comments.
+          var comment_nids = new Array();
+          
+          //
+
+          //
+
+          //
+
 
         }
       });

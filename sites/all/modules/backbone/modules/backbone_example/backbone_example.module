@@ -53,10 +53,10 @@ function backbone_example_menu() {
  */
 function backbone_example_theme($existing, $type, $theme, $path) {
   return array(
-    'backbone_example_node_template' => array(  // oddly this doesnt exist as a file. perhaps it needs to be created... -> its a function for now
+    'backbone_example_node_template' => array(
       'variables' => array(),
     ),
-    'backbone_example_app_template' => array( // this exists with the demo app - its a tpl.php file located in this folder. 
+    'backbone_example_app_template' => array(
       'template' => 'backbone-example-app-template',
       'variables' => array(),
     ),
@@ -100,7 +100,21 @@ function backbone_example_admin_page() {
  * @return String
  *   Return a standard _.template() style template.
  */
-function theme_backbone_example_node_template() { // ok so its just a function for now...
+function theme_backbone_example_node_template() {
+  $ret_value =  '<% if (typeof(title) != "undefined" && typeof(body) != "undefined" ) { %>' . 
+                '<h2><%= title %></h2>' . 
+                '<div><pre><%= body.und[0].safe_value' .  // cannot have HTML or unescaped chars inside the % 
+                '%>' . '<br/><br/>comment nid:<br/>' . 
+                '<% field_questions_reference.und[0].nid %>' .  // even arbitrary text strings cant . only non undefined JS variables...
+                '</pre></div><% } %>';                          // need to learn this templating language to use all these ... 
+                                                                // though really this should dispatch more JS calls for comments.
+                                                                // STRANGELY even though the js object contained a value for nid, this doesnt print it...
 
-  return '<% if (typeof(title) != "undefined" && typeof(body) != "undefined" ) { %><h2 class="mod2"><%= title %></h2><div><div>node</div><%= title<br/>body<body.und[0].safe_value %></div><% } %>';
+
+
+
+
+
+  return $ret_value;
+
 }
