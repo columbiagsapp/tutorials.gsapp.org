@@ -34,7 +34,7 @@ $('#add-question').click(function() {
 
         */
 
-        url: '/question-save/node', // the path / hook to hit
+        url: '/api/node', // the path / hook to hit
         dataType: 'json',
         success: updateData,
         contentType: "application/json;charset=utf-8",
