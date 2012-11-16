@@ -7,17 +7,17 @@ jQuery(document).ready(function ($) {
   
 
   
-$('#submit-answer').click(
-  var question_id = $(this).closest(".question").attr('id');
-  var answer_body = $(this).siblings('.answer-body').text();
-  var question_node_id = question_id.substr(2);
+  $('#submit-answer').click(
+    var question_id = $(this).closest(".question").attr('id');
+    var answer_body = $(this).siblings('.answer-body').text();
+    var question_node_id = question_id.substr(2);
 
-  console.log('tutorial.js | #submit-answer clicked');
-  console.log('tutorial.js | answer_body: '+answer_body);
-  console.log('tutorial.js | question_node_id: '+question_node_id);
+    console.log('tutorial.js | #submit-answer clicked');
+    console.log('tutorial.js | answer_body: '+answer_body);
+    console.log('tutorial.js | question_node_id: '+question_node_id);
 
-  submit_answer(question_node_id, answer_body);
-);
+    submit_answer(question_node_id, answer_body);
+  );
 
   
 
