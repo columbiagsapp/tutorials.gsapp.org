@@ -1,4 +1,4 @@
-<article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix"<?php print $attributes; ?>>
+<article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix tutorial"<?php print $attributes; ?>>
 
 
   <header>
@@ -22,25 +22,48 @@
 
 
     print render($content);
-
+    dsm($node);
 
     print 'hit this to save a test question <a href="#" id="add-question">add a new node</a>';
 
-
-
-    print '<div style="font-family: monospace; display: block; white-space: pre;">';
-      print_r($content);
-    print '</div>';
-
-
-    //drupal_db
-
-      // get answers
+    //
+    print '<div class="questions">';
 
 
 
+    print '<div class="ask-a-question">' .
+            '<input type="text" class="question-title" value="add a title"/>' .
+            '<textarea class="question-body">ask your question</textarea>' .
+            '<a href="#" class="submit-question">ask away</a>' .
+          '</div>';
 
-    //print render($content);
+    print '</div><!-- end questions -->';
+
+
+    print '<div class="questions">';
+
+    $qa_data = unserialize($content['field_qa_data']['und'][0]['value']);
+
+    foreach($qa_data as $key=>$_) {
+      print '<div class="question" id="'        . $_['dom_id'] . '">' .
+              '<div class="question-title">'    . $_['title'] . '</div>' .
+              '<div class="question-body">'     . $_['body'] . '</div>' .
+              '<div class="question-username">' . $_['username'] . '</div>' . 
+              '<!-- todo: use uid property on question to build path to name -->' .
+              '<div class="question-created">'   . $_['created'] . '</div>' .
+              '<div class="answers">';
+      //
+      //
+      foreach($_['answers'] as $k=>$__) {
+        print '<div class="answer" id="'        . $__['dom_nid'] . '">' .
+                '<div class="answer-body">'     . $__['body'] . '</div>' .
+                '<div class="answer-username">' . $__['username'] . '</div>' .
+                '<div class="answer-created">'  . $__['created'] . '</div>' .
+              '</div><!-- end answer -->';
+      }
+      print '</div>';
+    }
+    
   ?>
 
   <?php if (!empty($content['field_tags']) || !empty($content['links'])): ?>
