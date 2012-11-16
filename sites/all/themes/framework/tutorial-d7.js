@@ -7,7 +7,7 @@ jQuery(document).ready(function ($) {
   var model = {};
 
   var nodeCreateURL = '/api/node';
-  var nodeUpdateURL = '/api/node/update/';
+  var nodeUpdateURL = '/api/node/';
 
   //------------------ NEW ANSWER HANDLING
 
@@ -122,15 +122,15 @@ jQuery(document).ready(function ($) {
     model.question_id = new_question_nid;
 
     var tutorial_update = {
-      'nid': model.tutorial_id,
-      'type': 'question'   
+      "language":"und",
+      "field_questions_reference":{"und":{"0":{"nid":new_question_nid}}} 
     };
 
     var tutorial_update_json = JSON.stringify(tutorial_update);
     
     // AJAX post / update to parent question
     $.ajax({
-      type: 'POST',
+      type: 'PUT',
       url: nodeUpdateURL+model.tutorial_id,//url for update is '/api/node/update/nid'???? TODO confirm this
       dataType: 'json',
       success: updateTutorialPostSuccess,
