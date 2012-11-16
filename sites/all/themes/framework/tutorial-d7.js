@@ -4,6 +4,51 @@ jQuery(document).ready(function ($) {
 
   console.log('doc ready');
   
+  // gets called on error
+  var postError = function(jqXHR, errText, errThrown) {
+    // write an error and handle it
+    console.log('error');
+    console.log(errText);
+    console.log(errThrown);
+
+  }
+  
+  var tutorialQuestionReferencedCallback = function(response, textStatus, jqXHR) {
+    console.log('returned from tutorial callback');
+    console.dir(response);
+  }
+
+  // see what comes back
+  var questionAddedCallback = function(data) {
+    // log a message to the console
+    console.log('done');
+    console.log("response:"+data.nid);
+
+    var tutorial_array = {
+      'nid': data.nid,
+      'type': 'tutorial',
+      'field_questions_reference': data.nid
+    };
+    var json_tutorial = JSON.stringify(tutorial_array);
+   
+    var postURL = '/api/node/' + data.nid + '.json';
+
+    $.ajax({
+      type: 'POST',
+      url: postURL, // the path / hook to hit
+      dataType: 'json',
+      success: tutorialQuestionReferencedCallback,
+      contentType: "application/json;charset=utf-8",
+      error: postError,
+      data: json_tutorial
+    });
+
+  }
+
+  
+
+  
+
 
 $('#add-question').click(function() {
 
@@ -25,34 +70,12 @@ $('#add-question').click(function() {
       // write it to question_save
       $.ajax({
         type: 'POST',
-        /*
-        endpoint testing
-        defined in services as 'question_save'
-
-        url             result
-        question_save   http://tutorials-test7.postfog.org/node/question_save = 404
-
-        */
-
         url: '/api/node', // the path / hook to hit
         dataType: 'json',
-        success: updateData,
+        success: questionAddedCallback,
         contentType: "application/json;charset=utf-8",
         error: postError,
-        data: json_node,
-        success: function(response, textStatus, jqXHR){
-            // log a message to the console
-            console.log("response:"+response.nid);
-           
-
-        },
-        error: function(jqXHR, textStatus, errorThrown){
-            // log the error to the console
-            console.log(
-                "The following error occured: "+
-                textStatus, errorThrown
-            );
-        }
+        data: json_node
       });
       
       console.log('posted');
@@ -60,23 +83,7 @@ $('#add-question').click(function() {
 
 
 
-      // see what comes back
-       var updateData = function(data) {
-        // log successloghtml = loghtml + '<br/>Success!';
-        // log something or give confirm message
-        console.log('success');
-        console.log(data);
-      }
-
-      // gets called on error
-      var postError = function(jqXHR, errText, errThrown) {
-        // write an error and handle it
-        console.log('error');
-        console.log(errText);
-        console.log(errThrown);
-
-      }
-
+      
   });
 
 
