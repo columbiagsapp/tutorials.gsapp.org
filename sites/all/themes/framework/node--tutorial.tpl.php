@@ -19,11 +19,26 @@
   <?php
     // Hide comments, tags, and links now so that we can render them later.
 
-    print 'blablabla';
+
+
     print render($content);
 
 
     print 'hit this to save a test question <a href="#" id="add-question">add a new node</a>';
+
+
+
+    print '<div style="font-family: monospace; display: block; white-space: pre;">';
+      print_r($content);
+    print '</div>';
+
+
+    //drupal_db
+
+      // get answers
+
+
+
 
     //print render($content);
   ?>

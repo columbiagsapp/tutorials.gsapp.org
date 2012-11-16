@@ -4,15 +4,32 @@ jQuery(document).ready(function ($) {
 
   console.log('doc ready');
   
+  
+
+  
+  $('#submit-answer').click(
+    var question_id = $(this).closest(".question").attr('id');
+    var answer_body = $(this).siblings('.answer-body').text();
+    var question_node_id = question_id.substr(2);
+
+    console.log('tutorial.js | #submit-answer clicked');
+    console.log('tutorial.js | answer_body: '+answer_body);
+    console.log('tutorial.js | question_node_id: '+question_node_id);
+
+    submit_answer(question_node_id, answer_body);
+  );
+
+  
+
 
 $('#add-question').click(function() {
 
-
+    console.log('clicked');
       // make new node
       var node_array = {
         'title': 'new title',
         'type': 'question',
-        'body': 'some question'
+        'field_description': 'some question'
       };
 
       // json encode it
@@ -25,45 +42,20 @@ $('#add-question').click(function() {
       // write it to question_save
       $.ajax({
         type: 'POST',
-        /*
-        endpoint testing
-        defined in services as 'question_save'
-
-        url             result
-        question_save   http://tutorials-test7.postfog.org/node/question_save = 404
-
-        */
-
         url: '/api/node', // the path / hook to hit
         dataType: 'json',
-        success: updateData,
+        success: questionAddedCallback,
         contentType: "application/json;charset=utf-8",
-        error: postError,
+        error: postRequestError,
         data: json_node
       });
       
       console.log('posted');
 
 
+      return false;
 
-
-      // see what comes back
-       var updateData = function(data) {
-        // log successloghtml = loghtml + '<br/>Success!';
-        // log something or give confirm message
-        console.log('success');
-        console.log(data);
-      }
-
-      // gets called on error
-      var postError = function(jqXHR, errText, errThrown) {
-        // write an error and handle it
-        console.log('error');
-        console.log(errText);
-        console.log(errThrown);
-
-      }
-
+      
   });
 
 
