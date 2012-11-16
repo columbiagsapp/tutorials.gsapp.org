@@ -4,55 +4,27 @@ jQuery(document).ready(function ($) {
 
   console.log('doc ready');
   
-  // gets called on error
-  var postError = function(jqXHR, errText, errThrown) {
-    // write an error and handle it
-    console.log('error');
-    console.log(errText);
-    console.log(errThrown);
-
-  }
   
-  var tutorialQuestionReferencedCallback = function(response, textStatus, jqXHR) {
-    console.log('returned from tutorial callback');
-    console.dir(response);
-  }
-
-  // see what comes back
-  var questionAddedCallback = function(data) {
-    // log a message to the console
-    console.log('done');
-    console.log("response:"+data.nid);
-
-    var tutorial_array = {
-      'nid': data.nid,
-      'type': 'tutorial',
-      'field_questions_reference': data.nid
-    };
-    var json_tutorial = JSON.stringify(tutorial_array);
-   
-    var postURL = '/api/node/' + data.nid + '.json';
-
-    $.ajax({
-      type: 'POST',
-      url: postURL, // the path / hook to hit
-      dataType: 'json',
-      success: tutorialQuestionReferencedCallback,
-      contentType: "application/json;charset=utf-8",
-      error: postError,
-      data: json_tutorial
-    });
-
-  }
 
   
+$('#submit-answer').click(
+  var question_id = $(this).closest(".question").attr('id');
+  var answer_body = $(this).siblings('.answer-body').text();
+  var question_node_id = question_id.substr(2);
+
+  console.log('tutorial.js | #submit-answer clicked');
+  console.log('tutorial.js | answer_body: '+answer_body);
+  console.log('tutorial.js | question_node_id: '+question_node_id);
+
+  submit_answer(question_node_id, answer_body);
+);
 
   
 
 
 $('#add-question').click(function() {
 
-
+    console.log('clicked');
       // make new node
       var node_array = {
         'title': 'new title',
@@ -74,14 +46,14 @@ $('#add-question').click(function() {
         dataType: 'json',
         success: questionAddedCallback,
         contentType: "application/json;charset=utf-8",
-        error: postError,
+        error: postRequestError,
         data: json_node
       });
       
       console.log('posted');
 
 
-
+      return false;
 
       
   });

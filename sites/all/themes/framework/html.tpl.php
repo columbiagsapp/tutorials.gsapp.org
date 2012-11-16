@@ -15,8 +15,6 @@
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <!-- since modifying framework.info never works, including it here -->
-  <script src="/sites/all/themes/framework/tutorial-d7.js"></script>
   
 
 

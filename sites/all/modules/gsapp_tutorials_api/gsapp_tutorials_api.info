@@ -1,0 +1,3 @@
+name = GSAPP Tutorials API
+description = A simple module that holds a series of helper functions pertaining to saving and loading question and answer content for tutorial video postings.
+core = 7.x

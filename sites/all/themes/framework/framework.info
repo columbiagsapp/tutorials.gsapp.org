@@ -4,6 +4,9 @@ core = 7.x
 engine = phptemplate
 stylesheets[all][] = style.css
 
+scripts[] = api.js
+scripts[] = tutorial-d7.js
+
 regions[header]         = Header
 regions[navigation]     = Navigation
 regions[highlighted]    = Highlighted
