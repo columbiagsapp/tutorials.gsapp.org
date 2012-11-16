@@ -12,7 +12,7 @@ $('#add-question').click(function() {
       var node_array = {
         'title': 'new title',
         'type': 'question',
-        'body': 'some question'
+        'field_description': 'some question'
       };
 
       // json encode it
@@ -39,7 +39,20 @@ $('#add-question').click(function() {
         success: updateData,
         contentType: "application/json;charset=utf-8",
         error: postError,
-        data: json_node
+        data: json_node,
+        success: function(response, textStatus, jqXHR){
+            // log a message to the console
+            console.log("response:"+response.nid);
+           
+
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+            // log the error to the console
+            console.log(
+                "The following error occured: "+
+                textStatus, errorThrown
+            );
+        }
       });
       
       console.log('posted');
