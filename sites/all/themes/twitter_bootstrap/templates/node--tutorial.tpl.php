@@ -1,3 +1,5 @@
+<?php //dsm($node); ?>
+
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix tutorial"<?php print $attributes; ?>>
 
 
@@ -34,8 +36,8 @@
 
 
     print '<div class="ask-a-question">' .
-            '<div><label>Title: </label><input type="text" class="question-title" value="add a title"/></div>' .
-            '<div><label>Question: </label><textarea class="question-body">ask your question</textarea></label></div>' .
+            '<input type="text" class="question-title" value="add a title"/>' .
+            '<textarea class="question-body">ask your question</textarea>' .
             '<button class="btn btn-primary form-submit submit-question" name="op" value="Submit" type="submit">Submit</button>' .
           '</div>';
 

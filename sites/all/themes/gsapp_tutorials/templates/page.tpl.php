@@ -42,37 +42,42 @@
 <div class="container-fluid">
 
   <div class="row-fluid">
+	  <div class="span3" role="complementary">
+      <div class="affix sidebar-nav well">
+        <?php if ($page['sidebar_second']): ?>
+          
+            <?php print render($page['sidebar_second']); ?>
+          
+        <?php endif; ?>  
+      </div>
+    </div>  <!-- /#sidebar-first -->
 	  
-    <?php if ($page['sidebar_first']): ?>
-      <aside class="span3" role="complementary">
-        <?php print render($page['sidebar_second']); ?>
-      </aside>  <!-- /#sidebar-first -->
-    <?php endif; ?>  
-	  
-	  <section class="<?php print _twitter_bootstrap_content_span($columns); ?>">  
+	  <section class="<?php print _twitter_bootstrap_content_span(2); ?>">  
       <?php if ($page['highlighted']): ?>
         <div class="highlighted hero-unit"><?php print render($page['highlighted']); ?></div>
       <?php endif; ?>
 
-      <?php if ($breadcrumb): print $breadcrumb; endif;?>
+      <?php print $messages; ?>
+      <?php if ($tabs): ?>
+        <?php print render($tabs); ?>
+      <?php endif; ?>
+      <?php if ($page['help']): ?> 
+        <div class="well"><?php print render($page['help']); ?></div>
+      <?php endif; ?>
+
+      <?php //if ($breadcrumb): print $breadcrumb; endif;?>
+      <?php if ($action_links): ?>
+        <ul class="action-links"><?php print render($action_links); ?></ul>
+      <?php endif; ?>
+
       <a id="main-content"></a>
       <?php print render($title_prefix); ?>
       <?php if ($title): ?>
         <h1 class="page-header"><?php print $title; ?></h1>
       <?php endif; ?>
       <?php print render($title_suffix); ?>
-      <?php print $messages; ?>
-      <?php if ($tabs): ?>
-        <?php print render($tabs); ?>
-      <?php endif; ?>
 
-      <?php if ($page['help']): ?> 
-        <div class="well"><?php print render($page['help']); ?></div>
-      <?php endif; ?>
-
-      <?php if ($action_links): ?>
-        <ul class="action-links"><?php print render($action_links); ?></ul>
-      <?php endif; ?>
+      <?php //print render( field_view_field('node', $node, 'field_video_source') ); ?>
 
       <?php print render($page['content']); ?>
 
@@ -90,6 +95,17 @@
     <?php print render($page['footer']); ?>
   </footer>
 </div>
+
+<script>
+  $(function () {
+    $('.sidebar-nav').affix({
+      offset: {
+        top: function () { return $window.width() <= 980 ? 290 : 210 }
+      , bottom: 270
+      }
+    });
+  })
+</script>
 
 
 	
