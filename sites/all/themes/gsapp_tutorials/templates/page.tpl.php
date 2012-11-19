@@ -1,6 +1,6 @@
-<header id="navbar" role="banner" class="navbar navbar-fixed-top">
+<header id="navbar" role="banner" class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
-  	<div class="container">
+  	<div class="container-fluid">
   	  <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
   	  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
   		<span class="icon-bar"></span>
@@ -14,14 +14,10 @@
     		</a>
   	  <?php endif; ?>
 
-  	  <?php if ($site_name || $site_slogan): ?>
-    		<hgroup id="site-name-slogan">
-    		  <?php if ($site_name): ?>
-    			<h1>
-    			  <a href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>" class="brand"><?php print $site_name; ?></a>
-    			</h1>
-    		  <?php endif; ?>
-    		</hgroup>
+  	  <?php if ($site_name): ?>
+    		<div id="site-name-slogan">
+            <p class="lead"><?php print $site_name; ?></p>
+    		</div>
   	  <?php endif; ?>
   	  
   	  <div class="nav-collapse">
@@ -43,21 +39,13 @@
   </div>
 </header>
 
-<div class="container">
+<div class="container-fluid">
 
-  <header role="banner" id="page-header">
-    <?php if ( $site_slogan ): ?>
-      <p class="lead"><?php print $site_slogan; ?></p>
-    <?php endif; ?>
-
-    <?php print render($page['header']); ?>
-  </header> <!-- /#header -->
-	
-	<div class="row">
+  <div class="row-fluid">
 	  
     <?php if ($page['sidebar_first']): ?>
       <aside class="span3" role="complementary">
-        <?php print render($page['sidebar_first']); ?>
+        <?php print render($page['sidebar_second']); ?>
       </aside>  <!-- /#sidebar-first -->
     <?php endif; ?>  
 	  
@@ -65,6 +53,7 @@
       <?php if ($page['highlighted']): ?>
         <div class="highlighted hero-unit"><?php print render($page['highlighted']); ?></div>
       <?php endif; ?>
+
       <?php if ($breadcrumb): print $breadcrumb; endif;?>
       <a id="main-content"></a>
       <?php print render($title_prefix); ?>
@@ -76,20 +65,25 @@
       <?php if ($tabs): ?>
         <?php print render($tabs); ?>
       <?php endif; ?>
+
       <?php if ($page['help']): ?> 
         <div class="well"><?php print render($page['help']); ?></div>
       <?php endif; ?>
+
       <?php if ($action_links): ?>
         <ul class="action-links"><?php print render($action_links); ?></ul>
       <?php endif; ?>
+
       <?php print render($page['content']); ?>
+
+      <?php if ($page['sidebar_first']): ?>
+        <div class="row-fluid" role="complementary">
+          <?php print render($page['sidebar_first']); ?>
+        </div>  <!-- /#sidebar-first -->
+      <?php endif; ?>
 	  </section>
 
-    <?php if ($page['sidebar_second']): ?>
-      <aside class="span3" role="complementary">
-        <?php print render($page['sidebar_second']); ?>
-      </aside>  <!-- /#sidebar-second -->
-    <?php endif; ?>
+    
 
   </div>
   <footer class="footer container">
