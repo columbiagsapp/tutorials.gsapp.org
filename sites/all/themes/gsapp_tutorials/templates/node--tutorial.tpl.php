@@ -62,7 +62,7 @@
           $qa_data = unserialize($content['field_qa_data']['und'][0]['value']);
 
           foreach($qa_data as $key=>$_) {
-            print '<div class="question" id="'        . $_['dom_id'] . '">' .
+            print '<div class="question well" id="'        . $_['dom_id'] . '">' .
                     '<div class="question-title">'    . $_['title'] . '</div>' .
                     '<div class="question-body">'     . $_['body'] . '</div>' .
                     '<div class="question-username">' . $_['username'] . '</div>' . 
