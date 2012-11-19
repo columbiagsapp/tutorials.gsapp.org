@@ -1,22 +1,7 @@
-<?php //dsm($node); ?>
-
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix tutorial"<?php print $attributes; ?>>
 
 
-  <header>
-    <?php print render($title_prefix); ?>
-    <?php if (!$page && $title): ?>
-      <h2<?php print $title_attributes; ?>><a href="<?php print $node_url; ?>"><?php print $title; ?></a></h2>
-    <?php endif; ?>
-    <?php print render($title_suffix); ?>
-
-    <?php if ($display_submitted): ?>
-      <span class="submitted">
-        <?php print $user_picture; ?>
-        <?php print $submitted; ?>
-      </span>
-    <?php endif; ?>
-  </header>
+ 
 
   <?php
     // Hide comments, tags, and links now so that we can render them later.
@@ -28,7 +13,6 @@
     //print render($content);
 
     print render( field_view_field('node', $node, 'field_video_source') );
-    dsm($node);
 
 
 
@@ -62,17 +46,24 @@
           $qa_data = unserialize($content['field_qa_data']['und'][0]['value']);
 
           foreach($qa_data as $key=>$_) {
-            print '<div class="question well" id="'        . $_['dom_id'] . '">' .
-                    '<div class="question-title">'    . $_['title'] . '</div>' .
-                    '<div class="question-body">'     . $_['body'] . '</div>' .
-                    '<div class="question-username">' . $_['username'] . '</div>' . 
-                    '<!-- todo: use uid property on question to build path to name -->' .
-                    '<div class="question-created">'   . $_['created'] . '</div>';// .
-                    //'<div class="answers">';
-            //
-            //
+            print '<div class="question well clearfix" id="'   . $_['dom_id'] . '">' .
+                    '<div class="span1 pull-left">' .
+                      '<div class="question-vote-count"><label class="question-vote-label">Votes</label>' . '5' . '</div>' .
+                      '<div class="question-answer-count"><label class="question-answer-label">Votes</label>' . '10' . '</div>' .
+                      '<div class="question-view-count"><label class="question-view-label">Votes</label>' . '200' . '</div>' .
+                    '</div>' .
+                    '<div class="span6 pull-left">' .
+                      '<div class="question-title">'    . $_['title'] . '</div>' .
+                      '<div class="question-body">'     . $_['body'] . '</div>' .
+                    '</div>' .
+                    '<div class="span2 pull-left">' .
+                      '<div class="question-posted-relative">Asked ' . $_['created'] . 'by' . '</div>' .
+                      '<div class="question-user-portrait">' . 'User Portrait Here' . '</div>' .
+                      '<div class="question-username">' . $_['username'] . '</div>' . 
+                    '</div>';
+                      
             foreach($_['answers'] as $k=>$__) {
-              print '<div class="answer" id="'        . $__['dom_nid'] . '">' .
+              print '<div class="answer clearfix" id="'        . $__['dom_nid'] . '">' .
                       '<div class="answer-body">'     . $__['body'] . '</div>' .
                       '<div class="answer-username">' . $__['username'] . '</div>' .
                       '<div class="answer-created">'  . $__['created'] . '</div>' .
@@ -80,6 +71,7 @@
             }
             print '</div>';//end .question
           }
+          
         ?>
         </div><!-- /.questions -->
       </div>
@@ -103,6 +95,5 @@
     </footer>
   <?php endif; ?>
 
-  <?php print render($content['comments']); ?>
 
 </article> <!-- /.node -->

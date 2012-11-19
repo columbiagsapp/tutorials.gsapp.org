@@ -1,4 +1,4 @@
-<header id="navbar" role="banner" class="navbar navbar-inverse navbar-fixed-top">
+<nav id="navbar" role="banner" class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
   	<div class="container-fluid">
   	  <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
@@ -37,13 +37,22 @@
   	  </div>         
   	</div>
   </div>
+</nav>
+
+
+<header class="jumbotron subhead">
+  <div class="container">
+    <?php print render($title_prefix); ?>
+    <h1><?php print $title; ?></h1>
+    <?php print render($title_suffix); ?>
+  </div>
 </header>
 
 <div class="container-fluid">
 
   <div class="row-fluid">
 	  <div class="span3" role="complementary">
-      <div class="affix sidebar-nav well">
+      <div class="span3 affix sidebar-nav well">
         <?php if ($page['sidebar_second']): ?>
           
             <?php print render($page['sidebar_second']); ?>
@@ -71,11 +80,7 @@
       <?php endif; ?>
 
       <a id="main-content"></a>
-      <?php print render($title_prefix); ?>
-      <?php if ($title): ?>
-        <h1 class="page-header"><?php print $title; ?></h1>
-      <?php endif; ?>
-      <?php print render($title_suffix); ?>
+      
 
       <?php //print render( field_view_field('node', $node, 'field_video_source') ); ?>
 
