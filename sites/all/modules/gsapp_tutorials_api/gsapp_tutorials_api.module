@@ -11,28 +11,29 @@ function gsapp_tutorials_api_node_view($node, $view_mode, $langcode) {
       'nid'       => $q_node->nid,
       'dom_id'    => 'q-' . $q_node->nid,
       'title'     => $q_node->title,
-      'body'      => $q_node->field_description['und'][0]['safe_value'],
+      'body'      => (@strlen($q_node->field_description['und'][0]['safe_value'] > 0) ? $q_node->field_description['und'][0]['safe_value'] : ''),
       'uid'       => $q_node->uid,
       'username'  => $q_node->name,
       'created'    => $q_node->created,
       'answers'   => array()
     );
 
-    $answer_nids = $q_node->field_answers_reference['und'];
-    
-    foreach($answer_nids as $answer) {
-      $answer_node = node_load($answer['nid'], NULL, True);
-      $question_data['answers'][] = array(
-        'answer_nid'    => $answer_node->nid,
-        'dom_nid'       => 'a-' . $answer_node->nid,
-        'body'          => $answer_node->body['und'][0]['safe_value'],
-        'uid'           => $answer_node->uid,
-        'username'      => $answer_node->name,
-        'created'       => $answer_node->created
-      );
+    if (@strlen($q_node->field_answers_reference['und']) > 0) {
+      $answer_nids = $q_node->field_answers_reference['und'];
+      
+      foreach($answer_nids as $answer) {
+        $answer_node = node_load($answer['nid'], NULL, True);
+        $question_data['answers'][] = array(
+          'answer_nid'    => $answer_node->nid,
+          'dom_nid'       => 'a-' . $answer_node->nid,
+          'body'          => (@strlen($answer_node->body['und'][0]['safe_value']) > 0 ? $answer_node->body['und'][0]['safe_value'] : ''),
+          'uid'           => $answer_node->uid,
+          'username'      => $answer_node->name,
+          'created'       => $answer_node->created
+        );
+      }
+      $question_answer_data[] = $question_data;  
     }
-    $question_answer_data[] = $question_data;
   }
-  
   $node->content['field_qa_data']['und'][0]['value'] = serialize($question_answer_data);
 }
