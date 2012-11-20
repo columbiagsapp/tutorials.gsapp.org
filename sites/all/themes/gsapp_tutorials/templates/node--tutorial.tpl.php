@@ -1,25 +1,10 @@
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix tutorial"<?php print $attributes; ?>>
 
 
- 
-
-  <?php
-    // Hide comments, tags, and links now so that we can render them later.
-    //hide($content['comments']);
-    //hide($content['links']);
-    //hide($content['field_tags']);
-
-
-    //print render($content);
-
-    print render( field_view_field('node', $node, 'field_video_source') );
-
-
-
-
-  ?>
-
-  <div class="well">
+  <div class="mortar-bottom">
+    <?php print render( field_view_field('node', $node, 'field_video_source') );?>
+  </div>
+  <div class="brick">
     <ul class="nav nav-tabs" id="myTabs">
       <li class="active"><a href="#questions" data-toggle="tab">Q&amp;A</a></li>
       <li><a href="#assignments" data-toggle="tab">Assignments</a></li>
@@ -78,12 +63,6 @@
       <div class="tab-pane" id="assignments">assignments</div>
       <div class="tab-pane" id="transcript">transcript</div>
     </div>
-
-    <script>
-      $(function () {
-        $('#myTabs a:last').tab('show');
-      })
-    </script>
   </div><!-- /.well -->
 
     

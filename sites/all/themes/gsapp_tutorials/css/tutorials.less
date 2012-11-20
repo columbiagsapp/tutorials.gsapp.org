@@ -1,5 +1,10 @@
 
 @color: black;
+@borderwidth: 5px;
+@verticalpadding: 20px;
+.hidden{
+  display:none;
+}
 
 
 /* Landscape tablet */
@@ -7,10 +12,23 @@
 
 }
 
-/* tablet and phone */
+/* tablet and phone - starts to stack*/
 @media (max-width: 767px) {
-
+  .jumbotron{
+    border:5px solid black;
+  }
+  .jumbotron h1 {
+    font-size: 50px;
+  }
 }
+
+/* Landscape tablet or larger */
+@media (min-width: 768px) {
+  .jumbotron h1 {
+    font-size: 80px;
+  }
+}
+
 
 /* super large screen desktop */
 @media (min-width: 1200px) {
@@ -19,7 +37,6 @@
 
 /* phone in portrait */
 @media (max-width: 480px) {
-
 }
 
 /* all phone and tablet, all orientations */
@@ -30,6 +47,24 @@
 /* standard desktop */
 @media (min-width: 980px) {
 
+}
+
+
+
+
+.brick{
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: @verticalpadding;
+  border: @borderwidth solid @color;
+}
+
+.mortar-bottom{
+  margin-bottom:@verticalpadding;
+}
+
+.mortar-top{
+  margin-top:@verticalpadding;
 }
 
 .ajax-submission{
@@ -73,23 +108,10 @@ iframe {
   position: relative;
   margin:40px 0;/*height of fixed menu */
   padding: 40px 20px;
-  color: #fff;
   text-align: center;
-  text-shadow: 0 1px 3px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
-  background: #020031; /* Old browsers */
-  background: -moz-linear-gradient(45deg,  #020031 0%, #6d3353 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,#020031), color-stop(100%,#6d3353)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(45deg,  #020031 0%,#6d3353 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(45deg,  #020031 0%,#6d3353 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(45deg,  #020031 0%,#6d3353 100%); /* IE10+ */
-  background: linear-gradient(45deg,  #020031 0%,#6d3353 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#020031', endColorstr='#6d3353',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-  -webkit-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
-     -moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
-          box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
 }
+
 .jumbotron h1 {
-  font-size: 80px;
   font-weight: bold;
   letter-spacing: -1px;
   line-height: 1;
@@ -103,13 +125,9 @@ iframe {
 
 /* Link styles (used on .masthead-links as well) */
 .jumbotron a {
-  color: #fff;
-  color: rgba(255,255,255,.5);
-  -webkit-transition: all .2s ease-in-out;
-     -moz-transition: all .2s ease-in-out;
-          transition: all .2s ease-in-out;
+  color: #efefef;
+  border-bottom:1px dotted;
 }
 .jumbotron a:hover {
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255,255,255,.25);
+  border:none !important;
 }

@@ -256,10 +256,57 @@ jQuery(document).ready(function ($) {
 
   
 
+/*
+  This function resizes all videos to make sure they maintain a 16:9 aspect
+  ratio when resizing the browser with a responsive design
+*/
+$(function() {
+    
+    var $allVideos = $(".embedded-video iframe, .embedded-video object, .embedded-video embed"),
+    $fluidEl = $(".embedded-video");
+        
+  $allVideos.each(function() {
+    /* This was used to get the aspect ratio of the original iframe, but the video
+      embed module in Drupal core requires this to be defined statically, so I've
+      hard-wired it here to 16:9
+    var h = $(this).height();
+    var w = $(this).width();
+    */
+    $(this)
+      // jQuery .data does not work on object/embed elements
+      .attr('data-aspectRatio', 9 / 16)
+      .removeAttr('height')
+      .removeAttr('width');
+  
+  });
+  
+  $(window).resize(function() {
+  
+    var newWidth = $fluidEl.width();
+    $allVideos.each(function() {
+      var $el = $(this);
+      $el
+          .width(newWidth)
+          .height(newWidth * $el.attr('data-aspectRatio'));
+    });
+  
+  }).resize();
+
+});
 
 
+$(function () {
+  $('#myTabs a:first').tab('show');
+});
 
-
+$(function () {
+  $('.sidenav').affix({
+    offset: {
+      top: function () { return $window.width() <= 980 ? 290 : 210 }
+    , bottom: 270
+    }
+  });
+})
 
 
 });

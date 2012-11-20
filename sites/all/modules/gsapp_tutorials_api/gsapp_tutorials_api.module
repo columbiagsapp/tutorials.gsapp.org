@@ -1,6 +1,20 @@
 <?php
+/*
+function gsapp_tutorials_api_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items){
+  foreach ($entities as $id => $entity) {
+    if (empty($items[$id]) && $field['settings']['default_image']) {
+      if ($file = file_load($field['settings']['default_image'])) {
+        $items[$id][0] = (array) $file + array(
+          'is_default' => TRUE, 
+          'alt' => '', 
+          'title' => '',
+        );
+      }
+    }
+  }
 
 
+}*/
 
 function gsapp_tutorials_api_node_view($node, $view_mode, $langcode) {
 
@@ -53,3 +67,5 @@ function gsapp_tutorials_api_node_view($node, $view_mode, $langcode) {
     $node->content['field_qa_data']['und'][0]['value'] = serialize($question_answer_data);
   }
 }
+
+

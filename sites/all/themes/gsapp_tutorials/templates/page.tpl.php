@@ -62,7 +62,7 @@
         <?php print render($tabs); ?>
       <?php endif; ?>
       <?php if ($page['help']): ?> 
-        <div class="well"><?php print render($page['help']); ?></div>
+        <div class="brick"><?php print render($page['help']); ?></div>
       <?php endif; ?>
 
       <?php //if ($breadcrumb): print $breadcrumb; endif;?>
@@ -85,7 +85,7 @@
 	  </section>
 
     <div class="span3 sidebar" role="complementary">
-      <div id="sidenav" class="span3 well nav nav-list affix-top">
+      <div id="sidenav" class="span3 brick nav nav-list affix-top">
         <?php if ($page['sidebar_second']): ?>
           
             <?php print render($page['sidebar_second']); ?>
@@ -103,17 +103,6 @@
     <?php print render($page['footer']); ?>
   </div>
 </footer>
-
-<script>
-  $(function () {
-    $('.sidenav').affix({
-      offset: {
-        top: function () { return $window.width() <= 980 ? 290 : 210 }
-      , bottom: 270
-      }
-    });
-  })
-</script>
 
 
 	
