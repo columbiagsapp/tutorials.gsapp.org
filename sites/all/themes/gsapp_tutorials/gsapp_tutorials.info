@@ -12,7 +12,7 @@ regions[footer]         = 'Footer'
 
 stylesheets[all][] = css/tutorials.less
 
-scripts[] = js/api.js
+scripts[] = bootstrap/js/bootstrap-tab.js
 scripts[] = js/tutorial-d7.js
 
 settings[toggle_name] = 0
