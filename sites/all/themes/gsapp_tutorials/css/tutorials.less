@@ -1,6 +1,37 @@
 
 @color: black;
 
+
+/* Landscape tablet */
+@media (min-width: 768px) and (max-width: 979px) {
+
+}
+
+/* tablet and phone */
+@media (max-width: 767px) {
+
+}
+
+/* super large screen desktop */
+@media (min-width: 1200px) {
+
+}
+
+/* phone in portrait */
+@media (max-width: 480px) {
+
+}
+
+/* all phone and tablet, all orientations */
+@media (max-width: 979px) {
+
+}
+
+/* standard desktop */
+@media (min-width: 980px) {
+
+}
+
 .ajax-submission{
 	display:block;
 	margin:20px 0;
@@ -12,6 +43,21 @@
 	display:block;
 }
 
+.footer{
+  padding: 70px 0;
+  margin-top: 70px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+
+#sidenav{
+  width:100%;
+}
+
+iframe {
+  width:100%;
+  height:auto;
+}
 
 .ask-a-question input,
 .ask-a-question textarea,
@@ -25,7 +71,8 @@
 
 .jumbotron {
   position: relative;
-  padding: 40px 0;
+  margin:40px 0;/*height of fixed menu */
+  padding: 40px 20px;
   color: #fff;
   text-align: center;
   text-shadow: 0 1px 3px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);

@@ -3,9 +3,9 @@
   	<div class="container-fluid">
   	  <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
   	  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-  		<span class="icon-bar"></span>
-  		<span class="icon-bar"></span>
-  		<span class="icon-bar"></span>
+    		<span class="icon-bar"></span>
+    		<span class="icon-bar"></span>
+    		<span class="icon-bar"></span>
   	  </a>
   	  
   	  <?php if ($logo): ?>
@@ -51,16 +51,7 @@
 <div class="container-fluid">
 
   <div class="row-fluid">
-	  <div class="span3" role="complementary">
-      <div class="span3 affix sidebar-nav well">
-        <?php if ($page['sidebar_second']): ?>
-          
-            <?php print render($page['sidebar_second']); ?>
-          
-        <?php endif; ?>  
-      </div>
-    </div>  <!-- /#sidebar-first -->
-	  
+	    
 	  <section class="<?php print _twitter_bootstrap_content_span(2); ?>">  
       <?php if ($page['highlighted']): ?>
         <div class="highlighted hero-unit"><?php print render($page['highlighted']); ?></div>
@@ -93,17 +84,29 @@
       <?php endif; ?>
 	  </section>
 
+    <div class="span3 sidebar" role="complementary">
+      <div id="sidenav" class="span3 well nav nav-list affix-top">
+        <?php if ($page['sidebar_second']): ?>
+          
+            <?php print render($page['sidebar_second']); ?>
+          
+        <?php endif; ?>  
+      </div>
+    </div>  <!-- /#sidebar-first -->
     
 
   </div>
-  <footer class="footer container">
-    <?php print render($page['footer']); ?>
-  </footer>
 </div>
+
+<footer class="footer">
+  <div class="container-fluid">
+    <?php print render($page['footer']); ?>
+  </div>
+</footer>
 
 <script>
   $(function () {
-    $('.sidebar-nav').affix({
+    $('.sidenav').affix({
       offset: {
         top: function () { return $window.width() <= 980 ? 290 : 210 }
       , bottom: 270

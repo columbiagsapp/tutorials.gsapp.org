@@ -7,7 +7,7 @@
   <title><?php print $head_title; ?></title>
   
   <?php print $styles; ?>
-  <?php print $scripts; ?>
+  
 
 
   <!-- HTML5 element support for IE6-8 -->
@@ -26,5 +26,7 @@
   <?php print $page_top; ?>
   <?php print $page; ?>
   <?php print $page_bottom; ?>
+  <!-- Placed at the end of the document so the pages load faster -->
+  <?php print $scripts; ?>
 </body>
 </html>

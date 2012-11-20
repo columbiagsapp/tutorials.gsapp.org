@@ -10,6 +10,7 @@ regions[sidebar_first]  = 'Primary'
 regions[sidebar_second] = 'Secondary'
 regions[footer]         = 'Footer'
 
+stylesheets[all][] = css/twitter_bootstrap.css
 stylesheets[all][] = css/tutorials.less
 
 scripts[] = bootstrap/js/bootstrap-tab.js
