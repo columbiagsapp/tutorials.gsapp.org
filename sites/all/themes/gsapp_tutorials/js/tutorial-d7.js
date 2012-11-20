@@ -1,52 +1,66 @@
 jQuery(document).ready(function ($) {
-
-  
-//------------
   console.log('doc ready');
+
+/* jochen to do
+
+  clean up code
+  remove api.js
+  remove js files from parent theme
+  figure out dom writing upon success
+*/
+
   //set up a model for storing and passing new question/answer data locally
   var model = {};
-
-  var nodeCreateURL = '/api/node';
+  var nodeCreateURL = '/api/node';  
   var nodeUpdateURL = '/api/node/';
 
-  //------------------ NEW ANSWER HANDLING
 
+  /**
+   * gets called after new question is posted and parent tutorial reference
+   * has been set
+   */
   function updateQuestionPostSuccess(data) {
-    // new answer is made and parent question was updated ok
-   
+    //@ TODO
     var answer_html = $('<div ... model.answer_body>');
-    
     $("#q-" + model.question + " .answers").append(answer_html);
-
   }
 
+  /**
+   * parent tutorial to question could not be updated
+   */
   function updateQuestionPostError(jqXHR, errText, errThrown) {
-    //the parent question could not be updated
+    //@TODO
     show_error_message();//reenter your question, it didn't save
   }
 
+  /**
+   * answer could not be posted
+   */
   function submitAnswerPostError(jqXHR, errText, errThrown) {
     //the new answer could not be created
     show_error_message();//reenter your question, it didn't save
   }
 
-
+  /**
+   * answer posted, now update parent question node
+   */
   function submitAnswerPostSuccess(data) {
+    //@TODO!
+    console.log('api.js | in submitAnswerPostSuccess');
     var new_answer_nid = data.nid;
-    
     model.answer_id = new_answer_nid;
 
     var updated_node = {
       'nid': model.question_id,
-      'type': 'question'    
+       'title': 'updated title ',
     };
+
 
     var updated_node_json = JSON.stringify(updated_node);
     
-    // AJAX post / update to parent question
     $.ajax({
       type: 'POST',
-      url: nodeUpdateURL+model.question_id,//url for update is '/api/node/update/nid'???? TODO confirm this
+      url: nodeUpdateURL+model.question_id, //url for update is '/api/node/update/nid'???? TODO confirm this
       dataType: 'json',
       success: updateQuestionPostSuccess,
       contentType: "application/json;charset=utf-8",
@@ -57,7 +71,9 @@ jQuery(document).ready(function ($) {
 
 
 
-
+  /**
+   * entry point click handler when submitting a new answer //@TODO -> REMOVE???
+   */
   function submitAnswer(question_id, answer_body) {
     console.log('api.js | submitAnswer(' + question_id + ', '+ answer_body + ')');
 
@@ -93,13 +109,14 @@ jQuery(document).ready(function ($) {
 
   //------------------ NEW QUESTION HANDLING
 
+  /** 
+   * update DOM after successful question post and parent
+   * tutorial update
+   */
   function updateTutorialPostSuccess(data){
-    // new answer is made and parent question was updated ok
-   
+    //@TODO!
     var new_question_html = $('<div class="question" id="q-'+ model.question_id + '"><div class="question-title">'+model.question_title+'</div></div>');
-    
     $("#q-" + model.tutorial_id + " .questions").append(new_question_html);
-
   }
 
   function updateTutorialPostError(jqXHR, errText, errThrown) {
@@ -113,25 +130,54 @@ jQuery(document).ready(function ($) {
   }
 
 
+  /**
+   * after question has been posted, retrieve the parent tutorial 
+   * and set its node references
+   */
   function submitQuestionPostSuccess(data){
     console.log('api.js | submitQuestionPostSuccess()');
     console.log('api.js | data.nid: '+data.nid);
+    model.question_id = data.nid;
 
-    var new_question_nid = data.nid;
-    
-    model.question_id = new_question_nid;
+    $.ajax({
+        type: "GET",
+        url: '/api/node/' + model.tutorial_id,
+        dataType: 'json',
+        data: data,
 
+        success: function(data) { 
+          console.log('api.js | retreived data from tutorial');
+          model.tutorial_node = data;
+          var q_refs = data.field_questions_reference.und;
+          var question_nids = {};
+          question_nids["und"] = new Array();
+          var i = 0;
+          for (i in q_refs) {
+            var qnid = q_refs[i].nid;
+            question_nids["und"].push({'nid': '[nid:' + qnid + ']'});
+          }
+          question_nids["und"].push({'nid': '[nid:' + model.question_id + ']'});
+          model.question_ref_string = question_nids;
+          updateParentTutorial(model);
+        }
+    });
+  }
+
+  /**
+   * update question parent tutorial with references
+   */
+  function updateParentTutorial(model) {
     var tutorial_update = {
-      "language":"und",
-      "field_questions_reference":{"und":{"0":{"nid":new_question_nid}}} 
-    };
-
+      'nid': model.tutorial_id,
+      //'title': 'new tutorial title ' + Math.random(100), //@TODO remove this just here for debugging
+      'field_questions_reference' : model.question_ref_string
+    }
     var tutorial_update_json = JSON.stringify(tutorial_update);
-    
+
     // AJAX post / update to parent question
     $.ajax({
       type: 'PUT',
-      url: nodeUpdateURL+model.tutorial_id,//url for update is '/api/node/update/nid'???? TODO confirm this
+      url: nodeUpdateURL+model.tutorial_id,
       dataType: 'json',
       success: updateTutorialPostSuccess,
       contentType: "application/json;charset=utf-8",
@@ -141,24 +187,23 @@ jQuery(document).ready(function ($) {
   }
 
 
+  /** 
+   * submit a new question
+   */
   function submitQuestion(tutorial_id, question_title, question_body, $){
     console.log('api.js | submitQuestion(' + tutorial_id + ', '+ question_title + ', ' + question_body + ')');
 
-    //clear the model
+    // clear model
     model = {};
 
-    //TOOD add body 
     var new_question = {
       'title': question_title,
       'type': 'question',
       "language":"und",
       "field_description":{"und":{"0":{"value":question_body}}}
     };
-
-    //convert to json for services module POST
     var new_question_json = JSON.stringify(new_question);
-
-    console.log('api.js | new_question_json: '+new_question_json);
+    console.log('api.js | new_question_json: '+ new_question_json);
 
     model = {
       'tutorial_id': tutorial_id,
@@ -175,14 +220,13 @@ jQuery(document).ready(function ($) {
       error: submitQuestionPostError,
       data: new_question_json
     });
-
   }
 
-
-  //------------
   
 
-  
+
+  // _________ CLICK HANDLERS ________
+
   $('.submit-answer').click(function(){
     var question_id = $(this).closest(".question").attr('id');
     question_id = question_id.substr(2);
@@ -211,51 +255,6 @@ jQuery(document).ready(function ($) {
   });
 
   
-
-
-$('#add-question').click(function() {
-
-    console.log('clicked');
-      // make new node
-      var node_array = {
-        'title': 'new title',
-        'type': 'question',
-        'field_description': 'some question'
-      };
-
-      // json encode it
-      var json_node = JSON.stringify(node_array);
-      console.log('json node made');
-      console.dir(json_node);
-
-
-
-      // write it to question_save
-      $.ajax({
-        type: 'POST',
-        url: '/api/node', // the path / hook to hit
-        dataType: 'json',
-        success: questionAddedCallback,
-        contentType: "application/json;charset=utf-8",
-        error: postRequestError,
-        data: json_node
-      });
-      
-      console.log('posted');
-
-
-      return false;
-
-      
-  });
-
-
-
-
-  //var xNode = Drupal.Backbone.Models.Node({nid: 55});
-
-
-  //console.log(xNode);
 
 
 
