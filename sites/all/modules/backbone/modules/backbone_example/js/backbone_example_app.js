@@ -101,7 +101,7 @@
           this.nodeView = new NodeView({model: this.nodeModel});
           $('#question-add-anchor-div').append(this.render().el);
           this.$('#new-question-container').append(this.nodeView.render().el);
-          this.doLoadNode(98);
+          doLoadNode(98);
           console.log('init');
         },
 

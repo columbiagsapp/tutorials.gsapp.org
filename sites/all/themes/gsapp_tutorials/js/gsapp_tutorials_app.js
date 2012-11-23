@@ -1,59 +1,52 @@
-(function($) {
-  Drupal.behaviors.backbone_example = {
-    // ## attach()
-    //
-    // We start the app in a Drupal.behaviors attach function, this way we can
-    // be sure that our settings and required libraries have already been
-    // loaded.
-    //
-    // This app consists of 2 views and one model: views for displaying the app
-    // ui and an individual node, and a model to hold the node data.  Note that
-    // in Backbone views function much like controlers in more conventional MVC
-    // architecture, binding actions to events.
-    attach: function() {
-
-      // ### NodeView
-      //
-      // This is our view of a specific node, it takes care of rendering the
-      // node data once it has been loaded from the server and refreshing the
-      // display when new data is received.
-      //
-      // We use Backbone's extend() method to extend the base
-      // Drupal.Backbone.View, so that the new module gets all the parent's
-      // methods and properties.
-      var NodeView = Drupal.Backbone.View.extend({
-
-        // #### NodeView.templateSelector
-        //
-        // This should be a jQuery CSS selector object or string that matches
-        // the id of the template you specified in your `backbone_add_template`
-        // call (if you're using the Backbone module's standard template
-        // management functions).
-        templateSelector: '#backbone-example-node-template',
-
-        // #### NodeView.initialize()
-        //
-        // The initialize function binds the "change" event on the model to a
-        // re-render of the view, so the view is automatically updated whenever
-        // the properties of the model change.  This allows us to automatically
-        // re-render the node information after we've loaded the data from
-        // Drupal...it's magic!
-        //
-        // Note that we need to call the parent constructor explicitly, using the
-        // apply method on the prototype. This is a bit esoteric (except for in
-        // JavaScript), but it's basically the equivalent of
-        //
-        //     parent::__contruct()
-        //
-        // in PHP. This is not required in Backbone.js, but is required in Drupal
-        // Backbone if you want the template to be prepared for you so the default
-        // rendering function works at object create.
-        initialize: function(opts) {
-          this.model = opts.model;
-          this.model.bind('change', this.render, this);
-          Drupal.Backbone.View.prototype.initialize.apply(this);
-        }
+(function ($) {
+$(document).ready(function () {
+  console.log('starting up'+ $('body').attr('class') );
+  
+  var question = new Drupal.Backbone.Models.Node({
+        nid: 189
       });
+
+  var questionView = Drupal.Backbone.Views.Base.extend({
+    templateSelector: '#bb_question_template',
+    initialize: function(opts) {
+      this.model = opts.model;
+      this.model.bind('change', this.render, this);
+      Drupal.Backbone.View.prototype.initialize.apply(this);
+      console.log('init questionView');
+
+
+    //  model: opts.model,
+      renderer: "underscore"
+    }
+
+  });
+
+  var questionViewRenderer = new questionView({
+    model: question,
+    el: '#view-container-el'
+  });
+
+
+  question.fetch({
+    success: function() {
+      questionViewRenderer.render();
+    }
+  });
+
+//});
+
+
+  /*
+
+  var NodeView = Drupal.Backbone.Views.Base.extend({
+    templateSelector: '#bb_node_template',
+    initialize: function(opts) {
+      this.model = opts.model;
+      this.model.bind('change', this.render, this);
+      Drupal.Backbone.View.prototype.initialize.apply(this);
+      console.log('init nodeView');
+    }
+  });
 
       // ### AppView
       //
@@ -62,47 +55,26 @@
       // view is mainly a form, with bindings for the submit button that request
       // the node data from the server, and an initialize function that sets
       // everything up for us.
-      var AppView = Drupal.Backbone.View.extend({
+      var AppView = Drupal.Backbone.Views.Base.extend({
 
         // #### AppView.templateSelector
         //
         // This property functions the same way as NodeView.templateSelector.
-        templateSelector: '#backbone-example-app-template',
+        templateSelector: '#bb_app_template',
 
-        // #### AppView.events
-        //
-        // We use the events property to map jquery event selectors with methods
-        // of our view object.  In this case, we will call the function
-        // doLoadNode when the form is submitted.
-        //
-        // Note that our form tag is set to return false on submit, so the form
-        // does not actually submit.  In the real world we'd likely do that with
-        // jQuery so it would degrade nicely.
-        //
-        // TODO integrate Backbone forms with the Drupal Form API.
         events: {
           'submit form[name=question-add-form]': 'doLoadNode'
         },
 
-        // #### AppView.initialize()
-        //
-        // The main view's initialize function sets up the view first (via the
-        // call to the parent's initialize method, same as NodeView), then binds
-        // the new doLoadNode function to the correct object (see the FAQ in the
-        // Backbone docs for more on this).
-        //
-        // Once that's all done, we can create our child view and it's attendant
-        // model, then render the main app itself and attach it to the correct
-        // location on the page.
         initialize: function() {
           Drupal.Backbone.View.prototype.initialize.apply(this);
           _.bindAll(this, 'doLoadNode');
-          this.nodeModel = new Drupal.Backbone.NodeModel();
+          this.nodeModel = new Drupal.Backbone.Models.Node();
           this.nodeView = new NodeView({model: this.nodeModel});
-          $('#question-add-anchor-div').append(this.render().el);
+          //$('#question-add-anchor-div').append(this.render().el);
           this.$('#new-question-container').append(this.nodeView.render().el);
-          doLoadNode(98);
-          console.log('init');
+          //doLoadNode(98);
+          console.log('gsapp tutorials bb app init');
         },
 
         // #### AppView.doLoadNode()
@@ -127,14 +99,19 @@
       //
       // Then all we need to do is create an instance of our app view!
       var app = new AppView();
-    },
+    //},
 
     // ## unattach()
     //
     // Just to be consistent with Drupal standards, we provide an unattach
     // function as well.
-    unattach: function() {
-      $('#question-add-anchor-div').html('');
-    }
-  };
-})(jQuery);
+    //unattach: function() {
+    //  $('#question-add-anchor-div').html('');
+    //}
+  //};
+});
+}(jQuery));
+
+*/
+});
+}(jQuery));

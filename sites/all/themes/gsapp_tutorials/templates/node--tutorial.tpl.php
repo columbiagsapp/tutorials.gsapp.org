@@ -59,7 +59,35 @@
           
         ?>
         </div><!-- /.questions -->
-      </div>
+      </div><!-- /.tab-pane #questions-->
+
+      <div id="bb_app_template">
+        <form action="#" name="question-add-form" onSubmit="return false;">
+          <div>
+            <label for="nid">Node ID</label>
+            <input type="textfield" name="nid" id="nid" />
+            <input type="submit" value="load" />
+          </div>
+          <div id="new-question-container">
+          </div>
+        </form>
+
+      </div><!-- /#backbone-test -->
+
+      <div id="view-container-el"></div>
+
+
+      <script type="text/template" id="bb_question_template">
+        <% if (typeof(title) != "undefined" ) { %>
+          <h2><%= title %></h2>
+        <% } %>
+        <% if (typeof(field_description) != "undefined" ) { %>
+          <div><%= field_description.und[0].safe_value %></div>
+        <% } %>
+      </script>
+
+      
+      
       <div class="tab-pane" id="assignments">assignments</div>
       <div class="tab-pane" id="transcript">transcript</div>
     </div>
@@ -76,3 +104,4 @@
 
 
 </article> <!-- /.node -->
+

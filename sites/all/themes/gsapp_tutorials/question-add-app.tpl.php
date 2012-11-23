@@ -1,0 +1,1 @@
+<% if (typeof(title) != "undefined" && typeof(body) != "undefined" ) { %><h2><%= title %></h2><div><%= body.und[0].safe_value %></div><% } %>

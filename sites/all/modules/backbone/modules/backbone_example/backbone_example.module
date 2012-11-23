@@ -36,6 +36,14 @@ function backbone_example_menu() {
     'weight' => 0,
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['tutorial'] = array(
+    'title' => 'Tutorial',
+    'description' => 'A basic Backbone Drupal app.',
+    'page callback' => 'gsapp_tutorial_template_bindings',
+    'access arguments' => array('administer content'),
+    'weight' => 0,
+    'type' => MENU_NORMAL_ITEM,
+  );
   return $items;
 }
 
@@ -83,7 +91,26 @@ function backbone_example_admin_page() {
   backbone_add_template('backbone-example-node-template', theme('backbone_example_node_template'));
   backbone_add_template('backbone-example-app-template', theme('backbone_example_app_template'));
   // Add app js.
-  drupal_add_js(drupal_get_path('module', 'backbone_example') . '/js/backbone_example_app.js');
+  //drupal_add_js(drupal_get_path('module', 'backbone_example') . '/js/backbone_example_app.js');
+  // Return a container div for the app to anchor itself to.
+  return array(
+    '#type' => 'html_tag',
+    '#tag' => 'div',
+    '#attributes' => array(
+      'id' => 'question-add-anchor-div',
+    ),
+  );
+}
+
+function gsapp_tutorial_template_bindings() {
+  // Add backbone.js to page.
+  drupal_add_library('backbone_services', 'drupalbackbone-services');
+
+  // Add templates to page.
+  backbone_add_template('backbone-example-node-template', theme('backbone_example_node_template'));
+  //backbone_add_template('backbone-example-app-template', theme('backbone_example_app_template'));
+  // Add app js.
+  //drupal_add_js(drupal_get_path('module', 'backbone_example') . '/js/backbone_example_app.js');
   // Return a container div for the app to anchor itself to.
   return array(
     '#type' => 'html_tag',
