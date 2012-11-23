@@ -74,7 +74,7 @@
 
       </div><!-- /#backbone-test -->
 
-      <div id="view-container-el"></div>
+      <div id="question-container-el"></div>
 
 
       <script type="text/template" id="bb_question_template">

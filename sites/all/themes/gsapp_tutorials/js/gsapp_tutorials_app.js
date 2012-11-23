@@ -8,22 +8,21 @@ $(document).ready(function () {
 
   var questionView = Drupal.Backbone.Views.Base.extend({
     templateSelector: '#bb_question_template',
+    renderer: "underscore",
     initialize: function(opts) {
       this.model = opts.model;
       this.model.bind('change', this.render, this);
       Drupal.Backbone.View.prototype.initialize.apply(this);
       console.log('init questionView');
 
-
-    //  model: opts.model,
-      renderer: "underscore"
+      
     }
 
   });
 
   var questionViewRenderer = new questionView({
     model: question,
-    el: '#view-container-el'
+    el: '#question-container-el'
   });
 
 
