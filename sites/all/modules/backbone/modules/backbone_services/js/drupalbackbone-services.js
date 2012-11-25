@@ -116,13 +116,15 @@
       // * TODO create basic view collection, subclass node and field views.
       Drupal.Backbone.Collections.NodeView = Drupal.Backbone.Collections.Base.extend({
         initialize: function(opts) {
-	  opts = opts || {};
-          this.constructor.__super__.initialize.call(this, opts);
+	        opts = opts || {};
+          //this.constructor.__super__.initialize.call(this, opts);
+          Drupal.Backbone.Collections.Base.prototype.initialize.call(this, opts);
           // TODO: debug why this is needed, model should be automatically passed.
           this.model = opts.model ? opts.model : Drupal.Backbone.Models.Node;
           this.viewName = opts.viewName;
         },
         url: function() {
+          console.log(this.restEndpoint + "/views/" + this.viewName + ".json");
           return this.restEndpoint + "/views/" + this.viewName + ".json";
         }
       });
