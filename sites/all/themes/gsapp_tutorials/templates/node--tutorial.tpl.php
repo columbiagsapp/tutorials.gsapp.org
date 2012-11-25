@@ -6,7 +6,6 @@
   <div class="mortar-bottom">
     <?php print render( field_view_field('node', $node, 'field_video_source') );?>
   </div>
-  <ul id="questions-list"></ul>
 
   <div class="brick">
     <ul class="nav nav-tabs" id="myTabs">
@@ -18,9 +17,7 @@
     <div class="tab-content">
       <div class="tab-pane active" id="questions">
 
-        <div id="questions-app">
-          
-        </div>
+        <div id="questions-list-el"></div>
 
 
       <!--
@@ -148,23 +145,12 @@
           </li>
       </script>
 
-
-      <script type="text/template" id="item-template">
-        <div class="view">
-          <input class="toggle" type="checkbox" <%= node.log == 'done' ? 'checked="checked"' : '' %> />
-          <label><%= node.title %></label>
-          <a class="destroy"></a>
+      <script type="text/template" id="collection-list">
+        <div>
+          <ul class="collection-list-parent"></ul>
         </div>
-        <input class="edit" type="text" value="<%= node.title %>" />
       </script>
-
-
-      <script type="text/template" id="stats-template">
-        <% if (done) { %>
-          <a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
-        <% } %>
-        <div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
-      </script>
+      
       
       
       <div class="tab-pane" id="assignments">assignments</div>
