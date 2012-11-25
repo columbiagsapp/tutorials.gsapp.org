@@ -23,121 +23,80 @@ var pathArray = window.location.pathname.split('/');
         */
 
         var Question = Drupal.Backbone.Models.Node.extend({
+          
+          //need to init in order to bind vote
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+            _(this).bindAll('vote');
+            //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+            this.addNoSaveAttributes('field_tutorials_reference_q');
+          },
+
           vote: function(addition){
-            console.log('Question.vote() | current score: '+ this.get('field_question_votes').und[0].value );
-            var newVoteTotal = this.get('field_question_votes').und[0].value + addition;
-            this.set({ vote: newVoteTotal });
+            var newVoteTotal = parseInt(this.get('field_question_votes').und[0].value) + parseInt(addition);
+            
+            this.set({ 
+              field_question_votes: {und: [{ value: newVoteTotal }] }
+            });
+          
             this.save();
           }
         });
 
-        var QuestionList = Drupal.Backbone.Collections.NodeView.extend({
-          model: Question,
-          //initialize: function(opts){
-            //this.constructor.__super__.initialize.call(this, opts);
-          //  Drupal.Backbone.Collections.NodeView.prototype.initialize.call(this, opts);
-          //  console.log('init, length: '+ this.length);
-          //}
-          reorder: function(){
-            //function to reorder questions based on votes
-          }
-        });
-
-
-        // Create our global collection of **Todos**.
-        var Questions = new QuestionList({viewName: 'questions_from_tutorial' });
-        //set param to tutorial nid, the one argument the Drupal view takes
-        Questions.setParams({ nid: tutorialNid }); 
-
+        var question = new Question({ nid: 189 });
 
         /*
           STEP 3
-          Create a view for each Questions
+          Create a view for each Question
           Uses the bb_question_template from the node--tutorial.tpl.php file
           to format each question
         */
-        var QuestionView = Backbone.View.extend({
-          tagName:  "li",
-          template: _.template($('#bb_question_template').html()),
+        var QuestionView = Drupal.Backbone.Views.Base.extend({
+          el: "#questions-list",
+          //tagName: 'li',//DOESN'T SEEM TO BE WORKING
+          templateSelector: '#bb_question_template',
+
           events: {
-            "click .vote-up"   : "voteUp",
-            "click .vote-down"   : "voteDown"
+            "click .voteup" :  "voteUp",
+            "click .votedown" : "voteDown"
           },
 
-          initialize: function() {
+          initialize: function(opts) {
+            console.log('QuestionView | init()');
+
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
             this.model.bind('change', this.render, this);
-            console.log('QuestionView template: ');
-            console.dir(this.template);
-          },
-
-          voteUp: function(){
-            this.model.vote(1);
-          },
-
-          voteDown: function(){
-            this.model.vote(-1);
-          },
-
-          render: function() {
-            this.$el.html(this.template(this.model.toJSON()));
-            //TODO: resort based on new vote order
-
-            //this.$el.toggleClass('done', this.model.get('log') == 'done');
-            //this.input = this.$('.edit');
-            return this;
-          },
-
-        });
-
-
-
-
-        tutorial.fetch({
-          success: function() {
-            console.log('tutorial title: '+ tutorial.get('title') );
-
-            console.log('tutorial field_questions_reference: '+ tutorial.get('field_questions_reference').und[0].nid );
-
-
-            Questions.fetch({
+            var m = this.model;
+            this.model.fetch({
               success: function(){
-                console.log( Questions.length );
+                console.log('fetched');
+                m.vote('1')
               }
             });
 
+
             
+          },
 
+          voteUp: function(){
+            console.log('QuestionView | voteUp()');
+            this.model.vote('1');
+          },
 
-           // _.each(Questions, function(num, key){console.log('question num: '+ num + ' key: '+ key)});
-
-          /*
-            var questionsNidArray = tutorial.get('field_questions_reference').und; 
-            var questionsArray = [];
-            for(var i = 0; i < questionsArray.length; i++){
-              questionsArray[i] = new Question({ nid: questionsNidArray[i].nid });
-              //Questions.push(questionsArray[i]);
-            }
-
-            Questions.fetch({});
-          */
-
+          voteDown: function() {
+            console.log('QuestionView | voteDown()');
           }
+
         });
 
-        
+        var view = new QuestionView({ model: question });
 
 
         
 
-        
+        //console.log('question desc: '+ question.get('field_description').und[0].safe_value );
 
-        
-
-        //var quest = new Question({nid : 189});
-
-        //Questions = new QuestionList;
-
-      }
-    }
-  }
+      }//end if tutorial
+    }//end behavior attach
+  }//end behavior
 })(jQuery);
