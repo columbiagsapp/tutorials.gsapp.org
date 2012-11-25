@@ -34,11 +34,9 @@ var pathArray = window.location.pathname.split('/');
 
           vote: function(addition){
             var newVoteTotal = parseInt(this.get('field_question_votes').und[0].value) + parseInt(addition);
-            
             this.set({ 
               field_question_votes: {und: [{ value: newVoteTotal }] }
             });
-          
             this.save();
           }
         });
@@ -57,24 +55,16 @@ var pathArray = window.location.pathname.split('/');
           templateSelector: '#bb_question_template',
 
           events: {
-            "click .voteup" :  "voteUp",
+            "click #voteup" :  "voteUp",
             "click .votedown" : "voteDown"
           },
 
           initialize: function(opts) {
-            console.log('QuestionView | init()');
 
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
             this.model.bind('change', this.render, this);
             var m = this.model;
-            this.model.fetch({
-              success: function(){
-                console.log('fetched');
-                m.vote('1')
-              }
-            });
-
-
+            this.model.fetch({});
             
           },
 
