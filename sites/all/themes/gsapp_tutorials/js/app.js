@@ -26,16 +26,22 @@ var pathArray = window.location.pathname.split('/');
           
           //need to init in order to bind vote
           initialize: function(opts){
+            console.log('Question | init()');
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             _(this).bindAll('vote');
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
-            this.addNoSaveAttributes('field_tutorials_reference_q');
+            
+            this.addNoSaveAttributes(['body', 'field_tutorials_reference_q', 'field_answers_reference',
+            'author', 'revision', 'views', 'comment', 'day_views', 'last_view' ]);
+
+
           },
 
           vote: function(addition){
-            var newVoteTotal = parseInt(this.get('field_question_votes').und[0].value) + parseInt(addition);
+            var newVoteTotal = parseInt(this.get('field_question_votes')) + parseInt(addition);
+            console.log('newVoteTotal: '+newVoteTotal);
             this.set({ 
-              field_question_votes: {und: [{ value: newVoteTotal }] }
+              field_question_votes: newVoteTotal
             });
             this.save();
           }
@@ -60,10 +66,10 @@ var pathArray = window.location.pathname.split('/');
           },
 
           initialize: function(opts) {
-
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+
             this.model.bind('change', this.render, this);
-            var m = this.model;
+
             this.model.fetch({});
             
           },

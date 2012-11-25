@@ -138,10 +138,10 @@
             <h2><%= title %></h2>
           <% } %>
           <% if (typeof(field_description) != "undefined" ) { %>
-            <div><%= field_description.und[0].safe_value %></div>
+            <div><%= field_description %></div>
           <% } %>
           <% if (typeof(field_question_votes) != "undefined" ) { %>
-            <div><%= field_question_votes.und[0].value %></div>
+            <div><%= field_question_votes %></div>
           <% } %>
             <button class="voteup">&#43;</button>
             <button class="votedown">&#45;</button>
