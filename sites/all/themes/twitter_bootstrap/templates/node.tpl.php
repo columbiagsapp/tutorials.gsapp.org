@@ -26,22 +26,6 @@
     
 
     print render($content);
-  
-
-
-    print '<pre>';
-    print_r($node);
-    print '</pre>';
-
-
-
-
-
-
-
-
-
-
 
 
 
