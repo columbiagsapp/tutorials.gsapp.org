@@ -143,8 +143,8 @@
           <% if (typeof(field_question_votes) != "undefined" ) { %>
             <div><%= field_question_votes.und[0].value %></div>
           <% } %>
-            <button id="voteup">Vote Up</button>
-            <button class="votedown">Vote Down</button>
+            <button class="voteup">&#43;</button>
+            <button class="votedown">&#45;</button>
           </li>
       </script>
 

@@ -55,7 +55,7 @@ var pathArray = window.location.pathname.split('/');
           templateSelector: '#bb_question_template',
 
           events: {
-            "click #voteup" :  "voteUp",
+            "click .voteup" :  "voteUp",
             "click .votedown" : "voteDown"
           },
 
@@ -69,12 +69,11 @@ var pathArray = window.location.pathname.split('/');
           },
 
           voteUp: function(){
-            console.log('QuestionView | voteUp()');
             this.model.vote('1');
           },
 
           voteDown: function() {
-            console.log('QuestionView | voteDown()');
+            this.model.vote('-1');
           }
 
         });
