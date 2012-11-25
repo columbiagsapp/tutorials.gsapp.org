@@ -1,9 +1,13 @@
+<?php dsm($node); ?>
+
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix tutorial"<?php print $attributes; ?>>
 
 
   <div class="mortar-bottom">
     <?php print render( field_view_field('node', $node, 'field_video_source') );?>
   </div>
+  <ul id="questions-list"></ul>
+
   <div class="brick">
     <ul class="nav nav-tabs" id="myTabs">
       <li class="active"><a href="#questions" data-toggle="tab">Q&amp;A</a></li>
@@ -14,20 +18,46 @@
     <div class="tab-content">
       <div class="tab-pane active" id="questions">
 
-        <div>
-          Hit this to save a test question <a href="#" id="add-question">add a new node</a>
+        <div id="questions-app">
+          
+        </div>
 
-          <div class="questions">
+
+      <!--
+        <div id="bb_app_template">
+          <form action="#" name="question-add-form" onSubmit="return false;">
+            <div>
+              <label for="nid">Node ID</label>
+              <input type="textfield" name="nid" id="nid" />
+              <input type="submit" value="load" />
+            </div>
+            <div id="new-question-container">
+            </div>
+          </form>
+
+        </div>
+      -->
+        <!-- /#backbone-test -->
+
+
+
+
+    <!-- 
+          Hit this to save a test question <a href="#" id="add-question">add a new node</a>
+          <div class="questions">            
             <div class="ask-a-question">
               <input type="text" class="question-title" value="title"/>
               <textarea class="question-body">Ask your question</textarea>
               <button class="btn btn-primary form-submit submit-question" name="op" value="Submit" type="submit">Submit</button>
             </div>
-          </div><!-- end questions -->
+          
+          </div>
         </div>
         
         <div class="questions">
+    -->
         <?php
+        /*
           $qa_data = unserialize($content['field_qa_data']['und'][0]['value']);
 
           foreach($qa_data as $key=>$_) {
@@ -55,37 +85,86 @@
                     '</div><!-- end answer -->';
             }
             print '</div>';//end .question
+            
           }
-          
+          */
         ?>
-        </div><!-- /.questions -->
+    <!--
+        </div>
+    --> <!-- /.questions -->
       </div><!-- /.tab-pane #questions-->
 
-      <div id="bb_app_template">
-        <form action="#" name="question-add-form" onSubmit="return false;">
-          <div>
-            <label for="nid">Node ID</label>
-            <input type="textfield" name="nid" id="nid" />
-            <input type="submit" value="load" />
-          </div>
-          <div id="new-question-container">
-          </div>
-        </form>
 
-      </div><!-- /#backbone-test -->
+  <!--
+      <div id="todoapp">
+  
+        <header>
+          <h1>Todos</h1>
+          <input id="new-todo" type="text" placeholder="What needs to be done?">
+          <button id="new-todo-submit">Submit</button>
+        </header>
 
-      <div id="question-container-el"></div>
+        <section id="todoapp-main">
+          <input id="toggle-all" type="checkbox">
+          <label for="toggle-all">Mark all as complete</label>
+          <ul id="todo-list"></ul>
+        </section>
+
+        <footer>
+          <a id="clear-completed">Clear completed</a>
+          <div id="todo-count"></div>
+        </footer>
+
+      </div>
+
+      <div id="instructions">
+        Double-click to edit a todo.
+      </div>
+
+      <div id="credits">
+        Created by
+        <br />
+        <a href="http://jgn.me/">J&eacute;r&ocirc;me Gravel-Niquet</a>.
+        <br />Rewritten by: <a href="http://addyosmani.github.com/todomvc">TodoMVC</a>.
+        <br />Adapted for Drupal + Backone by: <a href="http://drupal.org/user/77805">Setvik</a>.
+      </div>
+      
+  -->
 
 
       <script type="text/template" id="bb_question_template">
-        <% if (typeof(title) != "undefined" ) { %>
-          <h2><%= title %></h2>
-        <% } %>
-        <% if (typeof(field_description) != "undefined" ) { %>
-          <div><%= field_description.und[0].safe_value %></div>
-        <% } %>
+        <li class="question">
+          <% if (typeof(title) != "undefined" ) { %>
+            <h2><%= title %></h2>
+          <% } %>
+          <% if (typeof(field_description) != "undefined" ) { %>
+            <div><%= field_description.und[0].safe_value %></div>
+          <% } %>
+          <% if (typeof(field_question_votes) != "undefined" ) { %>
+            <div><%= field_question_votes.und[0].value %></div>
+          <% } %>
+            <button class="voteup">Vote Up</button>
+            <button class="votedown">Vote Down</button>
+          </li>
       </script>
 
+
+      <script type="text/template" id="item-template">
+        <div class="view">
+          <input class="toggle" type="checkbox" <%= node.log == 'done' ? 'checked="checked"' : '' %> />
+          <label><%= node.title %></label>
+          <a class="destroy"></a>
+        </div>
+        <input class="edit" type="text" value="<%= node.title %>" />
+      </script>
+
+
+      <script type="text/template" id="stats-template">
+        <% if (done) { %>
+          <a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
+        <% } %>
+        <div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
+      </script>
       
       
       <div class="tab-pane" id="assignments">assignments</div>
