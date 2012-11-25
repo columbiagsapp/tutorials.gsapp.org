@@ -195,6 +195,9 @@
           else if (this.getParams()) {
             options.data = this.getParams();
           }
+
+          console.log('collection view fetching with options: ');
+          console.dir(options.data);
           // Call Super fetch function with options array including any collection params.
           Backbone.Collection.prototype.fetch.call(this, options);
         }
