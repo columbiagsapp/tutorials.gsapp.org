@@ -30,11 +30,9 @@ var pathArray = window.location.pathname.split('/');
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             _(this).bindAll('vote');
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
-            
+            //needed to take out a bunch when using REST WS - last_view seems to be the culprit
             this.addNoSaveAttributes(['body', 'field_tutorials_reference_q', 'field_answers_reference',
-            'author', 'revision', 'views', 'comment', 'day_views', 'last_view' ]);
-
-
+             'views', 'day_views', 'last_view' ]);
           },
 
           vote: function(addition){
