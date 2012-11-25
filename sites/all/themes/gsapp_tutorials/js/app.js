@@ -6,48 +6,57 @@ var pathArray = window.location.pathname.split('/');
   Drupal.behaviors.app = {
     attach: function() {
 
+      /*
+        STEP 0
+        Determine the page type from the url
+        tutorial or course
+      */
       if(pathArray[1] === 'tutorial'){
 
 
         /* 
           STEP 1
           create the tutorial node Backbone object
+          this will be used to fetch the tutorial node which can then tell us which questions
+          are related (through node refs), the related assignments, etc - ie. all the things
+          we want to load dynamically through Backbone so that the user can dynamically update them
         */
         var tutorialNid = pathArray[2];//nid from URL
-        console.log('tutorialNid: '+ tutorialNid);
         var tutorial = new Drupal.Backbone.Models.Node({ nid: tutorialNid });//get this from the url eventually
 
         
         /*
           STEP 2
-          Prep the collection of questions from Drupal view questions_from_tutorial
-          which takes one argument, the tutorial nid, and returns the related questions
+          create the question node Backbone Model by extending Backbone.Model
+          which has already been extended by Drupal.Backbone.Models.Node to take care
+          of boilerplate (like setting the entity type to node, etc)
         */
-
         var Question = Drupal.Backbone.Models.Node.extend({
           
-          //need to init in order to bind vote
+          //need to init in order to bind vote to this Model as a local function
           initialize: function(opts){
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             _(this).bindAll('vote');
+
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
             //needed to take out a bunch when using REST WS - last_view seems to be the culprit
             this.addNoSaveAttributes(['body', 'field_tutorials_reference_q', 'field_answers_reference',
              'views', 'day_views', 'last_view' ]);
           },
 
+          //used when user clicks on vote (up or down) button to promote the question up or down
           vote: function(addition){
             var newVoteTotal = parseInt(this.get('field_question_votes')) + parseInt(addition);
             console.log('newVoteTotal: '+newVoteTotal);
             this.set({ 
               field_question_votes: newVoteTotal
             });
+            //sends a PUT request to the REST WS server with a payload that includes all the attributes
+            //except for those passed in an array to addNoSaveAttributes() in initialize() above
             this.save();
           }
         });
 
-
-        //var question = new Question({ nid: 189 });
 
         /*
           STEP 3
@@ -56,10 +65,11 @@ var pathArray = window.location.pathname.split('/');
           to format each question
         */
         var QuestionView = Drupal.Backbone.Views.Base.extend({
-          //el: "#questions-list",
-          //tagName: 'li',//DOESN'T SEEM TO BE WORKING
+          //the Underscore formated template in node--tutorial.tpl.php stored in a 
+          //<script> tag and identified by its id
           templateSelector: '#bb_question_template',
 
+          //bind vote up and down events to the buttons and tie these to local functions
           events: {
             "click .voteup" :  "voteUp",
             "click .votedown" : "voteDown"
@@ -68,23 +78,14 @@ var pathArray = window.location.pathname.split('/');
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
 
+            //every time the related Question model changes any values, such
+            //as on a vote, this binding will call the render method from the super/parent
+            //class Drupal.Backbone.Views.Base which extends Backbone.View
             this.model.bind('change', this.render, this);//this calls the fetch
-
-
-            //this.model.fetch({});//just re-added this 12:04pm sunday nov 25
-            
           },
-          /*
-          render: function(opts){
-            var that = this;
-            this.model.fetch({
-              success: function(){
-                console.log('fetched Question, now calling super render()');
-                Drupal.Backbone.Views.Base.prototype.render.call(that, opts);
-              }
-            })
-          },
-  */
+          
+          //vote up binding - just calls the related Question model's vote method
+          //with the appropriate value (eg. +1)
           voteUp: function(){
             this.model.vote('1');
           },
@@ -96,26 +97,28 @@ var pathArray = window.location.pathname.split('/');
         });
 
 
+        /*
+          STEP 4
+          create a collection of questions that extends the NodeIndex collection
+          that comes with the Drupal Backbone module
+        */
 
         var QuestionsCollection = new Drupal.Backbone.Collections.RestWS.NodeIndex({
-          model: Question,
-
-          fetchOrig: function(options){
-            Backbone.Collection.prototype.fetch.call(this, options);
-          }
+          model: Question
         });
 
+        //TODO: for some reason the collection is initializing with one model
+        //that is undefined, so reset it immediately to clear it out
         QuestionsCollection.reset();
 
-        console.log('***** INIT COLLECTION SIZE: '+ QuestionsCollection.length);
-        console.log(QuestionsCollection.at(0));
-
-        //can i do this?
-        //QuestionsCollection.setParam("nid", "192");
-        //QuestionsCollection.setParam("nid", "193");
-
-        
-       
+        /*
+          STEP 5
+          create the CollectionView for the QuestionsCollection which will
+          run the main fetch command, which will drive the addOne functions
+          which call the .render function of each QuestionView (they will add
+          a QuestionView for each Question in the collection, then call its render,
+          then append it to el)
+        */
 
         var QuestionsCollectionView = new Drupal.Backbone.Views.CollectionView({
           collection: QuestionsCollection,
@@ -127,65 +130,28 @@ var pathArray = window.location.pathname.split('/');
           itemParent: '.collection-list-parent'
         });
 
+
+        /* 
+          STEP 6
+          Attach the #collection-list template including <ul .collection-list-parent
+          to the el (#question-list-el)
+        */
         QuestionsCollectionView.render();
 
-
-        //var q1 = new Question({ nid: 192 });
-        //var q2 = new Question({ nid: 193 });
-
-        //QuestionsCollection.add([ q1, q2 ]);
-        //QuestionsCollection.fetchOrig();
-        //QuestionsCollection.fetchQuery({ 
-        //  field_tutorials_reference_q: ["nid": '191']
-        //});
-
-        QuestionsCollection.fetchQuery({
-   "field_tutorials_reference_q":
-      {
-         "nid":{
-            "nid":"191"
-         }
-      }
-   
-});
-      
-        //renders the #collection-list template content html into the el (#questions-list-el)
-        //QuestionsCollectionView.render();
-
-        /*
-
-        var Questions_i = [];
-
-        tutorial.fetch({
-          success: function(){
-            var question_refs = tutorial.get('field_questions_reference');
-            //populate the Questions_i array with all the question reference nids
-            for(var i = 0; i < question_refs.length; i++){
-              Questions_i[i] = new Question({ nid: question_refs[i].id });
-              //add the array of questions to the QuestionsCollection
-              QuestionsCollection.add(Questions_i[i]);//should trigger addOne, which renders
-            }
-
-
-            QuestionsCollection.fetch({
-              success: function(){
-                QuestionsCollectionView.render();
-              }
-            });
-
-            
-
-            //QuestionsCollection.fetchQuery({type:"question", nid: question_nids[i]});
-          }
-        });
-
+        /* 
+          STEP 7
+          Fetch the collection of Question nodes by sending the nid of the tutorial
         */
-
-        //grabs all the nodes in the DB with the passed parameters to filter out
-        //here, that's only type = question, but need to fill this in with
-        //the list of question refs from the tutorial nid
-        //QuestionsCollection.fetchQuery({type:"question"});
-  
+        QuestionsCollection.fetchQuery({
+          "field_tutorials_reference_q":
+            {
+              "nid":{
+                "nid":"191"
+              }
+            }
+        });
+      
+        
 
       }//end if tutorial
     }//end behavior attach
