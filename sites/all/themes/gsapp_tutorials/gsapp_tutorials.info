@@ -13,7 +13,7 @@ regions[footer]         = 'Footer'
 stylesheets[all][] = css/twitter_bootstrap.css
 stylesheets[all][] = css/tutorials.less
 
-scripts[] = js/gsapp_tutorials_app.js
+scripts[] = js/app.js
 scripts[] = bootstrap/js/bootstrap-tab.js
 scripts[] = bootstrap/js/bootstrap-affix.js
 scripts[] = js/tutorial-d7.js
