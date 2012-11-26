@@ -145,9 +145,7 @@ var pathArray = window.location.pathname.split('/');
         QuestionsCollection.fetchQuery({
           "field_tutorials_reference_q":
             {
-              "nid":{
                 "nid":"191"
-              }
             }
         });
       
