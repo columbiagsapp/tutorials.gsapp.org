@@ -145,7 +145,7 @@
         // subclass, you need to execute Drupal.Backbone.Collection.initialize
         // explicitly.
         initialize: function(opts) {
-          console.log('Collections Base init() | restEndpoint: '+ this.restEndpoint);
+          //console.log('Collections Base init() | restEndpoint: '+ this.restEndpoint);
           _.bindAll(this, 'setParam', 'setParams', 'getParams');
           this.params = {};
         },
@@ -236,7 +236,7 @@
         //             templateSelector: '#template-id'
         //           });
         initialize: function(opts) {
-          console.log('running D.Bb.Views.Base.initialize()_________');
+          //console.log('running D.Bb.Views.Base.initialize()_________');
           _.bindAll(this,
                     'getTemplate',
                     'compileTemplate',
@@ -385,8 +385,8 @@
 
 
           var content = this.executeTemplate(variables);
-          console.log('D.Bb.Views.Base.render() | content: '+ content);
-          console.log('should be attaching to this.el: '+ this.el);
+          //console.log('D.Bb.Views.Base.render() | content: '+ content);
+          //console.log('should be attaching to this.el: '+ this.el);
           $(this.el).html(content);
 
           // return ```this``` so calls can be chained.
@@ -443,9 +443,9 @@
         // TODO: set up "insert at" rendering, so new models don't have to go at the end.
         // TODO: fix issue of extended renderer property being overridden/discounted by initialize.
         addOne: function(newModel) {
-          console.log('CollectionView.addOne | this.collection.length: '+this.collection.length);
-          console.log('CollectionView.addOne | newModel: '+newModel);
-          console.dir(newModel);
+          //console.log('CollectionView.addOne | this.collection.length: '+this.collection.length);
+          //console.log('CollectionView.addOne | newModel: '+newModel);
+          //console.dir(newModel);
 
 
           var myItemView = new this.ItemView({
@@ -460,14 +460,13 @@
           // TODO: fix binding issue so we can just call render and have it use its own model
           //       (currently "this" in ItemView.render is pointing to the collection view)
 
-          console.log('Rendering with properties >>');
-          console.dir(newModel.renderAttributes());
+          //console.log('Rendering with properties >>');
+          //console.dir(newModel.renderAttributes());
 
           myItemView.render(newModel.renderAttributes());
 
-          console.log('SHOULD BE RENDERING | itemParent: '+ this.itemParent);
-          console.log('myItemView.el: '+ myItemView.el.innerHTML);
-          console.log
+          //console.log('SHOULD BE RENDERING | itemParent: '+ this.itemParent);
+          //console.log('myItemView.el: '+ myItemView.el.innerHTML);
 
           this.$(this.itemParent).append(myItemView.el);
 
@@ -478,7 +477,6 @@
 
         // Add all, for bootstrapping, etc.
         addAll: function() {
-          console.log('CollectionView.addAll() | this.collection.length: '+this.collection.length);
           this.collection.each(this.addOne);
         },
 

@@ -37,6 +37,7 @@ var pathArray = window.location.pathname.split('/');
           initialize: function(opts){
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             _(this).bindAll('vote');
+            _(this).bindAll('submit');
 
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
             //needed to take out a bunch when using REST WS - last_view seems to be the culprit
@@ -54,6 +55,20 @@ var pathArray = window.location.pathname.split('/');
             //sends a PUT request to the REST WS server with a payload that includes all the attributes
             //except for those passed in an array to addNoSaveAttributes() in initialize() above
             this.save();
+          },
+
+          //used when user clicks on vote (up or down) button to promote the question up or down
+          submit: function(addition){
+            
+            console.log('newVoteTotal: '+newVoteTotal);
+            /*
+            this.set({ 
+              field_question_votes: "0"
+            });
+            //sends a PUT request to the REST WS server with a payload that includes all the attributes
+            //except for those passed in an array to addNoSaveAttributes() in initialize() above
+            this.save();
+            */
           }
         });
 
@@ -145,9 +160,43 @@ var pathArray = window.location.pathname.split('/');
         QuestionsCollection.fetchQuery({
           "field_tutorials_reference_q":
             {
-                "nid":"191"
+                "nid":pathArray[2]
             }
         });
+
+
+        /*
+          STEP 8
+          Create an empty question for new question to be asked
+        */
+
+        $('#questionsubmit').bind('click',function(){
+          var q = new Question({
+            "title": $('#submitquestiontitle').val(),
+            "field_tutorials_reference_q":
+              {
+                  "nid":pathArray[2]
+              },
+            "field_description": "testing testing tct",
+            "type": "question"
+
+          });
+
+          //need to set this explicitly for a node create
+          //because the Drupal Backbone module doesn't know
+          //when the node is new... must be a better way!
+          q.url = "/node";
+          
+          
+          q.save();
+
+          QuestionsCollectionView.addOne(q);
+          
+
+          console.log('did it add?');
+
+        });
+        
       
         
 

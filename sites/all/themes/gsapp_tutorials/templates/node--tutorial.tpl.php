@@ -18,6 +18,16 @@
       <div class="tab-pane active" id="questions">
 
         <div id="questions-list-el"></div>
+        <div class="add-question">
+          <h4>Ask a question</h4>
+          Title:
+          <textarea id="submitquestiontitle" cols=40 rows=1></textarea>
+          Question:
+          <textarea id="submitquestionquestion" name="submitquestionquestion" cols=40 rows=4>
+            Add your question text here
+          </textarea>
+          <button id="questionsubmit">Ask</button>
+        </div>
 
 
       <!--
@@ -145,10 +155,21 @@
           </li>
       </script>
 
+      <script type="text/template" id="submit_question_template">
+        <div class="add-question">
+          <h4>Ask a question</h4>
+          <textarea name="newquestion" cols=40 rows=4>
+            Add your question text here
+          </textarea>
+          <button class="questionsubmit">Ask</button>
+        </div>
+      </script>
+
       <script type="text/template" id="collection-list">
         <div>
           <ul class="collection-list-parent"></ul>
         </div>
+        
       </script>
       
       
