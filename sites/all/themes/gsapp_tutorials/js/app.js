@@ -41,8 +41,8 @@ var pathArray = window.location.pathname.split('/');
 
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
             //needed to take out a bunch when using REST WS - last_view seems to be the culprit
-            this.addNoSaveAttributes(['body', 'field_tutorials_reference_q', 'field_answers_reference',
-             'views', 'day_views', 'last_view' ]);
+            this.addNoSaveAttributes(['body', 'field_answers_reference',
+             'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
           },
 
           //used when user clicks on vote (up or down) button to promote the question up or down
@@ -118,13 +118,24 @@ var pathArray = window.location.pathname.split('/');
           that comes with the Drupal Backbone module
         */
 
-        var QuestionsCollection = new Drupal.Backbone.Collections.RestWS.NodeIndex({
-          model: Question
+        var QuestionCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: Question,
+          comparator: function(question) {
+            console.log('comparing');
+            console.dir(question);
+            console.log(question.get("field_question_votes"));
+            console.log('--');
+            return question.get("field_question_votes");
+          }
         });
+
+        var QuestionsCollection = new QuestionCollectionPrototype();
 
         //TODO: for some reason the collection is initializing with one model
         //that is undefined, so reset it immediately to clear it out
         QuestionsCollection.reset();
+
+       
 
         /*
           STEP 5
@@ -146,6 +157,7 @@ var pathArray = window.location.pathname.split('/');
         });
 
 
+
         /* 
           STEP 6
           Attach the #collection-list template including <ul .collection-list-parent
@@ -158,10 +170,7 @@ var pathArray = window.location.pathname.split('/');
           Fetch the collection of Question nodes by sending the nid of the tutorial
         */
         QuestionsCollection.fetchQuery({
-          "field_tutorials_reference_q":
-            {
-                "nid":pathArray[2]
-            }
+          "field_parent_tutorial_nid":pathArray[2]
         });
 
 
@@ -169,15 +178,11 @@ var pathArray = window.location.pathname.split('/');
           STEP 8
           Create an empty question for new question to be asked
         */
-
         $('#questionsubmit').bind('click',function(){
           var q = new Question({
             "title": $('#submitquestiontitle').val(),
-            "field_tutorials_reference_q":
-              {
-                  "nid":pathArray[2]
-              },
-            "field_description": "testing testing tct",
+            
+            "field_description": $('#submitquestionquestion').val(),
             "type": "question"
 
           });
@@ -188,7 +193,43 @@ var pathArray = window.location.pathname.split('/');
           q.url = "/node";
           
           
-          q.save();
+          var resp = q.save({}, {
+            success: function(model, response, options){
+              //to get the id, use response.id
+              
+
+                //not sure why the BB drupal module can't handle this
+                //need to set the model's id explicitly, otherwise it
+                //triggers the isNew() function in backbone.js and it
+                //tries to create a new one in the db, and because I 
+                //over rode the url because it was originally new,
+                //I need to re-instate the url
+                //TOOD: I should fix this in the Drupal BB module
+                q.id = response.id;
+                q.url = "/node/" + response.id + ".json";
+                q.set({
+                  "field_parent_tutorial_nid":"191"
+                });
+
+                q.save();
+
+                QuestionsCollection.render();
+              
+
+            }
+          });
+          
+          
+
+          /*
+          var temp = "[nid:191]";
+
+          q.set({"field_tutorials_reference_q":
+            {
+                "nid":temp
+            }
+          });
+          */
 
           QuestionsCollectionView.addOne(q);
           

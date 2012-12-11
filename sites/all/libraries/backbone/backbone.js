@@ -394,9 +394,6 @@
       options.error = Backbone.wrapError(options.error, model, options);
       var method = this.isNew() ? 'create' : 'update';
 
-      console.log('BB method: '+method);
-      console.dir(options);
-
       var xhr = (this.sync || Backbone.sync).call(this, method, this, options);
       if (options.wait) this.set(current, silentOptions);
       return xhr;
