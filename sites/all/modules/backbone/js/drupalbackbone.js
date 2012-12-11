@@ -377,6 +377,12 @@
         // this.el or other specified el.
         // TODO: refactor model rendering into separate view class
         render: function(variables, el){
+          console.log('REDNERINGSSSSS!!!!');
+
+          console.dir(variables);
+          console.dir(el);
+
+
           variables = (typeof variables === "object") ? variables : {};
           el = (typeof el === "undefined") ? this.el : el;
           if (this.model && (variables !=={})) {
@@ -482,6 +488,8 @@
 
         // Special render method
         render: function(vars) {
+          console.log('CollectionView Base render called with vars:');
+          console.dir(vars);
           // Call parent render function, pass any vars, to render container
           Drupal.Backbone.Views.Base.prototype.render.call(this, vars);
           return this;

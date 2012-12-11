@@ -37,7 +37,6 @@ var pathArray = window.location.pathname.split('/');
           initialize: function(opts){
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             _(this).bindAll('vote');
-            _(this).bindAll('submit');
 
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
             //needed to take out a bunch when using REST WS - last_view seems to be the culprit
@@ -55,20 +54,8 @@ var pathArray = window.location.pathname.split('/');
             //sends a PUT request to the REST WS server with a payload that includes all the attributes
             //except for those passed in an array to addNoSaveAttributes() in initialize() above
             this.save();
-          },
 
-          //used when user clicks on vote (up or down) button to promote the question up or down
-          submit: function(addition){
-            
-            console.log('newVoteTotal: '+newVoteTotal);
-            /*
-            this.set({ 
-              field_question_votes: "0"
-            });
-            //sends a PUT request to the REST WS server with a payload that includes all the attributes
-            //except for those passed in an array to addNoSaveAttributes() in initialize() above
-            this.save();
-            */
+            QuestionsCollectionView.resort();
           }
         });
 
@@ -121,11 +108,7 @@ var pathArray = window.location.pathname.split('/');
         var QuestionCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Question,
           comparator: function(question) {
-            console.log('comparing');
-            console.dir(question);
-            console.log(question.get("field_question_votes"));
-            console.log('--');
-            return question.get("field_question_votes");
+            return -question.get("field_question_votes");//negative value to sort from greatest to least
           }
         });
 
@@ -146,7 +129,17 @@ var pathArray = window.location.pathname.split('/');
           then append it to el)
         */
 
-        var QuestionsCollectionView = new Drupal.Backbone.Views.CollectionView({
+        var QuestionCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
+          resort: function(opts){
+            //this.el.detach();
+            console.log('unrendering');
+            this.collection.reset();
+            console.log('post sort, about to render');
+            //this.addAll();
+          }
+        });
+
+        var QuestionsCollectionView = new QuestionCollectionViewPrototype({
           collection: QuestionsCollection,
           templateSelector: '#collection-list',
           renderer: 'underscore',
@@ -192,50 +185,31 @@ var pathArray = window.location.pathname.split('/');
           //when the node is new... must be a better way!
           q.url = "/node";
           
-          
           var resp = q.save({}, {
             success: function(model, response, options){
-              //to get the id, use response.id
-              
+              //not sure why the BB drupal module can't handle this
+              //need to set the model's id explicitly, otherwise it
+              //triggers the isNew() function in backbone.js and it
+              //tries to create a new one in the db, and because I 
+              //over rode the url because it was originally new,
+              //I need to re-instate the url
+              //TOOD: I should fix this in the Drupal BB module
+              q.id = response.id;
+              q.url = "/node/" + response.id + ".json";
+              q.set({
+                "field_parent_tutorial_nid":"191"
+              });
 
-                //not sure why the BB drupal module can't handle this
-                //need to set the model's id explicitly, otherwise it
-                //triggers the isNew() function in backbone.js and it
-                //tries to create a new one in the db, and because I 
-                //over rode the url because it was originally new,
-                //I need to re-instate the url
-                //TOOD: I should fix this in the Drupal BB module
-                q.id = response.id;
-                q.url = "/node/" + response.id + ".json";
-                q.set({
-                  "field_parent_tutorial_nid":"191"
-                });
+              q.save();
 
-                q.save();
-
-                QuestionsCollection.render();
-              
-
+              QuestionsCollection.render();
             }
           });
-          
-          
-
-          /*
-          var temp = "[nid:191]";
-
-          q.set({"field_tutorials_reference_q":
-            {
-                "nid":temp
-            }
-          });
-          */
-
+          //this can be asyncronous with the server save, meaning that
+          //it can update the display even before the server returns a 
+          //response (it doesn't have to be in the success callback)
           QuestionsCollectionView.addOne(q);
-          
-
-          console.log('did it add?');
-
+       
         });
         
       
