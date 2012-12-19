@@ -44,8 +44,30 @@
 </div><!-- /.course -->
 
 
+<script type="text/template" id="bb_lesson_template">
+  <li id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %> <% }else{ %>node-temp<% } %>" class="lesson brick standard">
+    <div class="inner">
+      <% if ( typeof(title) != "undefined" ) { %>
+        <h2>
+          <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable lesson-title"><%= title %></textarea>
+        </h2>
+      <% } %>
+      <% if (typeof(field_description) != "undefined" ) { %>
+        <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable lesson-description"><%= field_description %></textarea>
+      <% } %>
+      
+      <?php if($editable){ ?>
+        <div class="edit-lesson-buttons">
+          <button class="delete-lesson">Delete this lesson</button>
+          <button class="edit-lesson">Save Changes</button>
+        </div>
+      <?php } ?>
+    </div><!-- /.inner -->
+  </li>
+</script>
+
 <script type="text/template" id="bb_week_template">
-  <li class="week brick roman <% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %> <% }else{ %>node-temp<% } %>">
+  <li id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman">
     <div class="inner">
       <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
         <h2>
@@ -55,6 +77,8 @@
       <% if (typeof(field_description) != "undefined" ) { %>
         <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-description brick standard"><%= field_description %></textarea>
       <% } %>
+
+      <div class="lessons-list-el"></div>
       
       <?php if($editable){ ?>
         <div class="add-lesson-note brick standard"><div class="add">+</div></div>
@@ -67,8 +91,14 @@
   </li>
 </script>
 
+<script type="text/template" id="lesson-list">
+  <div>
+    <ul class="lesson-list-container"></ul>
+  </div>
+</script>
 
-<script type="text/template" id="collection-list">
+
+<script type="text/template" id="week-list">
   <div>
     <ul class="week-list-container"></ul>
   </div>
