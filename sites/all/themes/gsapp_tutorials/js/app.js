@@ -481,7 +481,7 @@ var pathArray = window.location.pathname.split('/');
           itemTag: 'li',
           itemParent: '.week-list-container'
         });
-
+ 
         /* 
           STEP 6
           Attach the #collection-list template including <ul .collection-list-parent
