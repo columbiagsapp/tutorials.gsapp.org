@@ -24,18 +24,28 @@
 </article> <!-- /.node -->
 
 <script type="text/template" id="bb_week_template">
-  <li class="week brick">
+  <li class="week brick <% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %> <% }else{ %>node-temp<% } %>">
     <div class="inner">
       <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
         <h2>
-          Week <%= field_week_number %>: <%= title %>
+          Week <textarea <?php
+            if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
+              print 'readonly ';
+            }?>class="editable week-number"><%= field_week_number %></textarea>: <textarea <?php
+            if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
+              print 'readonly ';
+            }?>class="editable week-title"><%= title %></textarea>
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <div class="week-description"><%= field_description %></div>
+        <textarea <?php
+            if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
+              print 'readonly ';
+            }?>class="editable week-description"><%= field_description %></textarea>
       <% } %>
       <button class="add-lesson-note">Add lesson or note</button>
       <button class="delete-week">Delete this week</button>
+      <?php if( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) ){ ?><button class="edit-week">Save Changes</button><?php } ?>
     </div><!-- /.inner -->
   </li>
 </script>

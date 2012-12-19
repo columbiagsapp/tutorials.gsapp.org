@@ -261,7 +261,8 @@ var pathArray = window.location.pathname.split('/');
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
             "click .add-lesson-note" :  "addLessonNote",
-            "click .delete-week" : "deleteWeek"
+            "click .edit-week" : "editWeek",
+            "click textarea": "showEditButton"
           },
 
           initialize: function(opts) {
@@ -275,8 +276,20 @@ var pathArray = window.location.pathname.split('/');
             console.log('addLessonNote() clicked');
           },
 
-          deleteWeek: function() {
-            console.log('deleteWeek() clicked');
+          editWeek: function(){
+            var this_selector = '.node-' + this.model.get('nid');
+            this.model.set({
+              "title": $(this_selector + ' .week-title').val(),
+              "field_week_number": $(this_selector + ' .week-number').val(),
+              "field_description": $(this_selector + ' .week-description').val()
+            });
+
+            this.model.save();
+          },
+
+          showEditButton: function(){
+            var this_selector = '.node-' + this.model.get('nid');
+            $(this_selector + ' button.edit-week').show();
           }
 
         });
@@ -377,7 +390,8 @@ var pathArray = window.location.pathname.split('/');
               w.id = response.id;
               w.url = "/node/" + response.id + ".json";
               w.set({
-                "field_parent_course_nid":pathArray[2]
+                "field_parent_course_nid":pathArray[2],
+                "nid":response.id
               });
 
               w.save();

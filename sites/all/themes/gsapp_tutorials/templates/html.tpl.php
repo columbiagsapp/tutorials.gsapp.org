@@ -22,12 +22,16 @@
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
   <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 </head>
-<body class="<?php print $classes; ?>" <?php print $attributes;?>>
+<body class="<?php print $classes; 
+  foreach($user->roles as $key => $value){
+    print ' '.$value;
+  }?>" <?php print $attributes;?>>
   <?php print $page_top; ?>
   <?php print $page; ?>
   <?php print $page_bottom; ?>
   <!-- Placed at the end of the document so the pages load faster -->
   <?php print $scripts; ?>
+
 
 </body>
 </html>
