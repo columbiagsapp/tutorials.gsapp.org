@@ -45,7 +45,7 @@
 
 
 <script type="text/template" id="bb_lesson_template">
-  <li id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %> <% }else{ %>node-temp<% } %>" class="lesson brick standard">
+  <li id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2>
           <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable lesson-title"><%= title %></textarea>

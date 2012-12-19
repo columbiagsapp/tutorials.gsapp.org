@@ -243,7 +243,7 @@ var pathArray = window.location.pathname.split('/');
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
             //needed to take out a bunch when using REST WS - last_view seems to be the culprit
-            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
           }
         });
         /*
@@ -345,8 +345,6 @@ var pathArray = window.location.pathname.split('/');
             //when the node is new... must be a better way!
             l.url = "/node";
 
-            
-            
             var resp = l.save({}, {
               success: function(model, response, options){
                 //not sure why the BB drupal module can't handle this
@@ -362,17 +360,9 @@ var pathArray = window.location.pathname.split('/');
                   "field_parent_week_nid":weekNID,
                   "nid":response.id
                 });
-
                 l.save();
-
-                //WeeksCollection.render();
-
-                
               }
             });
-            //this can be asyncronous with the server save, meaning that
-            //it can update the display even before the server returns a 
-            //response (it doesn't have to be in the success callback)
             LessonsCollectionView[weekNID].addOne(l);
             
 
