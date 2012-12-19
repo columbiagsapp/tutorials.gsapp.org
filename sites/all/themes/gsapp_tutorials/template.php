@@ -19,3 +19,23 @@ function gsapp_tutorials_field__field_video_source__tutorial($variables){
 
   return $output;
 }
+
+/**
+ * Process variables for user-profile.tpl.php.
+ *
+ * The $variables array contains the following arguments:
+ * - $account
+ *
+ * @see user-profile.tpl.php
+ */
+function gsapp_tutorials_preprocess_user_profile(&$variables) {
+  $account = $variables['elements']['#account'];
+  // Helpful $user_profile variable for templates.
+  foreach (element_children($variables['elements']) as $key) {
+    $variables['user_profile'][$key] = $variables['elements'][$key];
+  }
+  //Add mail to $user_profile variable
+  $variables['user_profile']['mail'] = $account->mail;
+  // Preprocess fields.
+  field_attach_preprocess('user', $account, $variables['elements'], $variables);
+}

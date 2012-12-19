@@ -439,8 +439,6 @@
         // TODO: set up "insert at" rendering, so new models don't have to go at the end.
         // TODO: fix issue of extended renderer property being overridden/discounted by initialize.
         addOne: function(newModel) {
-
-
           var myItemView = new this.ItemView({
             model: newModel,
             renderer: this.options.renderer // this is a cheat, assume same renderer for children (specifying renderer via extend isn't working)
@@ -452,12 +450,8 @@
           // TODO: refactor using model view class
           // TODO: fix binding issue so we can just call render and have it use its own model
           //       (currently "this" in ItemView.render is pointing to the collection view)
-
-
           myItemView.render(newModel.renderAttributes());
-
           this.$(this.itemParent).append(myItemView.el);
-
 
           // Bind collection remove to model view remove.
           newModel.bind('remove', myItemView.unrender);

@@ -42,12 +42,7 @@
 <div class="container-fluid">
 
   <div class="row-fluid">
-	    
-	  <section class="<?php print _twitter_bootstrap_content_span(2); ?>">  
-      <?php if ($page['highlighted']): ?>
-        <div class="highlighted hero-unit"><?php print render($page['highlighted']); ?></div>
-      <?php endif; ?>
-
+    <section class="<?php print _twitter_bootstrap_content_span(1); ?>">  
       <?php print $messages; ?>
       <?php if ($tabs): ?>
         <?php print render($tabs); ?>
@@ -60,34 +55,14 @@
       <?php if ($action_links): ?>
         <ul class="action-links"><?php print render($action_links); ?></ul>
       <?php endif; ?>
-
-      <a id="main-content"></a>
-      
-
-      <?php //print render( field_view_field('node', $node, 'field_video_source') ); ?>
-
-      <?php print render($page['content']); ?>
-
-      <?php if ($page['sidebar_first']): ?>
-        <div class="row-fluid" role="complementary">
-          <?php print render($page['sidebar_first']); ?>
-        </div>  <!-- /#sidebar-first -->
-      <?php endif; ?>
-	  </section>
-
-    <div class="span3 sidebar" role="complementary">
-      <div id="sidenav" class="span3 brick nav nav-list affix-top">
-        <?php if ($page['sidebar_second']): ?>
-          
-            <?php print render($page['sidebar_second']); ?>
-          
-        <?php endif; ?>  
-      </div>
-    </div>  <!-- /#sidebar-first -->
-    
-
+    </section>
   </div>
-</div>
+
+  <div class="row-fluid">
+    <a id="main-content"></a>      
+    <?php print render($page['content']); ?>
+  </div><!-- /.row-fluid -->
+</div><!-- /.container-fluid -->
 
 <footer class="footer">
   <div class="container-fluid">

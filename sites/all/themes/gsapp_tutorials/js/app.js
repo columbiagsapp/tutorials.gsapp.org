@@ -262,7 +262,8 @@ var pathArray = window.location.pathname.split('/');
           events: {
             "click .add-lesson-note" :  "addLessonNote",
             "click .edit-week" : "editWeek",
-            "click textarea": "showEditButton"
+            "click textarea": "showEditButton",
+            "click .delete-week": "deleteWeek"
           },
 
           initialize: function(opts) {
@@ -290,6 +291,10 @@ var pathArray = window.location.pathname.split('/');
           showEditButton: function(){
             var this_selector = '.node-' + this.model.get('nid');
             $(this_selector + ' button.edit-week').show();
+          },
+
+          deleteWeek: function(){
+            this.model.destroy();
           }
 
         });

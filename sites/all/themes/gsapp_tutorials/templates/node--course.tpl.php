@@ -1,8 +1,8 @@
 
+<div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix course"<?php print $attributes; ?>>
 
-<article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix course"<?php print $attributes; ?>>
 
-  <header class="jumbotron subhead">
+  <header class="jumbotron subhead span12">
     <div class="container header-left">
       <div class="clearfix"><?php print render($content['field_code']); ?> <?php print render($content['field_semester']); ?> <?php print render($content['field_year']); ?></div>
       <h1 class="clearfix"><?php print $title; ?></h1>
@@ -14,17 +14,30 @@
     </div><!-- /.header-right -->
   </header>
 
-  <div class="weeks">
-    <div id="weeks-list-el"></div>
-    <div id="add-week-container" class="brick"></div>
-  </div>
+
+  <div class="row-fluid">
+    <section class="span9"> 
+      <div class="weeks">
+        <div id="weeks-list-el"></div>
+        <div id="add-week-container" class="brick roman"><div class="add">+</div></div>
+      </div>
+    </section> <!-- /.node -->
 
 
-  
-</article> <!-- /.node -->
+    <section class="span3 sidebar" role="complementary">
+      <div id="sidenav" class="span3 brick nav nav-list affix-top">
+        <h2>Announcements</h2>
+      </div>
+    </section>  <!-- /.span3 -->
+
+  </div><!-- /.row-fluid -->
+
+
+</div><!-- /.course -->
+
 
 <script type="text/template" id="bb_week_template">
-  <li class="week brick <% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %> <% }else{ %>node-temp<% } %>">
+  <li class="week brick roman <% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %> <% }else{ %>node-temp<% } %>">
     <div class="inner">
       <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
         <h2>
@@ -41,9 +54,9 @@
         <textarea <?php
             if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
               print 'readonly ';
-            }?>class="editable week-description"><%= field_description %></textarea>
+            }?>class="editable week-description brick standard"><%= field_description %></textarea>
       <% } %>
-      <button class="add-lesson-note">Add lesson or note</button>
+      <div class="add-lesson-note brick standard"><div class="add">+</div></div>
       <button class="delete-week">Delete this week</button>
       <?php if( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) ){ ?><button class="edit-week">Save Changes</button><?php } ?>
     </div><!-- /.inner -->
