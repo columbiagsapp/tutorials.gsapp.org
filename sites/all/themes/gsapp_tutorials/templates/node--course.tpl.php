@@ -1,3 +1,9 @@
+<?php if(( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
+  $editable = true;
+  }else{
+    $editable = false;
+  }
+?>
 
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix course"<?php print $attributes; ?>>
 
@@ -19,7 +25,9 @@
     <section class="span9"> 
       <div class="weeks">
         <div id="weeks-list-el"></div>
-        <div id="add-week-container" class="brick roman"><div class="add">+</div></div>
+        <?php if($editable){ ?>
+          <div id="add-week-container" class="brick roman"><div class="add">+</div></div>
+        <?php } ?>
       </div>
     </section> <!-- /.node -->
 
@@ -41,20 +49,11 @@
     <div class="inner">
       <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
         <h2>
-          Week <textarea <?php
-            if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
-              print 'readonly ';
-            }?>class="editable week-number"><%= field_week_number %></textarea>: <textarea <?php
-            if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
-              print 'readonly ';
-            }?>class="editable week-title"><%= title %></textarea>
+          Week <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-number"><%= field_week_number %></textarea>: <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-title"><%= title %></textarea>
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea <?php
-            if(!( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
-              print 'readonly ';
-            }?>class="editable week-description brick standard"><%= field_description %></textarea>
+        <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-description brick standard"><%= field_description %></textarea>
       <% } %>
       <div class="add-lesson-note brick standard"><div class="add">+</div></div>
       <button class="delete-week">Delete this week</button>
