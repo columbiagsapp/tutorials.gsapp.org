@@ -58,8 +58,10 @@
       
       <?php if($editable){ ?>
         <div class="add-lesson-note brick standard"><div class="add">+</div></div>
-        <button class="delete-week">Delete this week</button>
-        <button class="edit-week">Save Changes</button>
+        <div class="edit-week-buttons">
+          <button class="delete-week">Delete this week</button>
+          <button class="edit-week">Save Changes</button>
+        </div>
       <?php } ?>
     </div><!-- /.inner -->
   </li>
