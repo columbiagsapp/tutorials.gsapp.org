@@ -277,6 +277,8 @@ var pathArray = window.location.pathname.split('/');
           events: {
             "click .edit-lesson" : "editLesson",
             "click textarea": "showEditButton",
+            "keyup textarea": "showEditButton",
+            "paste textarea": "showEditButton",
             "click .delete-lesson": "deleteLesson"
           },
 
@@ -322,6 +324,8 @@ var pathArray = window.location.pathname.split('/');
             "click .add-lesson" :  "addLesson",
             "click .edit-week" : "editWeek",
             "click textarea": "showEditButton",
+            "keyup textarea": "showEditButton",
+            "paste textarea": "showEditButton",
             "click .delete-week": "deleteWeek"
           },
 
@@ -370,9 +374,17 @@ var pathArray = window.location.pathname.split('/');
 
           editWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
+            var weekNumber = $(this_selector + ' .week-number').val();
+            //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
+            if( weekNumber.length == 1){
+              weekNumber = '0' + weekNumber;
+            }else if(weekNumber.length > 2){
+              weekNumber = weekNumber.substr(0,2);
+            }
+
             this.model.set({
               "title": $(this_selector + ' .week-title').val(),
-              "field_week_number": $(this_selector + ' .week-number').val(),
+              "field_week_number": weekNumber,
               "field_description": $(this_selector + ' .week-description').val()
             });
 
@@ -532,7 +544,7 @@ var pathArray = window.location.pathname.split('/');
           var w = new Week({
             "title": "Optional title",
             "field_description": "Optional description",
-            "field_week_number": "#",
+            "field_week_number": "##",
             "type": "week"
           });
 
