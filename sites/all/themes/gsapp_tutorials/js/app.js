@@ -319,7 +319,7 @@ var pathArray = window.location.pathname.split('/');
 
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
-            "click .add-lesson-note" :  "addLesson",
+            "click .add-lesson" :  "addLesson",
             "click .edit-week" : "editWeek",
             "click textarea": "showEditButton",
             "click .delete-week": "deleteWeek"
@@ -327,15 +327,54 @@ var pathArray = window.location.pathname.split('/');
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-
-
-
             this.model.bind('change', this.render, this);//this calls the fetch 
           },
           
           //vote up binding - just calls the related Question model's vote method
           //with the appropriate value (eg. +1)
           addLesson: function(){
+            var weekNID = this.model.get('nid');
+            var l = new Lesson({
+              "title": "Lesson title",
+              "field_description": "Optional description",
+              "type": "lesson"
+            });
+
+            //need to set this explicitly for a node create
+            //because the Drupal Backbone module doesn't know
+            //when the node is new... must be a better way!
+            l.url = "/node";
+
+            
+            
+            var resp = l.save({}, {
+              success: function(model, response, options){
+                //not sure why the BB drupal module can't handle this
+                //need to set the model's id explicitly, otherwise it
+                //triggers the isNew() function in backbone.js and it
+                //tries to create a new one in the db, and because I 
+                //over rode the url because it was originally new,
+                //I need to re-instate the url
+                //TOOD: I should fix this in the Drupal BB module
+                l.id = response.id;
+                l.url = "/node/" + response.id + ".json";
+                l.set({
+                  "field_parent_week_nid":weekNID,
+                  "nid":response.id
+                });
+
+                l.save();
+
+                //WeeksCollection.render();
+
+                
+              }
+            });
+            //this can be asyncronous with the server save, meaning that
+            //it can update the display even before the server returns a 
+            //response (it doesn't have to be in the success callback)
+            LessonsCollectionView[weekNID].addOne(l);
+            
 
           },
 
@@ -500,10 +539,6 @@ var pathArray = window.location.pathname.split('/');
           Create an empty question for new question to be asked
         */
         $('#add-week-container').bind('click',function(){
-
-
-
-
           var w = new Week({
             "title": "Optional title",
             "field_description": "Optional description",

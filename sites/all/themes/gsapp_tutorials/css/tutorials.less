@@ -236,7 +236,7 @@ iframe {
 }
 
 .course #add-week-container:hover,
-.course .add-lesson-note:hover{
+.course .add-lesson:hover{
   cursor:pointer;
   background-color:@editableBGColorHover;
   color:@inverseColor;
@@ -273,8 +273,16 @@ textarea.editable{
   
 }
 
-textarea.editable.week-number{
+textarea.week-number{
   max-width:40px;
+}
+
+textarea.week-title{
+  width:50%;
+}
+
+.course .lesson textarea{
+  width:100%;
 }
 
 .course button.edit-week{
@@ -284,9 +292,19 @@ textarea.editable.week-number{
 .course .edit-week-buttons,
 .course .edit-lesson-buttons{
   position:absolute;
-  top:20px;
   right:20px;
 }
+
+.course .edit-week-buttons{
+  top:20px;
+}
+
+.course .edit-lesson-buttons{
+  bottom:20px;
+  width:100%;
+  margin-top:5px;
+}
+
 .course .edit-week-buttons button,
 .course .edit-lesson-buttons button{
   float:right;
@@ -301,11 +319,11 @@ textarea.editable.week-number{
 .course #add-week-container .add{
   margin:55px auto 0;
 }
-.course .add-lesson-note .add{
+.course .add-lesson .add{
   margin:110px auto 0;
 }
 
-.course .add-lesson-note{
+.course .add-lesson{
   background-color:@editableBGColor;
 }
 

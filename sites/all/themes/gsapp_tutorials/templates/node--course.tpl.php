@@ -34,7 +34,7 @@
 
     <section class="span3 sidebar" role="complementary">
       <div id="sidenav" class="span3 brick nav nav-list affix-top">
-        <h2>Announcements</h2>
+        <h2>Updates</h2>
       </div>
     </section>  <!-- /.span3 -->
 
@@ -57,7 +57,7 @@
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons">
-          <button class="delete-lesson">Delete this lesson</button>
+          <button class="delete-lesson">Delete</button>
           <button class="edit-lesson">Save Changes</button>
         </div>
       <?php } ?>
@@ -79,7 +79,7 @@
       <div class="lessons-list-el"></div>
       
       <?php if($editable){ ?>
-        <div class="add-lesson-note brick standard"><div class="add">+</div></div>
+        <div class="add-lesson brick standard"><div class="add">+</div></div>
         <div class="edit-week-buttons">
           <button class="delete-week">Delete this week</button>
           <button class="edit-week">Save Changes</button>
