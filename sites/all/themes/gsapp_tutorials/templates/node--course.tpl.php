@@ -55,9 +55,12 @@
       <% if (typeof(field_description) != "undefined" ) { %>
         <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-description brick standard"><%= field_description %></textarea>
       <% } %>
-      <div class="add-lesson-note brick standard"><div class="add">+</div></div>
-      <button class="delete-week">Delete this week</button>
-      <?php if( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) ){ ?><button class="edit-week">Save Changes</button><?php } ?>
+      
+      <?php if($editable){ ?>
+        <div class="add-lesson-note brick standard"><div class="add">+</div></div>
+        <button class="delete-week">Delete this week</button>
+        <button class="edit-week">Save Changes</button>
+      <?php } ?>
     </div><!-- /.inner -->
   </li>
 </script>

@@ -1,5 +1,7 @@
 
 @color: black;
+@editableBGColor: #efefef;
+@editableBGColorHover: gray;
 @borderwidth: 5px;
 @verticalpadding: 20px;
 @horizontalpadding: 0;
@@ -8,6 +10,8 @@
 @standardBrickPadding: 20px;
 @standardBrickMargin: 20px;
 @phoneBrickPadding: 10px;
+
+
 .hidden{
   display:none;
 }
@@ -220,14 +224,18 @@ iframe {
   padding:0;
 }
 
+.course #add-week-container,
+.course .add-lesson-note{
+  background-color:@editableBGColor;
+}
 .course #add-week-container{
-  background-color:#efefef;
   height:150px;
 }
 
-.course #add-week-container:hover{
+.course #add-week-container:hover,
+.course .add-lesson-note:hover{
   cursor:pointer;
-  background-color:gray;
+  background-color:@@editableBGColorHover;
 }
 
 textarea.editable{
@@ -257,7 +265,7 @@ textarea.editable{
 
 .administrator textarea.editable,
 .faculty textarea.editable{
-  background-color: #efefef;
+  background-color: @editableBGColor;
   
 }
 
@@ -275,20 +283,19 @@ textarea.editable.week-number{
   right:20px;
 }
 
-.course #add-week-container .add{
+.course .add{
   font-size:80px;
   text-align:center;
+}
+
+.course #add-week-container .add{
   margin:55px auto 0;
 }
-
-.course a#add-week-container{
-  color:@color;
+.course .add-lesson-note .add{
+  margin:110px auto 0;
 }
 
-.course a#add-week-container:hover {
-  text-decoration: none;
+.course .add-lesson-note{
+  background-color:@editableBGColor;
 }
 
-.course .add-lesson-note:hover{
-  cursor:pointer;
-}
