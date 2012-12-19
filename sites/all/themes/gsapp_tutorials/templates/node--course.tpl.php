@@ -16,6 +16,7 @@
 
   <div class="weeks">
     <div id="weeks-list-el"></div>
+    <div id="add-week-container" class="brick"></div>
   </div>
 
 

@@ -199,7 +199,7 @@ var pathArray = window.location.pathname.split('/');
               q.id = response.id;
               q.url = "/node/" + response.id + ".json";
               q.set({
-                "field_parent_tutorial_nid":"191"
+                "field_parent_tutorial_nid":pathArray[2]
               });
 
               q.save();
@@ -342,6 +342,54 @@ var pathArray = window.location.pathname.split('/');
         */
         WeeksCollection.fetchQuery({
           "field_parent_course_nid":pathArray[2]
+        });
+
+        /*
+          STEP 8
+          Create an empty question for new question to be asked
+        */
+        $('#add-week-container').bind('click',function(){
+
+
+
+
+          var w = new Week({
+            "title": "Optional title",
+            "field_description": "Optional description",
+            "field_week_number": "#",
+            "type": "week"
+          });
+
+          //need to set this explicitly for a node create
+          //because the Drupal Backbone module doesn't know
+          //when the node is new... must be a better way!
+          w.url = "/node";
+          
+          var resp = w.save({}, {
+            success: function(model, response, options){
+              //not sure why the BB drupal module can't handle this
+              //need to set the model's id explicitly, otherwise it
+              //triggers the isNew() function in backbone.js and it
+              //tries to create a new one in the db, and because I 
+              //over rode the url because it was originally new,
+              //I need to re-instate the url
+              //TOOD: I should fix this in the Drupal BB module
+              w.id = response.id;
+              w.url = "/node/" + response.id + ".json";
+              w.set({
+                "field_parent_course_nid":pathArray[2]
+              });
+
+              w.save();
+
+              //WeeksCollection.render();
+            }
+          });
+          //this can be asyncronous with the server save, meaning that
+          //it can update the display even before the server returns a 
+          //response (it doesn't have to be in the success callback)
+          WeeksCollectionView.addOne(w);
+       
         });
 
       }//end if course
