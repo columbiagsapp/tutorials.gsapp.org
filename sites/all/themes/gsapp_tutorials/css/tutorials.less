@@ -2,6 +2,7 @@
 @color: black;
 @borderwidth: 5px;
 @verticalpadding: 20px;
+@horizontalpadding: 0;
 .hidden{
   display:none;
 }
@@ -18,14 +19,14 @@
     border:5px solid black;
   }
   .jumbotron h1 {
-    font-size: 50px;
+    font-size: 30px;
   }
 }
 
 /* Landscape tablet or larger */
 @media (min-width: 768px) {
   .jumbotron h1 {
-    font-size: 80px;
+    font-size: 50px;
   }
 }
 
@@ -54,9 +55,17 @@
 
 .brick{
   min-height: 20px;
-  padding: 19px;
+  width:100%;
   margin-bottom: @verticalpadding;
   border: @borderwidth solid @color;
+  display:block;
+  clear:both;
+  float:left;
+  list-style: none;
+}
+
+.brick .inner{
+  margin:20px;
 }
 
 .mortar-bottom{
@@ -108,7 +117,7 @@ iframe {
   position: relative;
   margin:40px 0;/*height of fixed menu */
   padding: 40px 20px;
-  text-align: center;
+  text-align: left;
 }
 
 .jumbotron h1 {
@@ -125,9 +134,46 @@ iframe {
 
 /* Link styles (used on .masthead-links as well) */
 .jumbotron a {
-  color: #efefef;
+  color: gray;
   border-bottom:1px dotted;
 }
 .jumbotron a:hover {
   border:none !important;
+}
+
+
+/* COURSE */
+.course .jumbotron .header-left .field{
+  float:left;
+  margin-right:5px;
+}
+
+.course .header-left .profile .profile-picture .field-label{
+  display:none;
+}
+
+.course .header-left .field-name-field-instructors .field-items .field-item{
+  float:left;
+  margin-right:1em;
+}
+
+.course .header-left{
+  float:left;
+  width:90%;
+  margin:0;
+}
+.course .header-right{
+  float:right;
+  width:10%;
+  margin:0;
+}
+
+.course .weeks{
+  width:100%;
+  margin:@verticalpadding @horizontalpadding;
+}
+
+.course .week-list-container{
+  margin:0;
+  padding:0;
 }

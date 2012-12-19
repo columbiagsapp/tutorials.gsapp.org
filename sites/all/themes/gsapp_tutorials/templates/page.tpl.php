@@ -39,15 +39,6 @@
   </div>
 </nav>
 
-
-<header class="jumbotron subhead">
-  <div class="container">
-    <?php print render($title_prefix); ?>
-    <h1><?php print $title; ?></h1>
-    <?php print render($title_suffix); ?>
-  </div>
-</header>
-
 <div class="container-fluid">
 
   <div class="row-fluid">

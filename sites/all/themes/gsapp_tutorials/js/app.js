@@ -218,6 +218,133 @@ var pathArray = window.location.pathname.split('/');
         
 
       }//end if tutorial
+
+      if(pathArray[1] === 'course'){
+        console.log('its a course with nid: '+ pathArray[2]);
+        /* 
+          STEP 1
+          create the tutorial node Backbone object
+          this will be used to fetch the tutorial node which can then tell us which questions
+          are related (through node refs), the related assignments, etc - ie. all the things
+          we want to load dynamically through Backbone so that the user can dynamically update them
+        */
+        var courseNid = pathArray[2];//nid from URL
+        var course = new Drupal.Backbone.Models.Node({ nid: courseNid });//get this from the url eventually
+
+        /*
+          STEP 2
+          create the question node Backbone Model by extending Backbone.Model
+          which has already been extended by Drupal.Backbone.Models.Node to take care
+          of boilerplate (like setting the entity type to node, etc)
+        */
+        var Week = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+
+            //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+            //needed to take out a bunch when using REST WS - last_view seems to be the culprit
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
+          }
+        });
+
+        /*
+          STEP 3
+          Create a view for each Question
+          Uses the bb_question_template from the node--tutorial.tpl.php file
+          to format each question
+        */
+        var WeekView = Drupal.Backbone.Views.Base.extend({
+          //the Underscore formated template in node--tutorial.tpl.php stored in a 
+          //<script> tag and identified by its id
+          templateSelector: '#bb_week_template',
+
+          //bind vote up and down events to the buttons and tie these to local functions
+          events: {
+            "click .add-lesson-note" :  "addLessonNote",
+            "click .delete-week" : "deleteWeek"
+          },
+
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            this.model.bind('change', this.render, this);//this calls the fetch
+          },
+          
+          //vote up binding - just calls the related Question model's vote method
+          //with the appropriate value (eg. +1)
+          addLessonNote: function(){
+            console.log('addLessonNote() clicked');
+          },
+
+          deleteWeek: function() {
+            console.log('deleteWeek() clicked');
+          }
+
+        });
+
+        /*
+          STEP 4
+          create a collection of questions that extends the NodeIndex collection
+          that comes with the Drupal Backbone module
+        */
+
+        var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: Week,
+          comparator: function(question) {
+            return question.get("field_week_number");//negative value to sort from greatest to least
+          }
+        });
+
+        var WeeksCollection = new WeekCollectionPrototype();
+
+        //TODO: for some reason the collection is initializing with one model
+        //that is undefined, so reset it immediately to clear it out
+        WeeksCollection.reset();
+
+        /*
+          STEP 5
+          create the CollectionView for the QuestionsCollection which will
+          run the main fetch command, which will drive the addOne functions
+          which call the .render function of each QuestionView (they will add
+          a QuestionView for each Question in the collection, then call its render,
+          then append it to el)
+        */
+
+        var WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
+          resort: function(opts){
+            //this.el.detach();
+            console.log('unrendering');
+            this.collection.reset();
+            console.log('post sort, about to render');
+            //this.addAll();
+          }
+        });
+
+        var WeeksCollectionView = new WeekCollectionViewPrototype({
+          collection: WeeksCollection,
+          templateSelector: '#collection-list',
+          renderer: 'underscore',
+          el: '#weeks-list-el',
+          ItemView: WeekView,
+          itemTag: 'li',
+          itemParent: '.week-list-container'
+        });
+
+        /* 
+          STEP 6
+          Attach the #collection-list template including <ul .collection-list-parent
+          to the el (#question-list-el)
+        */
+        WeeksCollectionView.render();
+
+        /* 
+          STEP 7
+          Fetch the collection of Question nodes by sending the nid of the tutorial
+        */
+        WeeksCollection.fetchQuery({
+          "field_parent_course_nid":pathArray[2]
+        });
+
+      }//end if course
     }//end behavior attach
   }//end behavior
 })(jQuery);
