@@ -17,8 +17,8 @@ stylesheets[all][] = css/twitter_bootstrap.css
 stylesheets[all][] = css/tutorials.less
 
 scripts[] = bootstrap/js/bootstrap.js
-scripts[] = js/api.js
-scripts[] = js/tutorial-d7.js
+;scripts[] = js/api.js
+;scripts[] = js/tutorial-d7.js
 
 settings[toggle_name] = 0
 settings[toggle_search] = 1

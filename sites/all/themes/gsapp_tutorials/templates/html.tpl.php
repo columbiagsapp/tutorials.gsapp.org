@@ -28,5 +28,7 @@
   <?php print $page_bottom; ?>
   <!-- Placed at the end of the document so the pages load faster -->
   <?php print $scripts; ?>
+  <script data-main="/sites/all/themes/gsapp_tutorials/js/app" src="/sites/all/themes/gsapp_tutorials/js/require.js"></script>
+
 </body>
 </html>

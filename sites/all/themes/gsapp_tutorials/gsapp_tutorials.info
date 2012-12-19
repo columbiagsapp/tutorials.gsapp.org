@@ -16,7 +16,7 @@ stylesheets[all][] = css/tutorials.less
 scripts[] = js/app.js
 scripts[] = bootstrap/js/bootstrap-tab.js
 scripts[] = bootstrap/js/bootstrap-affix.js
-scripts[] = js/tutorial-d7.js
+;scripts[] = js/tutorial-d7.js
 
 settings[toggle_name] = 0
 settings[toggle_search] = 1
