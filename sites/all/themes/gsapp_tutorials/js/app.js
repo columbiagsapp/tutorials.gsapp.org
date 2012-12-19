@@ -260,7 +260,7 @@ var pathArray = window.location.pathname.split('/');
 
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
-            "click .add-lesson-note" :  "addLessonNote",
+            "click .add-lesson-note" :  "addLesson",
             "click .edit-week" : "editWeek",
             "click textarea": "showEditButton",
             "click .delete-week": "deleteWeek"
@@ -268,13 +268,13 @@ var pathArray = window.location.pathname.split('/');
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            this.model.bind('change', this.render, this);//this calls the fetch
+            this.model.bind('change', this.render, this);//this calls the fetch 
           },
           
           //vote up binding - just calls the related Question model's vote method
           //with the appropriate value (eg. +1)
-          addLessonNote: function(){
-            console.log('addLessonNote() clicked');
+          addLesson: function(){
+
           },
 
           editWeek: function(){
