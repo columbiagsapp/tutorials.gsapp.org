@@ -47,15 +47,17 @@ var pathArray = window.location.pathname.split('/');
           //used when user clicks on vote (up or down) button to promote the question up or down
           vote: function(addition){
             var newVoteTotal = parseInt(this.get('field_question_votes')) + parseInt(addition);
-            console.log('newVoteTotal: '+newVoteTotal);
-            this.set({ 
-              field_question_votes: newVoteTotal
-            });
-            //sends a PUT request to the REST WS server with a payload that includes all the attributes
-            //except for those passed in an array to addNoSaveAttributes() in initialize() above
-            this.save();
 
-            QuestionsCollectionView.resort();
+            if(newVoteTotal >= 0){ //don't let the total go below zero
+              this.set({ 
+                field_question_votes: newVoteTotal
+              });
+              //sends a PUT request to the REST WS server with a payload that includes all the attributes
+              //except for those passed in an array to addNoSaveAttributes() in initialize() above
+              this.save();
+
+              QuestionsCollectionView.resort();
+            }
           }
         });
 
@@ -174,7 +176,7 @@ var pathArray = window.location.pathname.split('/');
         $('#questionsubmit').bind('click',function(){
           var q = new Question({
             "title": $('#submitquestiontitle').val(),
-            
+            "field_question_votes":"0",
             "field_description": $('#submitquestionquestion').val(),
             "type": "question"
 

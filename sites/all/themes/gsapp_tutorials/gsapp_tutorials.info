@@ -13,6 +13,11 @@ regions[footer]         = 'Footer'
 stylesheets[all][] = css/twitter_bootstrap.css
 stylesheets[all][] = css/tutorials.less
 
+scripts[] = js/underscore-min.js
+scripts[] = js/backbone.js
+scripts[] = js/drupalbackbone.js
+scripts[] = js/drupalbackbone-restws.js
+
 scripts[] = js/app.js
 scripts[] = bootstrap/js/bootstrap-tab.js
 scripts[] = bootstrap/js/bootstrap-affix.js
