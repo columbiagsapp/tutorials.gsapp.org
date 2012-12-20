@@ -359,7 +359,7 @@ iframe {
   .float-left;
 }
 
-textarea.editable{
+textarea{
   background-color: transparent;
   border: none;
   -webkit-box-shadow: none;
@@ -384,10 +384,10 @@ textarea.editable{
   resize:none;
 }
 
-.administrator textarea.editable,
-.faculty textarea.editable{
+.administrator .edit-mode textarea,
+.faculty .edit-mode textarea{
   background-color: @editableBGColor;
-  border: @editableBorder;
+  border-bottom: @editableBorder;
 }
 
 textarea.week-number{

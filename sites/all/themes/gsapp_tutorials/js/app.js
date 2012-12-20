@@ -291,6 +291,7 @@ var pathArray = window.location.pathname.split('/');
               $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
               $('.button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
               $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').hide();
+              $(this_selector).addClass('edit-mode');
             }else{
               console.log('editLesson-save');
               this.model.set({
@@ -316,6 +317,7 @@ var pathArray = window.location.pathname.split('/');
             $('.button', this_selector).css('backgroundColor', '').css('color','');
             $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            $('.edit-mode').removeClass('edit-mode');
             
             //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
             $('textarea.lesson-title', this_selector).val( this.model.get('title') );
@@ -396,6 +398,7 @@ var pathArray = window.location.pathname.split('/');
               $('.edit-week-buttons .button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
               $('.lesson .edit-lesson-buttons', this_selector).hide();
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+              $(this_selector).addClass('edit-mode');
             }else{
               console.log('editWeek-save');
               var weekNumber = $(this_selector + ' .week-number').val();
@@ -431,6 +434,7 @@ var pathArray = window.location.pathname.split('/');
             $('.lesson .edit-lesson-buttons', this_selector).show();
             $('.add-lesson-note-wrapper', this_selector).show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            $('.edit-mode').removeClass('edit-mode');
             
             //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
             $('textarea.week-title', this_selector).val( this.model.get('title') );
@@ -463,6 +467,7 @@ var pathArray = window.location.pathname.split('/');
               $('.button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
               $('#add-update-container').hide();
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+              $(this_selector).addClass('edit-mode');
             }else{
               console.log('editUpdate-save');
               this.model.set({
@@ -488,6 +493,7 @@ var pathArray = window.location.pathname.split('/');
             $('.button', this_selector).css('backgroundColor', '').css('color','');
             $('#add-update-container').show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            $('.edit-mode').removeClass('edit-mode');
             
             //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
             $('textarea.update-title', this_selector).val( this.model.get('title') );
