@@ -282,6 +282,7 @@ var pathArray = window.location.pathname.split('/');
           },
 
           editLesson: function(){
+            console.log('editLesson');
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
@@ -291,6 +292,7 @@ var pathArray = window.location.pathname.split('/');
               $('.button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
               $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').hide();
             }else{
+              console.log('editLesson-save');
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
                 "field_description": $(this_selector + ' .lesson-description').val()
@@ -306,6 +308,7 @@ var pathArray = window.location.pathname.split('/');
           },
 
           cancelEdit: function(){
+            console.log('cancelEdit lesson');
             var this_selector = '#node-' + this.model.get('nid');
             $('.edit', this_selector).text('Edit');
             $('.delete, .cancel', this_selector).hide();
@@ -336,7 +339,11 @@ var pathArray = window.location.pathname.split('/');
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            this.model.bind('change', this.render, this);//this calls the fetch 
+            //TODO TCT2003 THURS DEC 20, 2012: this shouldn't be commented out, but 
+            //I had to because adding {silent: true} as an option to the set method in 
+            //the editWeek function (during a save) was triggering a change event
+            //which called a fetch and then deleted all the lessons from the week
+            //this.model.bind('change', this.render, this);//this calls the fetch 
           },
           
           //vote up binding - just calls the related Question model's vote method
@@ -379,8 +386,8 @@ var pathArray = window.location.pathname.split('/');
 
           editWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
-
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
+              console.log('editWeek-edit');
               $('.edit-week-buttons .edit', this_selector).text('Save');
               $('.edit-week-buttons .delete', this_selector).show();
               $('.edit-week-buttons .cancel', this_selector).show();
@@ -390,6 +397,7 @@ var pathArray = window.location.pathname.split('/');
               $('.lesson .edit-lesson-buttons', this_selector).hide();
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
             }else{
+              console.log('editWeek-save');
               var weekNumber = $(this_selector + ' .week-number').val();
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
@@ -397,15 +405,14 @@ var pathArray = window.location.pathname.split('/');
               }else if(weekNumber.length > 2){
                 weekNumber = weekNumber.substr(0,2);
               }
-
+              
               this.model.set({
                 "title": $(this_selector + ' .week-title').val(),
                 "field_week_number": weekNumber,
                 "field_description": $(this_selector + ' .week-description').val()
-              });
+              });//TODO TCT2003 should have {silent: true}, see TODO DEC 20 in initialize
 
               this.model.save();
-
               this.cancelEdit();
             }
           },
@@ -424,8 +431,11 @@ var pathArray = window.location.pathname.split('/');
             $('.lesson .edit-lesson-buttons', this_selector).show();
             $('.add-lesson-note-wrapper', this_selector).show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-            //TODO TCT2003 THURS DEC 20, 2012 need to figure out how to revert to original textarea text if no change
-            //should i use fetch? get?
+            
+            //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
+            $('textarea.week-title', this_selector).val( this.model.get('title') );
+            $('textarea.week-number', this_selector).val( this.model.get('field_week_number') );
+            $('textarea.week-description', this_selector).val( this.model.get('field_description') );
           }
 
         });
@@ -444,6 +454,7 @@ var pathArray = window.location.pathname.split('/');
           },
 
           editUpdate: function(){
+            console.log('editUpdate');
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
               $('.edit', this_selector).text('Save');
@@ -453,6 +464,7 @@ var pathArray = window.location.pathname.split('/');
               $('#add-update-container').hide();
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
             }else{
+              console.log('editUpdate-save');
               this.model.set({
                 "title": $(this_selector + ' .update-title').val(),
                 "field_description": $(this_selector + ' .update-description').val()
@@ -476,8 +488,10 @@ var pathArray = window.location.pathname.split('/');
             $('.button', this_selector).css('backgroundColor', '').css('color','');
             $('#add-update-container').show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-            //TODO TCT2003 THURS DEC 20, 2012 need to figure out how to revert to original textarea text if no change
-            //should i use fetch? get?
+            
+            //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
+            $('textarea.update-title', this_selector).val( this.model.get('title') );
+            $('textarea.update-description', this_selector).val( this.model.get('field_description') );
           }
 
         });
