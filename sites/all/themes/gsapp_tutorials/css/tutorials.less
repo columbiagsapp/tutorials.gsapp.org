@@ -25,9 +25,10 @@
 @buttonTextColor: whitesmoke;
 @buttonBGColorHover:black;
 @inverseButtonTextColor:whitesmoke;
-@buttonTextSize: 20px;
+@buttonTextSize: 16px;
 @buttonTextWeight: 500;
 @buttonWidth: auto;
+@buttonMargin: 10px 0 0 10px;
 
 @lessonNoteButtonWidth: 80%;
 
@@ -189,7 +190,7 @@
   background-color: whiteSmoke;
 }
 
-#sidenav{
+#updates{
   width:100%;
 }
 
@@ -290,6 +291,14 @@ iframe {
   font-weight: @buttonTextWeight;
 }
 
+.button{
+  background-color: @buttonBGColor;
+  padding: @buttonPadding;
+  color: @buttonTextColor;
+  width:@buttonWidth;
+  font-weight: @buttonTextWeight;
+}
+
 .course #add-update-container{
   float:right;
 }
@@ -303,10 +312,9 @@ iframe {
   text-align: center;
   margin:@verticalpadding auto 0;
   width:@lessonNoteButtonWidth;
-
 }
 
-.course .add{
+.button{
   font-size: @buttonTextSize;
   text-align:center;
 }
@@ -316,6 +324,12 @@ iframe {
 .course .add-lesson-container:hover,
 .course .add-note-container:hover,
 .course #add-update-container:hover{
+  cursor:pointer;
+  background-color:@buttonBGColorHover;
+  color:@inverseButtonTextColor;
+}
+
+.button:hover{
   cursor:pointer;
   background-color:@buttonBGColorHover;
   color:@inverseButtonTextColor;
@@ -342,6 +356,7 @@ iframe {
 
 .course #updates-list-el{
   margin-top:20px;
+  .float-left;
 }
 
 textarea.editable{
@@ -393,11 +408,6 @@ textarea.week-title{
   height:auto;
 }
 
-.course button.edit-week,
-.course button.edit-lesson{
-  
-}
-
 .course .edit-week-buttons,
 .course .edit-lesson-buttons{
   position:absolute;
@@ -418,11 +428,11 @@ textarea.week-title{
   margin:20px;
 }
 
-.course .edit-week-buttons button,
-.course .edit-lesson-buttons button,
-.course .edit-update-buttons button{
+.course .edit-week-buttons .button,
+.course .edit-lesson-buttons .button,
+.course .edit-update-buttons .button{
   float:right;
-  margin-left:10px;
+  margin:@buttonMargin;
 }
 
 .course .delete,

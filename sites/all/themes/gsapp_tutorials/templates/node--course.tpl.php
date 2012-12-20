@@ -26,17 +26,17 @@
       <div class="weeks">
         <div id="weeks-list-el"></div>
         <?php if($editable){ ?>
-          <div id="add-week-container" class="brick roman"><div class="add">+ Week</div></div>
+          <div id="add-week-container" class="button">+ Week</div>
         <?php } ?>
       </div>
     </section> <!-- /.node -->
 
 
     <section class="span3 sidebar" role="complementary">
-      <div id="sidenav" class="span3 brick nav nav-list affix-top">
+      <div id="updates" class="span3 brick nav nav-list affix-top">
         <h2 class="title float-left">Updates</h2>
         <?php if($editable){ ?>
-          <div id="add-update-container" class="brick roman"><div class="add">+</div></div>
+          <div id="add-update-container" class="button">+</div>
         <?php } ?>
         <div id="updates-list-el" class="el"></div>
       </div>
@@ -52,18 +52,18 @@
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">
-          <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable lesson-title"><%= title %></textarea>
+          <textarea readonly class="editable lesson-title"><%= title %></textarea>
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable lesson-description"><%= field_description %></textarea>
+        <textarea readonly class="editable lesson-description"><%= field_description %></textarea>
       <% } %>
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons">
-          <button class="cancel-lesson">Cancel</button>
-          <button class="edit-lesson">Edit</button>
-          <button class="delete-lesson">Delete</button>
+          <div class="edit button">Edit</div>
+          <div class="cancel button">Cancel</div>
+          <div class="delete button">Delete</div>
         </div>
       <?php } ?>
   </div>
@@ -73,11 +73,11 @@
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman">
     <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
       <h2 class="title">
-        Week <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-number"><%= field_week_number %></textarea>: <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-title"><%= title %></textarea>
+        Week <textarea readonly class="editable week-number"><%= field_week_number %></textarea>: <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-title"><%= title %></textarea>
       </h2>
     <% } %>
     <% if (typeof(field_description) != "undefined" ) { %>
-      <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-description brick standard"><%= field_description %></textarea>
+      <textarea readonly class="editable week-description brick standard"><%= field_description %></textarea>
     <% } %>
 
     <div class="lessons-list-el"></div>
@@ -86,14 +86,14 @@
       <div class="add-lesson-note-wrapper brick standard">
         <div class="add-lesson-note-plus">+</div>
         <div class="add-lesson-note-container">
-          <div class="add-lesson-container"><div class="add">Lesson</div></div>
-          <div class="add-note-container"><div class="add">Note</div></div>
+          <div class="add-lesson-container button">Lesson</div>
+          <div class="add-note-container button">Note</div>
         </div>
       </div>
       <div class="edit-week-buttons">
-        <button class="cancel-week">Cancel</button>
-        <button class="edit-week">Edit</button>
-        <button class="delete-week">Delete</button>
+        <div class="edit button">Edit</div>
+        <div class="cancel button">Cancel</div>
+        <div class="delete button">Delete</div>
       </div>
     <?php } ?>
   </div>
@@ -104,18 +104,18 @@
   <div>
     <% if ( typeof(title) != "undefined" ) { %>
       <h2 class="title">
-        <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable update-title"><%= title %></textarea>
+        <textarea readonly class="editable update-title"><%= title %></textarea>
       </h2>
     <% } %>
     <% if (typeof(field_description) != "undefined" ) { %>
-      <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable update-description"><%= field_description %></textarea>
+      <textarea readonly class="editable update-description"><%= field_description %></textarea>
     <% } %>
     
     <?php if($editable){ ?>
       <div class="edit-update-buttons">
-        <button class="cancel-update">Cancel</button>
-        <button class="edit-update">Edit</button>
-        <button class="delete-update">Delete</button>
+        <div class="edit button">Edit</div>
+        <div class="cancel button">Cancel</div>
+        <div class="delete button">Delete</div>
       </div>
     <?php } ?>
     </div>

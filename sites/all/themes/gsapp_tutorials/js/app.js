@@ -271,8 +271,9 @@ var pathArray = window.location.pathname.split('/');
 
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
-            "click .edit-lesson" : "editLesson",
-            "click .delete-lesson": "deleteLesson"
+            "click .edit" : "editLesson",
+            "click .delete": "deleteLesson",
+            "click .cancel": "cancelEdit"
           },
 
           initialize: function(opts) {
@@ -282,10 +283,13 @@ var pathArray = window.location.pathname.split('/');
 
           editLesson: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            if($('.edit-lesson', this_selector).text() == "Edit"){
-              $('.edit-lesson', this_selector).text('Save');
-              $('.delete-lesson', this_selector).show();
+            if($('.edit', this_selector).text() == "Edit"){
+              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+              $('.edit', this_selector).text('Save');
+              $('.delete, .cancel', this_selector).show();
               $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
+              $('.button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
+              $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').hide();
             }else{
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
@@ -293,14 +297,26 @@ var pathArray = window.location.pathname.split('/');
               });
 
               this.model.save();
-              $('.edit-lesson', this_selector).text('Edit');
-              $('.delete-lesson', this_selector).hide();
-              $(this_selector).css('backgroundColor', '').css('color','');
+              this.cancelEdit();
             }
           },
 
           deleteLesson: function(){
             this.model.destroy();
+          },
+
+          cancelEdit: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $('.edit', this_selector).text('Edit');
+            $('.delete, .cancel', this_selector).hide();
+            $(this_selector).css('backgroundColor', '').css('color','');
+            $('.button', this_selector).css('backgroundColor', '').css('color','');
+            $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').show();
+            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            
+            //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
+            $('textarea.lesson-title', this_selector).val( this.model.get('title') );
+            $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
           }
 
         });
@@ -313,8 +329,9 @@ var pathArray = window.location.pathname.split('/');
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
             "click .add-lesson-container" :  "addLesson",
-            "click .edit-week" : "editWeek",
-            "click .delete-week": "deleteWeek"
+            "click .edit-week-buttons .edit" : "editWeek",
+            "click .edit-week-buttons .delete": "deleteWeek",
+            "click .edit-week-buttons .cancel": "cancelEdit"
           },
 
           initialize: function(opts) {
@@ -363,10 +380,15 @@ var pathArray = window.location.pathname.split('/');
           editWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
 
-            if($('.edit-week', this_selector).text() == "Edit"){
-              $('.edit-week', this_selector).text('Save');
-              $('.delete-week', this_selector).show();
+            if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
+              $('.edit-week-buttons .edit', this_selector).text('Save');
+              $('.edit-week-buttons .delete', this_selector).show();
+              $('.edit-week-buttons .cancel', this_selector).show();
+              $('.add-lesson-note-wrapper', this_selector).hide();
               $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
+              $('.edit-week-buttons .button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
+              $('.lesson .edit-lesson-buttons', this_selector).hide();
+              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
             }else{
               var weekNumber = $(this_selector + ' .week-number').val();
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
@@ -383,14 +405,27 @@ var pathArray = window.location.pathname.split('/');
               });
 
               this.model.save();
-              $('.edit-week', this_selector).text('Edit');
-              $('.delete-week', this_selector).hide();
-              $(this_selector).css('backgroundColor', '').css('color','');
+
+              this.cancelEdit();
             }
           },
 
           deleteWeek: function(){
             this.model.destroy();
+          },
+
+          cancelEdit: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $('.edit-week-buttons .edit', this_selector).text('Edit');
+            $('.edit-week-buttons .delete', this_selector).hide();
+            $('.edit-week-buttons .cancel', this_selector).hide();
+            $(this_selector).css('backgroundColor', '').css('color','');
+            $('.edit-week-buttons .button', this_selector).css('backgroundColor', '').css('color','');
+            $('.lesson .edit-lesson-buttons', this_selector).show();
+            $('.add-lesson-note-wrapper', this_selector).show();
+            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            //TODO TCT2003 THURS DEC 20, 2012 need to figure out how to revert to original textarea text if no change
+            //should i use fetch? get?
           }
 
         });
@@ -398,11 +433,9 @@ var pathArray = window.location.pathname.split('/');
         var UpdateView = Drupal.Backbone.Views.Base.extend({
           templateSelector: '#bb_update_template',
           events: {
-            "click .edit-update" : "editUpdate",
-            "click textarea": "showEditButton",
-            "keyup textarea": "showEditButton",
-            "paste textarea": "showEditButton",
-            "click .delete-update": "deleteUpdate"
+            "click .edit" : "editUpdate",
+            "click .delete": "deleteUpdate",
+            "click .cancel": "cancelEdit"
           },
 
           initialize: function(opts) {
@@ -412,21 +445,39 @@ var pathArray = window.location.pathname.split('/');
 
           editUpdate: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            this.model.set({
-              "title": $(this_selector + ' .update-title').val(),
-              "field_description": $(this_selector + ' .update-description').val()
-            });
+            if($('.edit', this_selector).text() == "Edit"){
+              $('.edit', this_selector).text('Save');
+              $('.delete, .cancel', this_selector).show();
+              $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
+              $('.button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
+              $('#add-update-container').hide();
+              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+            }else{
+              this.model.set({
+                "title": $(this_selector + ' .update-title').val(),
+                "field_description": $(this_selector + ' .update-description').val()
+              });
 
-            this.model.save();
+              this.model.save();
+              this.cancelEdit();
+            }
           },
 
-          showEditButton: function(){
-            var this_selector = '#node-' + this.model.get('nid');
-            $(this_selector + ' button.edit-lesson').show();
-          },
 
           deleteUpdate: function(){
             this.model.destroy();
+          },
+
+          cancelEdit: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $('.edit', this_selector).text('Edit');
+            $('.delete, .cancel', this_selector).hide();
+            $(this_selector).css('backgroundColor', '').css('color','');
+            $('.button', this_selector).css('backgroundColor', '').css('color','');
+            $('#add-update-container').show();
+            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            //TODO TCT2003 THURS DEC 20, 2012 need to figure out how to revert to original textarea text if no change
+            //should i use fetch? get?
           }
 
         });
