@@ -311,7 +311,7 @@ var pathArray = window.location.pathname.split('/');
 
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
-            "click .add-lesson" :  "addLesson",
+            "click .add-lesson-container" :  "addLesson",
             "click .edit-week" : "editWeek",
             "click textarea": "showEditButton",
             "keyup textarea": "showEditButton",

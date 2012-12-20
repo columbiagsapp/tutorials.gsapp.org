@@ -1,16 +1,68 @@
+@bgColor: white;
 
-@color: black;
-@inverseColor: white;
-@editableBGColor: #efefef;
+@textColor: black;
+@inverseTextColor: white;
+
+@editableBGColor: transparent;
 @editableBGColorHover: black;
-@borderwidth: 5px;
+@editableBorder: 1px solid @textColor;
+
+@brickPadding: 20px;
+@brickBorder: none;
+@brickBGColor: #efefef;
+
 @verticalpadding: 20px;
 @horizontalpadding: 0;
 @standardBrickWidth: 210px;
 @standardBrickHeight: 260px;
 @standardBrickPadding: 20px;
-@standardBrickMargin: 20px;
+@standardBrickMargin: 0 20px 20px 0;
 @phoneBrickPadding: 10px;
+@editableBorder: none;
+
+@buttonBGColor: #aaa;
+@buttonPadding: 5px 10px 7px;
+@buttonTextColor: whitesmoke;
+@buttonBGColorHover:black;
+@inverseButtonTextColor:whitesmoke;
+@buttonTextSize: 20px;
+@buttonTextWeight: 500;
+@buttonWidth: auto;
+
+@lessonNoteButtonWidth: 80%;
+
+
+
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  box-shadow:         @style @c;
+  -webkit-box-shadow: @style @c;
+  -moz-box-shadow:    @style @c;
+}
+.box-shadow(@style, @alpha: 50%) when (isnumber(@alpha)) {
+  .box-shadow(@style, rgba(0, 0, 0, @alpha));
+}
+.glowing-box { 
+  .box-shadow(0 0 5px, 30%);
+}
+
+.el{
+  clear:both;
+  width:100%;
+}
+
+.title{
+  margin:0;
+  line-height: 1em;
+}
+
+.float-left{
+  float:left;
+}
+
+.float-right{
+  float:right;
+}
 
 
 .hidden{
@@ -24,7 +76,7 @@
     width:@standardBrickWidth;
     height:@standardBrickHeight;
     padding:@standardBrickPadding;
-    margin: 0 @standardBrickMargin @standardBrickMargin 0;
+    margin: @standardBrickMargin;
   }
 }
 
@@ -47,7 +99,7 @@
     width:@standardBrickWidth;
     height:@standardBrickHeight;
     padding:@standardBrickPadding;
-    margin: 0 @standardBrickMargin @standardBrickMargin 0;
+    margin: @standardBrickMargin;
   }
 }
 
@@ -58,7 +110,7 @@
     width:@standardBrickWidth;
     height:@standardBrickHeight;
     padding:@standardBrickPadding;
-    margin: 0 @standardBrickMargin @standardBrickMargin 0;
+    margin: @standardBrickMargin;
   }
 }
 
@@ -78,7 +130,7 @@
     width:@standardBrickWidth;
     height:@standardBrickHeight;
     padding:@standardBrickPadding;
-    margin: 0 @standardBrickMargin @standardBrickMargin 0;
+    margin: @standardBrickMargin;
   }
 }
 
@@ -97,18 +149,17 @@
 .brick{
   min-height: 20px;
   margin-bottom: @verticalpadding;
-  border: @borderwidth solid @color;
+  padding: @brickPadding;
+  border: @brickBorder;
+  background-color:@brickBGColor;
   display:block;
   float:left;
   list-style: none;
+  position:relative;
 }
 
 .brick.roman{
   width:100%;
-}
-
-.brick .inner{
-  margin:20px;
 }
 
 .mortar-bottom{
@@ -123,7 +174,7 @@
 	display:block;
 	margin:20px 0;
 	border:2px solid;
-	color: @color;
+	color: @textColor;
 }
 
 .bl{
@@ -227,22 +278,69 @@ iframe {
   padding:0;
 }
 
+.course #add-update-container,
 .course #add-week-container,
-.course .add-lesson-note,
-.course #add-update-container{
-  background-color:@editableBGColor;
-}
-.course #add-week-container,
-.course #add-update-container{
-  height:150px;
+.course .add-lesson-container,
+.course .add-note-container{
+  background-color: @buttonBGColor;
+  padding: @buttonPadding;
+  color: @buttonTextColor;
+  width:@buttonWidth;
+  font-weight: @buttonTextWeight;
 }
 
+.course #add-update-container{
+  float:right;
+}
+
+.course #add-week-container{
+  float:left;
+}
+
+.course .add-lesson-container,
+.course .add-note-container{
+  text-align: center;
+  margin:@verticalpadding auto 0;
+  width:@lessonNoteButtonWidth;
+
+}
+
+.course .add{
+  font-size: @buttonTextSize;
+  text-align:center;
+}
+
+
 .course #add-week-container:hover,
-.course .add-lesson:hover,
+.course .add-lesson-container:hover,
+.course .add-note-container:hover,
 .course #add-update-container:hover{
   cursor:pointer;
-  background-color:@editableBGColorHover;
-  color:@inverseColor;
+  background-color:@buttonBGColorHover;
+  color:@inverseButtonTextColor;
+}
+
+.course .add-lesson-note-plus{
+  font-size:120px;
+  line-height: 1em;
+  font-weight: bold;
+  text-align: center;
+  color:@buttonBGColor;
+  margin:0 auto;
+}
+
+.course .add-lesson-note-container{
+  position:absolute;
+  bottom:@standardBrickPadding;
+  width:@lessonNoteButtonWidth;
+}
+
+.course .add-lesson-note-wrapper:hover{
+  .box-shadow(0 0 5px, 30%);
+}
+
+.course #updates-list-el{
+  margin-top:20px;
 }
 
 textarea.editable{
@@ -273,7 +371,7 @@ textarea.editable{
 .administrator textarea.editable,
 .faculty textarea.editable{
   background-color: @editableBGColor;
-  
+  border: @editableBorder;
 }
 
 textarea.week-number{
@@ -287,6 +385,11 @@ textarea.week-title{
 .course .lesson textarea,
 .course .update textarea{
   width:100%;
+}
+
+.course .update textarea.update-description{
+  min-height: 150px;
+  height:auto;
 }
 
 .course button.edit-week,
@@ -310,29 +413,14 @@ textarea.week-title{
   margin-top:5px;
 }
 
+.course .edit-update-buttons{
+  margin:20px;
+}
+
 .course .edit-week-buttons button,
-.course .edit-lesson-buttons button{
+.course .edit-lesson-buttons button,
+.course .edit-update-buttons button{
   float:right;
   margin-left:10px;
-}
-
-.course .add{
-  font-size:80px;
-  text-align:center;
-}
-
-.course #add-week-container .add{
-  margin:55px auto 0;
-}
-.course .add-lesson .add{
-  margin:110px auto 0;
-}
-
-.course #add-update-container .add{
-  margin:55px auto 0;
-}
-
-.course .add-lesson{
-  background-color:@editableBGColor;
 }
 
