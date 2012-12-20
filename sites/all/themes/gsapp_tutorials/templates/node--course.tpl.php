@@ -61,8 +61,9 @@
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons">
+          <button class="cancel-lesson">Cancel</button>
+          <button class="edit-lesson">Edit</button>
           <button class="delete-lesson">Delete</button>
-          <button class="edit-lesson">Save Changes</button>
         </div>
       <?php } ?>
   </div>
@@ -90,8 +91,9 @@
         </div>
       </div>
       <div class="edit-week-buttons">
-        <button class="delete-week">Delete this week</button>
-        <button class="edit-week">Save Changes</button>
+        <button class="cancel-week">Cancel</button>
+        <button class="edit-week">Edit</button>
+        <button class="delete-week">Delete</button>
       </div>
     <?php } ?>
   </div>
@@ -111,8 +113,9 @@
     
     <?php if($editable){ ?>
       <div class="edit-update-buttons">
+        <button class="cancel-update">Cancel</button>
+        <button class="edit-update">Edit</button>
         <button class="delete-update">Delete</button>
-        <button class="edit-update">Save Changes</button>
       </div>
     <?php } ?>
     </div>

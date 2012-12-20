@@ -272,9 +272,6 @@ var pathArray = window.location.pathname.split('/');
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
             "click .edit-lesson" : "editLesson",
-            "click textarea": "showEditButton",
-            "keyup textarea": "showEditButton",
-            "paste textarea": "showEditButton",
             "click .delete-lesson": "deleteLesson"
           },
 
@@ -285,17 +282,21 @@ var pathArray = window.location.pathname.split('/');
 
           editLesson: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            this.model.set({
-              "title": $(this_selector + ' .lesson-title').val(),
-              "field_description": $(this_selector + ' .lesson-description').val()
-            });
+            if($('.edit-lesson', this_selector).text() == "Edit"){
+              $('.edit-lesson', this_selector).text('Save');
+              $('.delete-lesson', this_selector).show();
+              $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
+            }else{
+              this.model.set({
+                "title": $(this_selector + ' .lesson-title').val(),
+                "field_description": $(this_selector + ' .lesson-description').val()
+              });
 
-            this.model.save();
-          },
-
-          showEditButton: function(){
-            var this_selector = '#node-' + this.model.get('nid');
-            $(this_selector + ' button.edit-lesson').show();
+              this.model.save();
+              $('.edit-lesson', this_selector).text('Edit');
+              $('.delete-lesson', this_selector).hide();
+              $(this_selector).css('backgroundColor', '').css('color','');
+            }
           },
 
           deleteLesson: function(){
@@ -313,9 +314,6 @@ var pathArray = window.location.pathname.split('/');
           events: {
             "click .add-lesson-container" :  "addLesson",
             "click .edit-week" : "editWeek",
-            "click textarea": "showEditButton",
-            "keyup textarea": "showEditButton",
-            "paste textarea": "showEditButton",
             "click .delete-week": "deleteWeek"
           },
 
@@ -364,26 +362,31 @@ var pathArray = window.location.pathname.split('/');
 
           editWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            var weekNumber = $(this_selector + ' .week-number').val();
-            //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
-            if( weekNumber.length == 1){
-              weekNumber = '0' + weekNumber;
-            }else if(weekNumber.length > 2){
-              weekNumber = weekNumber.substr(0,2);
+
+            if($('.edit-week', this_selector).text() == "Edit"){
+              $('.edit-week', this_selector).text('Save');
+              $('.delete-week', this_selector).show();
+              $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
+            }else{
+              var weekNumber = $(this_selector + ' .week-number').val();
+              //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
+              if( weekNumber.length == 1){
+                weekNumber = '0' + weekNumber;
+              }else if(weekNumber.length > 2){
+                weekNumber = weekNumber.substr(0,2);
+              }
+
+              this.model.set({
+                "title": $(this_selector + ' .week-title').val(),
+                "field_week_number": weekNumber,
+                "field_description": $(this_selector + ' .week-description').val()
+              });
+
+              this.model.save();
+              $('.edit-week', this_selector).text('Edit');
+              $('.delete-week', this_selector).hide();
+              $(this_selector).css('backgroundColor', '').css('color','');
             }
-
-            this.model.set({
-              "title": $(this_selector + ' .week-title').val(),
-              "field_week_number": weekNumber,
-              "field_description": $(this_selector + ' .week-description').val()
-            });
-
-            this.model.save();
-          },
-
-          showEditButton: function(){
-            var this_selector = '#node-' + this.model.get('nid');
-            $(this_selector + ' button.edit-week').show();
           },
 
           deleteWeek: function(){
