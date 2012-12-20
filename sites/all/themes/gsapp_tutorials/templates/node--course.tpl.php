@@ -36,6 +36,9 @@
       <div id="sidenav" class="span3 brick nav nav-list affix-top">
         <h2>Updates</h2>
         <div id="updates-list-el"></div>
+        <?php if($editable){ ?>
+          <div id="add-update-container" class="brick roman"><div class="add">+</div></div>
+        <?php } ?>
       </div>
     </section>  <!-- /.span3 -->
 

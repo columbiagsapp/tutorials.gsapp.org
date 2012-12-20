@@ -228,15 +228,18 @@ iframe {
 }
 
 .course #add-week-container,
-.course .add-lesson-note{
+.course .add-lesson-note,
+.course #add-update-container{
   background-color:@editableBGColor;
 }
-.course #add-week-container{
+.course #add-week-container,
+.course #add-update-container{
   height:150px;
 }
 
 .course #add-week-container:hover,
-.course .add-lesson:hover{
+.course .add-lesson:hover,
+.course #add-update-container:hover{
   cursor:pointer;
   background-color:@editableBGColorHover;
   color:@inverseColor;
@@ -323,6 +326,10 @@ textarea.week-title{
 }
 .course .add-lesson .add{
   margin:110px auto 0;
+}
+
+.course #add-update-container .add{
+  margin:55px auto 0;
 }
 
 .course .add-lesson{

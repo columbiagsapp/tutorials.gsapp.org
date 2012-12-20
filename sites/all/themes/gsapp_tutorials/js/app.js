@@ -614,6 +614,44 @@ var pathArray = window.location.pathname.split('/');
        
         });
 
+        $('#add-update-container').bind('click',function(){
+          var u = new Update({
+            "title": "Title",
+            "field_description": "Text",
+            "type": "update"
+          });
+
+          //need to set this explicitly for a node create
+          //because the Drupal Backbone module doesn't know
+          //when the node is new... must be a better way!
+          u.url = "/node";
+          
+          var resp = u.save({}, {
+            success: function(model, response, options){
+              //not sure why the BB drupal module can't handle this
+              //need to set the model's id explicitly, otherwise it
+              //triggers the isNew() function in backbone.js and it
+              //tries to create a new one in the db, and because I 
+              //over rode the url because it was originally new,
+              //I need to re-instate the url
+              //TOOD: I should fix this in the Drupal BB module
+              u.id = response.id;
+              u.url = "/node/" + response.id + ".json";
+              u.set({
+                "field_parent_course_nid":pathArray[2],
+                "nid":response.id //need to set this here to update the #node-### id for the containing div
+              });
+
+              u.save();
+            }
+          });
+          //this can be asyncronous with the server save, meaning that
+          //it can update the display even before the server returns a 
+          //response (it doesn't have to be in the success callback)
+          UpdatesCollectionView.addOne(u);
+       
+        });
+
       }//end if course
     }//end behavior attach
   }//end behavior
