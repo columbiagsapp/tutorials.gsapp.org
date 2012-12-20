@@ -35,6 +35,7 @@
     <section class="span3 sidebar" role="complementary">
       <div id="sidenav" class="span3 brick nav nav-list affix-top">
         <h2>Updates</h2>
+        <div id="updates-list-el"></div>
       </div>
     </section>  <!-- /.span3 -->
 
@@ -45,7 +46,7 @@
 
 
 <script type="text/template" id="bb_lesson_template">
-  <li id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2>
           <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable lesson-title"><%= title %></textarea>
@@ -61,11 +62,11 @@
           <button class="edit-lesson">Save Changes</button>
         </div>
       <?php } ?>
-  </li>
+  </div>
 </script>
 
 <script type="text/template" id="bb_week_template">
-  <li id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman">
     <div class="inner">
       <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
         <h2>
@@ -86,28 +87,49 @@
         </div>
       <?php } ?>
     </div><!-- /.inner -->
-  </li>
+  </div>
+</script>
+
+<script type="text/template" id="bb_update_template">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="update brick roman">
+    <div class="inner">
+      <% if ( typeof(title) != "undefined" ) { %>
+        <h2>
+          <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable update-title"><%= title %></textarea>
+        </h2>
+      <% } %>
+      <% if (typeof(field_description) != "undefined" ) { %>
+        <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable update-description"><%= field_description %></textarea>
+      <% } %>
+      
+      <?php if($editable){ ?>
+        <div class="edit-update-buttons">
+          <button class="delete-update">Delete</button>
+          <button class="edit-update">Save Changes</button>
+        </div>
+      <?php } ?>
+    </div><!-- /.inner -->
+  </div>
 </script>
 
 <script type="text/template" id="lesson-list">
   <div>
-    <ul class="lesson-list-container"></ul>
+    <div class="lesson-list-container"></div>
   </div>
 </script>
 
 
 <script type="text/template" id="week-list">
   <div>
-    <ul class="week-list-container"></ul>
+    <div class="week-list-container"></div>
+  </div>
+</script>
+
+<script type="text/template" id="update-list">
+  <div>
+    <div class="update-list-container"></div>
   </div>
 </script>
 
 
-<script type="text/template" id="submit_week_template">
-  <div class="week new">
-    Week <textarea name="new-week-number" cols=3 rows=1>#</textarea>: <textarea name="new-week-title" cols=60 rows=1>Optional title</textarea>
-    <textarea name="new-week-body" cols=80 rows=4>Optional description</textarea>
-    <button class="week-submit">Create new week</button>
-  </div>
-</script>
 

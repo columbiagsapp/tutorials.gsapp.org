@@ -133,11 +133,6 @@ var pathArray = window.location.pathname.split('/');
 
         var QuestionCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
-            //this.el.detach();
-            console.log('unrendering');
-            this.collection.reset();
-            console.log('post sort, about to render');
-            //this.addAll();
           }
         });
 
@@ -220,7 +215,7 @@ var pathArray = window.location.pathname.split('/');
       }//end if tutorial
 
       if(pathArray[1] === 'course'){
-        console.log('its a course with nid: '+ pathArray[2]);
+       
         /* 
           STEP 1
           create the tutorial node Backbone object
@@ -246,18 +241,19 @@ var pathArray = window.location.pathname.split('/');
             this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
           }
         });
-        /*
-          STEP 2B
-          create the week node Backbone Model by extending Backbone.Model
-          which has already been extended by Drupal.Backbone.Models.Node to take care
-          of boilerplate (like setting the entity type to node, etc)
-        */
+        
         var Week = Drupal.Backbone.Models.Node.extend({
           initialize: function(opts){
             Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
-
             //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
             //needed to take out a bunch when using REST WS - last_view seems to be the culprit
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
+          }
+        });
+
+        var Update = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
             this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
           }
         });
@@ -308,12 +304,6 @@ var pathArray = window.location.pathname.split('/');
 
         });
 
-        /*
-          STEP 3B
-          Create a view for each Week
-          Uses the bb_question_template from the node--tutorial.tpl.php file
-          to format each question
-        */
         var WeekView = Drupal.Backbone.Views.Base.extend({
           //the Underscore formated template in node--tutorial.tpl.php stored in a 
           //<script> tag and identified by its id
@@ -402,6 +392,42 @@ var pathArray = window.location.pathname.split('/');
 
         });
 
+        var UpdateView = Drupal.Backbone.Views.Base.extend({
+          templateSelector: '#bb_update_template',
+          events: {
+            "click .edit-update" : "editUpdate",
+            "click textarea": "showEditButton",
+            "keyup textarea": "showEditButton",
+            "paste textarea": "showEditButton",
+            "click .delete-update": "deleteUpdate"
+          },
+
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            this.model.bind('change', this.render, this);//this calls the fetch 
+          },
+
+          editUpdate: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            this.model.set({
+              "title": $(this_selector + ' .update-title').val(),
+              "field_description": $(this_selector + ' .update-description').val()
+            });
+
+            this.model.save();
+          },
+
+          showEditButton: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $(this_selector + ' button.edit-lesson').show();
+          },
+
+          deleteUpdate: function(){
+            this.model.destroy();
+          }
+
+        });
+
         /*
           STEP 4A
           create a collection of lessons that extends the NodeIndex collection
@@ -411,13 +437,6 @@ var pathArray = window.location.pathname.split('/');
         var LessonCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Lesson
         });
-
-        
-        /*
-          STEP 4B
-          create a collection of weeks that extends the NodeIndex collection
-          that comes with the Drupal Backbone module
-        */
 
         var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Week,
@@ -432,6 +451,13 @@ var pathArray = window.location.pathname.split('/');
         //that is undefined, so reset it immediately to clear it out
         WeeksCollection.reset();
 
+        var UpdateCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: Update
+        });
+
+        var UpdatesCollection = new UpdateCollectionPrototype();
+        UpdatesCollection.reset();
+
         /*
           STEP 5A
           create the CollectionView for the LessonssCollection which will
@@ -443,24 +469,9 @@ var pathArray = window.location.pathname.split('/');
 
         var LessonCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
-            //this.el.detach();
-            console.log('unrendering');
-            this.collection.reset();
-            console.log('post sort, about to render');
-            //this.addAll();
           }
         });
 
-        
-
-        /*
-          STEP 5B
-          create the CollectionView for the WeeksCollection which will
-          run the main fetch command, which will drive the addOne functions
-          which call the .render function of each QuestionView (they will add
-          a QuestionView for each Question in the collection, then call its render,
-          then append it to el)
-        */
 
         var WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
@@ -478,16 +489,33 @@ var pathArray = window.location.pathname.split('/');
           renderer: 'underscore',
           el: '#weeks-list-el',
           ItemView: WeekView,
-          itemTag: 'li',
+          //itemTag: 'li',
           itemParent: '.week-list-container'
         });
  
+
+        var UpdateCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
+          resort: function(opts){
+          }
+        });
+
+        var UpdatesCollectionView = new UpdateCollectionViewPrototype({
+          collection: UpdatesCollection,
+          templateSelector: '#update-list',
+          renderer: 'underscore',
+          el: '#updates-list-el',
+          ItemView: UpdateView,
+          itemParent: '.update-list-container'
+        });
+
         /* 
           STEP 6
           Attach the #collection-list template including <ul .collection-list-parent
           to the el (#question-list-el)
         */
         WeeksCollectionView.render();
+
+        UpdatesCollectionView.render();
 
         var LessonsCollection = [];
         var LessonsCollectionView = [];
@@ -496,23 +524,18 @@ var pathArray = window.location.pathname.split('/');
           Fetch the collection of Question nodes by sending the nid of the tutorial
         */
         WeeksCollection.fetchQuery({
-          "field_parent_course_nid":pathArray[2]
-        }, {
+          "field_parent_course_nid":pathArray[2],
+          "type":"week"
+          }, {
             success: function(model, response, options){
-              console.log('SUCCESS on fetchQuery #1');
-
-              $('.course .weeks li.week').each(function(i){
-                console.log('each i: '+i+', ID: '+$(this).attr('id'));
-
+              $('.course .weeks .week').each(function(i){
                 var weekID = $(this).attr('id');
                 weekID = weekID.substr(5);
-                console.log('weekID: '+weekID);
 
                 LessonsCollection[weekID] = new LessonCollectionPrototype();
                 LessonsCollection[weekID].reset();
 
                 var theEL = '#node-' + weekID + ' .lessons-list-el';
-                console.log('theEL: '+theEL);
 
                 LessonsCollectionView[weekID] = new LessonCollectionViewPrototype({
                   collection: LessonsCollection[weekID],
@@ -520,7 +543,7 @@ var pathArray = window.location.pathname.split('/');
                   renderer: 'underscore',
                   el: theEL,
                   ItemView: LessonView,
-                  itemTag: 'li',
+                  //itemTag: 'li',
                   itemParent: '.lesson-list-container'
                 });
 
@@ -528,12 +551,22 @@ var pathArray = window.location.pathname.split('/');
 
                 //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
                 LessonsCollection[weekID].fetchQuery({
-                  "field_parent_week_nid":weekID
+                  "field_parent_week_nid":weekID,
+                  "type":"lesson"
                 });
 
 
               });
             }
+        });
+
+        UpdatesCollection.fetchQuery({
+          "field_parent_course_nid":pathArray[2],
+          "type":"update"
+          }, {
+            success: function(model, response, options){
+              console.log("returned!!");
+          }
         });
 
         /*
