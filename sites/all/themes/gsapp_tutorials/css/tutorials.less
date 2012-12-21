@@ -15,18 +15,22 @@
 
 @verticalpadding: 20px;
 @horizontalpadding: 0;
-@standardBrickWidth: 210px;
-@standardBrickHeight: 260px;
+@standardBrickWidth: 190px;
+@standardBrickHeight: 230px;
+@fullStandardBrickWidth: 230px;
+@fullStandardBrickHeight: 270px;
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
 @standardBrickHoverBG: #dfdfdf;
+
+
 @phoneBrickPadding: 10px;
 @editableBorder: none;
 
 @preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
 
 
-
+@headerHeightAndMargin: 62px;
 
 
 
@@ -72,6 +76,15 @@
   float:right;
 }
 
+.outer{
+  width:100%;
+  background-color:@brickBGColor;
+}
+
+.inner{
+  margin:@brickPadding;
+}
+
 .preloader{
   background-position: center;
   background-image: @preloaderBGURL;
@@ -97,8 +110,8 @@
     margin: @standardBrickMargin;
   }
   .course .week .week-description{
-    width:250px;
-    height:300px;
+    width:@fullStandardBrickWidth;
+    height:@fullStandardBrickHeight;
     padding:0;
     margin: @standardBrickMargin;
   }
@@ -126,8 +139,8 @@
     margin: @standardBrickMargin;
   }
   .course .week .week-description{
-    width:250px;
-    height:300px;
+    width:@fullStandardBrickWidth;
+    height:@fullStandardBrickHeight;
     padding:0;
     margin: @standardBrickMargin;
   }
@@ -143,8 +156,8 @@
     margin: @standardBrickMargin;
   }
   .course .week .week-description{
-    width:250px;
-    height:300px;
+    width:@fullStandardBrickWidth;
+    height:@fullStandardBrickHeight;
     padding:0;
     margin: @standardBrickMargin;
   }
@@ -182,10 +195,14 @@
 
 /* standard desktop */
 @media (min-width: 980px) {
-
+  #wrapper{
+    margin-top:@headerHeightAndMargin;
+  }
 }
 
-
+body{
+  color:@textColor;
+}
 
 
 .brick{
@@ -236,10 +253,6 @@
   background-color: whiteSmoke;
 }
 
-#updates{
-  width:100%;
-}
-
 iframe {
   width:100%;
   height:auto;
@@ -257,7 +270,7 @@ iframe {
 
 .jumbotron {
   position: relative;
-  margin:40px 0;/*height of fixed menu */
+  margin:20px 0 40px;/*height of fixed menu */
   padding: 40px 20px;
   text-align: left;
   float:left;

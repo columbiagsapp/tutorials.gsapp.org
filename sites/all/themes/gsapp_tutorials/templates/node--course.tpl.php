@@ -21,8 +21,8 @@
   </header>
 
 
-  <div class="row-fluid">
-    <section class="span9"> 
+  <div id="main" class="row-fluid">
+    <section id="schedule" class="span9"> 
       <div class="weeks">
         <div id="weeks-list-el"></div>
         <div id="week-preloader" class="week brick roman preloader"></div>
@@ -33,15 +33,15 @@
     </section> <!-- /.node -->
 
 
-    <section class="span3 sidebar" role="complementary">
-      <div id="updates" class="span3 brick nav nav-list affix-top">
-        <h2 class="title float-left">Updates</h2>
-        <?php if($editable){ ?>
-          <div id="add-update-container" class="button">+</div>
-        <?php } ?>
-        <div id="updates-list-el" class="el"></div>
-        <div id="update-preloader" class="update brick standard preloader"></div>
-      </div>
+    <section id="updates" class="span3 outer" role="complementary">
+        <div class="inner">
+          <h2 class="title float-left">Updates</h2>
+          <?php if($editable){ ?>
+            <div id="add-update-container" class="button">+</div>
+          <?php } ?>
+          <div id="updates-list-el" class="el"></div>
+          <div id="update-preloader" class="update brick standard preloader"></div>
+        </div>
     </section>  <!-- /.span3 -->
 
   </div><!-- /.row-fluid -->
@@ -83,7 +83,7 @@
     <% } %>
 
     <div class="lessons-list-el"></div>
-    <div id="lesson-preloader" class="lesson brick standard preloader"></div>
+    <div class="lesson brick standard preloader"></div>
     
     <?php if($editable){ ?>
       <div class="add-lesson-note-wrapper brick standard">

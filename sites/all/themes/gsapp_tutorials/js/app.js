@@ -1,6 +1,7 @@
 
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
+var updates_detached;
 
 (function ($){
   Drupal.behaviors.app = {
@@ -347,7 +348,8 @@ var pathArray = window.location.pathname.split('/');
             "click .add-lesson-container" :  "addLesson",
             "click .edit-week-buttons .edit" : "editWeek",
             "click .edit-week-buttons .delete": "deleteWeek",
-            "click .edit-week-buttons .cancel": "cancelEdit"
+            "click .edit-week-buttons .cancel": "cancelEdit",
+            "click .lesson":"openLesson"
           },
 
           initialize: function(opts) {
@@ -357,6 +359,17 @@ var pathArray = window.location.pathname.split('/');
             //the editWeek function (during a save) was triggering a change event
             //which called a fetch and then deleted all the lessons from the week
             //this.model.bind('change', this.render, this);//this calls the fetch 
+          },
+
+          openLesson: function(){
+            $('#schedule').removeClass('span9').addClass('span3');
+            updates_detached = $('#updates').detach();
+
+            var contentSectionHTML = 
+            '<section id="lesson-content" class="span9 outer" role="complementary"><div class="inner"><h2 class="title float-left">Lesson</h2><div id="lesson-content-el" class="el"></div><div id="lesson-content-preloader" class="lesson-content brick roman preloader"></div></div></section><!-- /.span3 -->';
+
+            $('#main').append(contentSectionHTML);
+
           },
           
           //vote up binding - just calls the related Question model's vote method

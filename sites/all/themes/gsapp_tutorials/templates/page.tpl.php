@@ -1,3 +1,10 @@
+<?php if( in_array("administrator", $user->roles) ){
+  $admin = true;
+  }else{
+    $admin = false;
+  }
+?>
+
 <nav id="navbar" role="banner" class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
   	<div class="container-fluid">
@@ -39,8 +46,8 @@
   </div>
 </nav>
 
-<div class="container-fluid">
-
+<div id="wrapper" class="container-fluid">
+  <?php if($admin){ ?>
   <div class="row-fluid">
     <section class="<?php print _twitter_bootstrap_content_span(1); ?>">  
       <?php print $messages; ?>
@@ -57,6 +64,7 @@
       <?php endif; ?>
     </section>
   </div>
+  <?php } ?>
 
   <div class="row-fluid">
     <a id="main-content"></a>      
