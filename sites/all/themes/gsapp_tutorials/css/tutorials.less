@@ -531,25 +531,30 @@ textarea.week-title{
 
 
 .lesson:hover,
-.note:hover{
+.note:hover,
+.update:hover{
   cursor:pointer;
   .glowing-box-inset;
   background-color:@standardBrickHoverBG;
 }
 
 .lesson textarea:hover,
-.note textarea:hover{
+.note textarea:hover,
+.update textarea:hover{
   cursor:pointer;
 }
 
 .edit-mode.lesson:hover,
-.edit-mode.note:hover{
+.edit-mode.note:hover,
+.edit-mode.update:hover{
   cursor:auto;
+  background-color:@editModeBGColor;
   .glowing-box;
 }
 
 .edit-mode.lesson textarea:hover,
-.edit-mode.note textarea:hover{
+.edit-mode.note textarea:hover,
+.edit-mode.update textarea:hover{
   cursor: auto;
 }
 

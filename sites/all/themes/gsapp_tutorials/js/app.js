@@ -388,21 +388,16 @@ var pathArray = window.location.pathname.split('/');
           },
 
           editWeek: function(){
-            console.log('editWeek()');
             var this_selector = '#node-' + this.model.get('nid');
-            console.log('this_selector: '+this_selector);
 
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
-              console.log('editWeek() edit version');
               $('input[type="text"].week-field, textarea.week-field', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
               $('.lesson, .note', this_selector).addClass('disabled-mode');
             }else{
-              console.log('editWeek() save version');
               $(this_selector).removeClass('first-edit');
               var weekNumber = $('.week-number', this_selector).val();
-              console.log('weekNumber: '+weekNumber);
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
                 weekNumber = '0' + weekNumber;
@@ -422,21 +417,18 @@ var pathArray = window.location.pathname.split('/');
           },
 
           deleteWeek: function(){
-            console.log('week deleteWeek()');
             WeeksCollectionView.remove(this.model);
             this.model.destroy();
             this.remove();
           },
 
           cancelEdit: function(){
-            console.log('week cancelEdit()');
             var this_selector = '#node-' + this.model.get('nid');
             if($(this_selector).hasClass('first-edit')){
               console.log('delete via cancelEdit()');
               this.model.save();
               this.deleteWeek();
             }else{
-              console.log('regular cancelEdit()');
               $('.edit', this_selector).text('Edit');
               $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
               $(this_selector).removeClass('edit-mode');
@@ -464,15 +456,20 @@ var pathArray = window.location.pathname.split('/');
             this.model.bind('change', this.render, this);//this calls the fetch 
           },
 
+          firstEditUpdate: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $(this_selector).addClass('first-edit');
+            this.editUpdate();
+          },
+
           editUpdate: function(){
-            console.log('editUpdate');
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
             }else{
-              console.log('editUpdate-save');
+              $(this_selector).removeClass('first-edit');
               this.model.set({
                 "title": $(this_selector + ' .update-title').val(),
                 "field_description": $(this_selector + ' .update-description').val()
@@ -485,18 +482,25 @@ var pathArray = window.location.pathname.split('/');
 
 
           deleteUpdate: function(){
+            UpdatesCollectionView.remove(this.model);
             this.model.destroy();
+            this.remove();
           },
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            $('.edit', this_selector).text('Edit');
-            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-            $('.edit-mode').removeClass('edit-mode');
-            
-            //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
-            $('textarea.update-title', this_selector).val( this.model.get('title') );
-            $('textarea.update-description', this_selector).val( this.model.get('field_description') );
+            if($(this_selector).hasClass('first-edit')){
+              this.model.save();
+              this.deleteUpdate();
+            }else{
+              $('.edit', this_selector).text('Edit');
+              $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+              $('.edit-mode').removeClass('edit-mode');
+              
+              //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
+              $('textarea.update-title', this_selector).val( this.model.get('title') );
+              $('textarea.update-description', this_selector).val( this.model.get('field_description') );
+            }
           }
 
         });
@@ -690,8 +694,6 @@ var pathArray = window.location.pathname.split('/');
 
               w.save();
               
-
-
               $('#node-temp').attr('id', 'node-'+response.id);
               $('#week-preloader').remove();
               var newWeekView = WeeksCollectionView.addOne(w);
@@ -731,12 +733,16 @@ var pathArray = window.location.pathname.split('/');
               });
 
               u.save();
+              $('#node-temp').attr('id', 'node-'+response.id);
+              $('#update-preloader').remove();
+              var newUpdateView = UpdatesCollectionView.addOne(u);
+              newUpdateView.firstEditUpdate();
             }
           });
           //this can be asyncronous with the server save, meaning that
           //it can update the display even before the server returns a 
           //response (it doesn't have to be in the success callback)
-          UpdatesCollectionView.addOne(u);
+          
        
         });
 
