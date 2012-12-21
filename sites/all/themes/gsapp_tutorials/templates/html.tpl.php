@@ -32,6 +32,8 @@
   <!-- Placed at the end of the document so the pages load faster -->
   <?php print $scripts; ?>
 
+  <img id="preloaded-preloader" class="hidden" src="/sites/all/themes/gsapp_tutorials/assets/preloader.gif" />
+
 
 </body>
 </html>

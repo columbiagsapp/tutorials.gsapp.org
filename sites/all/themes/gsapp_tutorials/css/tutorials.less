@@ -22,6 +22,8 @@
 @phoneBrickPadding: 10px;
 @editableBorder: none;
 
+@preloaderBG: @editModeBGColor url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif') no-repeat;
+
 
 
 
@@ -51,6 +53,20 @@
 
 .hidden{
   display:none;
+}
+
+.float-left{
+  float:left;
+}
+
+.float-right{
+  float:right;
+}
+
+.week.preloader{
+  height: 420px;
+  background:@preloaderBG;
+  background-position: center;
 }
 
 
@@ -350,6 +366,11 @@ iframe {
 .edit-mode .delete,
 .edit-mode .cancel{
   display:block;
+}
+
+
+.first-edit .delete{
+  display:none !important;
 }
 
 .child-edit-mode .edit-week-buttons, 
