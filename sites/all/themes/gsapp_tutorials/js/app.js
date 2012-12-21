@@ -602,6 +602,7 @@ var pathArray = window.location.pathname.split('/');
           }, {
             success: function(model, response, options){
               $('.course .weeks .week').each(function(i){
+                $('#week-preloader').remove();
                 var weekID = $(this).attr('id');
                 weekID = weekID.substr(5);
 
@@ -626,9 +627,19 @@ var pathArray = window.location.pathname.split('/');
                 LessonsCollection[weekID].fetchQuery({
                   "field_parent_week_nid":weekID,
                   "type":"lesson"
+                }, {
+                  success: function(model, response, options){
+                    //remove preloader for lesson for this particular week based on weekID
+                    $('.lesson.preloader', '#node-'+weekID).remove();
+                  },
+                  error: function(model, xhr, options){
+                    //remove preloader for lesson for this particular week based on weekID
+                    $('.lesson.preloader', '#node-'+weekID).remove();
+                  }
+
                 });
 
-
+                
               });
             }
         });
@@ -638,7 +649,8 @@ var pathArray = window.location.pathname.split('/');
           "type":"update"
           }, {
             success: function(model, response, options){
-              console.log("returned!!");
+
+              $('#update-preloader').remove();
           }
         });
 
@@ -659,7 +671,7 @@ var pathArray = window.location.pathname.split('/');
           //when the node is new... must be a better way!
           w.url = "/node";
           
-          $('.week-list-container').append('<div id="week-preloader" class="week brick roman preloader"></div>');
+          $('.week-list-container').append('<div id="week-preloader" class="week brick roman preloader edit-mode"></div>');
           var resp = w.save({}, {
             success: function(model, response, options){
               //not sure why the BB drupal module can't handle this

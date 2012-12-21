@@ -25,6 +25,7 @@
     <section class="span9"> 
       <div class="weeks">
         <div id="weeks-list-el"></div>
+        <div id="week-preloader" class="week brick roman preloader"></div>
         <?php if($editable){ ?>
           <div id="add-week-container" class="button">+ Week</div>
         <?php } ?>
@@ -39,6 +40,7 @@
           <div id="add-update-container" class="button">+</div>
         <?php } ?>
         <div id="updates-list-el" class="el"></div>
+        <div id="update-preloader" class="update brick standard preloader"></div>
       </div>
     </section>  <!-- /.span3 -->
 
@@ -81,6 +83,7 @@
     <% } %>
 
     <div class="lessons-list-el"></div>
+    <div id="lesson-preloader" class="lesson brick standard preloader"></div>
     
     <?php if($editable){ ?>
       <div class="add-lesson-note-wrapper brick standard">
@@ -131,7 +134,8 @@
 
 <script type="text/template" id="week-list">
   <div>
-    <div class="week-list-container"></div>
+    <div class="week-list-container">
+    </div>
   </div>
 </script>
 

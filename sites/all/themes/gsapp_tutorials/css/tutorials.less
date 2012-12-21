@@ -22,7 +22,7 @@
 @phoneBrickPadding: 10px;
 @editableBorder: none;
 
-@preloaderBG: @editModeBGColor url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif') no-repeat;
+@preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
 
 
 
@@ -63,10 +63,19 @@
   float:right;
 }
 
-.week.preloader{
-  height: 420px;
-  background:@preloaderBG;
+.preloader{
   background-position: center;
+  background-image: @preloaderBGURL;
+  background-repeat: no-repeat;
+}
+
+#week-preloader{
+  height: 420px;
+}
+
+#update-preloader,
+.lesson.preloader{
+  height:300px;
 }
 
 
