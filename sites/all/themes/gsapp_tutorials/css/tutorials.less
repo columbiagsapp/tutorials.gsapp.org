@@ -19,6 +19,7 @@
 @standardBrickHeight: 260px;
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
+@standardBrickHoverBG: #dfdfdf;
 @phoneBrickPadding: 10px;
 @editableBorder: none;
 
@@ -453,7 +454,8 @@ iframe {
   float:left;
 }
 
-textarea{
+textarea,
+textarea[readonly]{
   background-color: transparent;
   border: none;
   -webkit-box-shadow: none;
@@ -532,6 +534,7 @@ textarea.week-title{
 .note:hover{
   cursor:pointer;
   .glowing-box-inset;
+  background-color:@standardBrickHoverBG;
 }
 
 .lesson textarea:hover,
