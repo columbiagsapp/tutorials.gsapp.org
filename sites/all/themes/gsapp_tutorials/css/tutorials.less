@@ -1,4 +1,6 @@
 @bgColor: white;
+@lightBGColor: #efefef;
+@darkBGColor: #aaa;
 
 @baseFontSize: 14px;
 @baseLineHeight: 20px;
@@ -43,8 +45,8 @@
 
 @brickPadding: 20px;
 @brickBorder: none;
-@brickBGColor: #efefef;
-@editModeBGColor: #aaa;
+@brickBGColor: @lightBGColor;
+@editModeBGColor: @darkBGColor;
 
 @verticalpadding: 20px;
 @horizontalpadding: 0;
@@ -56,11 +58,14 @@
 @standardBrickMargin: 0 20px 20px 0;
 @standardBrickHoverBG: #dfdfdf;
 
+@weekStandardHeight: 420px;
+
 
 @phoneBrickPadding: 10px;
 @editableBorder: none;
 
 @preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
+@playBGURL25: url('/sites/all/themes/gsapp_tutorials/assets/play25x25.png');
 
 
 @headerHeightAndMargin: 62px;
@@ -127,8 +132,9 @@
   background-repeat: no-repeat;
 }
 
-#week-preloader{
-  height: 420px;
+#week-preloader,
+#lesson-content-preloader{
+  height: @weekStandardHeight;
 }
 
 #update-preloader,
@@ -632,4 +638,21 @@ textarea.week-title{
 }
 
 
+.course .lesson-youtube-icon{
+  margin-top:10px;
+  background:@darkBGColor @playBGURL25 no-repeat center;
+  width:48%;
+  height:50px;
+}
+
+
+/* LESSON OPEN */
+
+.lesson-open textarea{
+  width:100%;
+}
+
+.lesson-open .lesson-youtube{
+  min-height:@weekStandardHeight;
+}
 

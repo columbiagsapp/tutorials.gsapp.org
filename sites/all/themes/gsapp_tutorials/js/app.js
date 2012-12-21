@@ -1,7 +1,8 @@
 
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
-var updates_detached;
+var updates_detached,
+    openLessonModel;
 
 (function ($){
   Drupal.behaviors.app = {
@@ -274,12 +275,37 @@ var updates_detached;
           events: {
             "click .edit" : "editLesson",
             "click .delete": "deleteLesson",
-            "click .cancel": "cancelEdit"
+            "click .cancel": "cancelEdit",
+            "click .lesson":"openLesson"
           },
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
             this.model.bind('change', this.render, this);//this calls the fetch 
+          },
+
+          openLesson: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $(this_selector).closest('.week').addClass('selected');
+            $(this_selector).addClass('open').hide();
+            $('#schedule').removeClass('span9').addClass('span3 collapsed');
+            updates_detached = $('#updates').detach();
+
+            var contentSectionHTML = 
+            '<section id="lesson-content" class="span9 outer" role="complementary"><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+
+            $('#main').append(contentSectionHTML);
+
+            openLessonModel = this.model.clone();
+
+            var openLessonView = new LessonView({
+              model: this.model,
+              el: '#lesson-content-el',
+              templateSelector: '#bb_lesson_open_template'
+            });
+
+            openLessonView.render(); 
+
           },
 
           firstEditLesson: function(){
@@ -348,8 +374,7 @@ var updates_detached;
             "click .add-lesson-container" :  "addLesson",
             "click .edit-week-buttons .edit" : "editWeek",
             "click .edit-week-buttons .delete": "deleteWeek",
-            "click .edit-week-buttons .cancel": "cancelEdit",
-            "click .lesson":"openLesson"
+            "click .edit-week-buttons .cancel": "cancelEdit"
           },
 
           initialize: function(opts) {
@@ -359,17 +384,6 @@ var updates_detached;
             //the editWeek function (during a save) was triggering a change event
             //which called a fetch and then deleted all the lessons from the week
             //this.model.bind('change', this.render, this);//this calls the fetch 
-          },
-
-          openLesson: function(){
-            $('#schedule').removeClass('span9').addClass('span3 collapsed');
-            updates_detached = $('#updates').detach();
-
-            var contentSectionHTML = 
-            '<section id="lesson-content" class="span9 outer" role="complementary"><div class="inner"><h2 class="title float-left">Lesson</h2><div id="lesson-content-el" class="el"></div><div id="lesson-content-preloader" class="lesson-content brick roman preloader"></div></div></section><!-- /.span3 -->';
-
-            $('#main').append(contentSectionHTML);
-
           },
           
           //vote up binding - just calls the related Question model's vote method

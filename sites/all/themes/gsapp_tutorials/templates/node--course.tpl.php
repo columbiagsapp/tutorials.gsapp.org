@@ -61,6 +61,36 @@
       <% if (typeof(field_description) != "undefined" ) { %>
         <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
       <% } %>
+      <% if (typeof(field_youtube_embed) != "undefined" ) {
+            if(field_youtube_embed != null) { %>
+        <div class="editable collapsible lesson-youtube-icon"></div>
+      <% } }%>
+      
+      <?php if($editable){ ?>
+        <div class="edit-lesson-buttons collapsible">
+          <div class="edit button">Edit</div>
+          <div class="cancel button">Cancel</div>
+          <div class="delete button">Delete</div>
+        </div>
+      <?php } ?>
+    </div><!-- /.inner -->
+  </div>
+</script>
+
+<script type="text/template" id="bb_lesson_open_template">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson-open">
+    <div class="inner">
+      <% if ( typeof(title) != "undefined" ) { %>
+        <h2 class="title">
+          <textarea readonly class="editable lesson-title"><%= title %></textarea>
+        </h2>
+      <% } %>
+      <% if (typeof(field_description) != "undefined" ) { %>
+        <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
+      <% } %>
+      <% if (typeof(field_youtube_embed) != "undefined" ) { %>
+        <div class="editable collapsible lesson-youtube"><%= field_youtube_embed %></div>
+      <% } %>
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons collapsible">
