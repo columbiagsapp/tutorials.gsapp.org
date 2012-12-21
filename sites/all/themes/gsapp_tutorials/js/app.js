@@ -281,8 +281,13 @@ var pathArray = window.location.pathname.split('/');
             this.model.bind('change', this.render, this);//this calls the fetch 
           },
 
+          firstEditLesson: function(){
+            var this_selector = '#node-' + this.model.get('nid');
+            $(this_selector).addClass('first-edit');
+            this.editLesson();
+          },
+
           editLesson: function(){
-            console.log('editLesson');
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
@@ -290,7 +295,7 @@ var pathArray = window.location.pathname.split('/');
               $(this_selector).addClass('edit-mode');
               $(this_selector).closest('.week').addClass('child-edit-mode');
             }else{
-              console.log('editLesson-save');
+              $(this_selector).removeClass('first-edit');
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
                 "field_description": $(this_selector + ' .lesson-description').val()
@@ -302,20 +307,32 @@ var pathArray = window.location.pathname.split('/');
           },
 
           deleteLesson: function(){
+            var weekID = $('#node-'+this.model.get('nid')).closest('.week').attr('id')
+            console.log('weekID: '+weekID);
+            console.log("calling: $('#node-'+weekID).removeClass('child-edit-mode')");
+            $('#'+weekID).removeClass('child-edit-mode');
+            weekID = weekID.substr(5);
+            LessonsCollectionView[weekID].remove(this.model);
             this.model.destroy();
+            this.remove();
           },
 
           cancelEdit: function(){
-            console.log('cancelEdit lesson');
             var this_selector = '#node-' + this.model.get('nid');
-            $('.edit', this_selector).text('Edit');
-            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-            $(this_selector).removeClass('edit-mode');
-            $(this_selector).closest('.week').removeClass('child-edit-mode');
-            
-            //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
-            $('textarea.lesson-title', this_selector).val( this.model.get('title') );
-            $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
+            if($(this_selector).hasClass('first-edit')){
+              $(this_selector).closest('.week').removeClass('child-edit-mode');
+              this.model.save();
+              this.deleteLesson();
+            }else{
+              $('.edit', this_selector).text('Edit');
+              $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+              $(this_selector).removeClass('edit-mode');
+              $(this_selector).closest('.week').removeClass('child-edit-mode');
+              
+              //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
+              $('textarea.lesson-title', this_selector).val( this.model.get('title') );
+              $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
+            }
           }
 
         });
@@ -373,9 +390,11 @@ var pathArray = window.location.pathname.split('/');
                   "nid":response.id
                 });
                 l.save();
+                var newLessonView = LessonsCollectionView[weekNID].addOne(l);
+                newLessonView.firstEditLesson();
               }
             });
-            LessonsCollectionView[weekNID].addOne(l);
+            
             
 
           },
