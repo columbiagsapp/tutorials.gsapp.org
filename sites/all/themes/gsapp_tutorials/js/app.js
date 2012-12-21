@@ -381,8 +381,8 @@ var pathArray = window.location.pathname.split('/');
           },
 
           firstEditWeek: function(){
-            console.log('firstEditWeek()');
             var this_selector = '#node-' + this.model.get('nid');
+            $('.lesson.preloader', this_selector).remove();
             $(this_selector).addClass('first-edit');
             this.editWeek();
           },
