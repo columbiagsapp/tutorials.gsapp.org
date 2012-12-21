@@ -1,7 +1,8 @@
 @bgColor: white;
 
+
 @textColor: black;
-@inverseTextColor: white;
+@editModeTextColor: whiteSmoke;
 
 @editableBGColor: transparent;
 @editableBGColorHover: black;
@@ -10,6 +11,7 @@
 @brickPadding: 20px;
 @brickBorder: none;
 @brickBGColor: #efefef;
+@editModeBGColor: #aaa;
 
 @verticalpadding: 20px;
 @horizontalpadding: 0;
@@ -20,17 +22,7 @@
 @phoneBrickPadding: 10px;
 @editableBorder: none;
 
-@buttonBGColor: #aaa;
-@buttonPadding: 5px 10px 7px;
-@buttonTextColor: whitesmoke;
-@buttonBGColorHover:black;
-@inverseButtonTextColor:whitesmoke;
-@buttonTextSize: 16px;
-@buttonTextWeight: 500;
-@buttonWidth: auto;
-@buttonMargin: 10px 0 0 10px;
 
-@lessonNoteButtonWidth: 80%;
 
 
 
@@ -57,15 +49,6 @@
   line-height: 1em;
 }
 
-.float-left{
-  float:left;
-}
-
-.float-right{
-  float:right;
-}
-
-
 .hidden{
   display:none;
 }
@@ -77,6 +60,12 @@
     width:@standardBrickWidth;
     height:@standardBrickHeight;
     padding:@standardBrickPadding;
+    margin: @standardBrickMargin;
+  }
+  .course .week .week-description{
+    width:250px;
+    height:300px;
+    padding:0;
     margin: @standardBrickMargin;
   }
 }
@@ -102,6 +91,12 @@
     padding:@standardBrickPadding;
     margin: @standardBrickMargin;
   }
+  .course .week .week-description{
+    width:250px;
+    height:300px;
+    padding:0;
+    margin: @standardBrickMargin;
+  }
 }
 
 
@@ -113,6 +108,12 @@
     padding:@standardBrickPadding;
     margin: @standardBrickMargin;
   }
+  .course .week .week-description{
+    width:250px;
+    height:300px;
+    padding:0;
+    margin: @standardBrickMargin;
+  }
 }
 
 /* phone in portrait */
@@ -121,6 +122,12 @@
     width:100%;
     height:auto;
     padding:@phoneBrickPadding;
+    margin: 0 0 5px;
+  }
+  .course .week .week-description{
+    width:100%;
+    height:auto;
+    padding:0;
     margin: 0 0 5px;
   }
 }
@@ -160,6 +167,11 @@
   color:@textColor;
 }
 
+.brick.edit-mode{
+  color:@editModeTextColor;
+  background-color:@editModeBGColor;
+}
+
 .brick.roman{
   width:100%;
 }
@@ -173,14 +185,14 @@
 }
 
 .ajax-submission{
-	display:block;
-	margin:20px 0;
-	border:2px solid;
-	color: @textColor;
+  display:block;
+  margin:20px 0;
+  border:2px solid;
+  color: @textColor;
 }
 
 .bl{
-	display:block;
+  display:block;
 }
 
 .footer{
@@ -202,11 +214,11 @@ iframe {
 .ask-a-question input,
 .ask-a-question textarea,
 .ask-a-question button {
-	.bl;
+  .bl;
 }
 
 .ask-a-question textarea{
-	min-width:450px;
+  min-width:450px;
 }
 
 .jumbotron {
@@ -280,16 +292,34 @@ iframe {
   padding:0;
 }
 
-.course #add-update-container,
-.course #add-week-container,
-.course .add-lesson-container,
-.course .add-note-container{
-  background-color: @buttonBGColor;
-  padding: @buttonPadding;
-  color: @buttonTextColor;
-  width:@buttonWidth;
-  font-weight: @buttonTextWeight;
+
+.course .week-description{
+  float:left;
 }
+.course .edit-mode .week-description{
+  color:@editModeTextColor;
+}
+
+
+
+
+
+@buttonBGColor: #aaa;
+@buttonPadding: 5px 10px 7px;
+@buttonTextColor: whitesmoke;
+@buttonBGColorHover:black;
+@inverseButtonTextColor:whitesmoke;
+@buttonTextSize: 16px;
+@buttonTextWeight: 500;
+@buttonWidth: auto;
+@buttonMargin: 10px 0 0 10px;
+
+@lessonNoteButtonWidth: 80%;
+
+
+
+
+
 
 .button{
   background-color: @buttonBGColor;
@@ -297,7 +327,43 @@ iframe {
   color: @buttonTextColor;
   width:@buttonWidth;
   font-weight: @buttonTextWeight;
+  font-size: @buttonTextSize;
+  text-align:center;
 }
+
+.edit-mode .button{
+  background-color: @buttonTextColor;
+  color: @buttonBGColor;
+}
+
+.button:hover{
+  cursor:pointer;
+  background-color:@buttonBGColorHover;
+  color:@inverseButtonTextColor;
+}
+
+.delete,
+.cancel{
+  .hidden;
+}
+
+.edit-mode .delete,
+.edit-mode .cancel{
+  display:block;
+}
+
+.child-edit-mode .edit-week-buttons, 
+.child-edit-mode .add-lesson-note-wrapper,
+.edit-mode .add-lesson-note-wrapper{
+  .hidden;
+}
+
+.disabled-mode .button{
+  .hidden;
+  color:@editModeTextColor;
+}
+
+
 
 .course #add-update-container{
   float:right;
@@ -314,26 +380,16 @@ iframe {
   width:@lessonNoteButtonWidth;
 }
 
-.button{
-  font-size: @buttonTextSize;
-  text-align:center;
-}
-
 
 .course #add-week-container:hover,
 .course .add-lesson-container:hover,
 .course .add-note-container:hover,
 .course #add-update-container:hover{
-  cursor:pointer;
   background-color:@buttonBGColorHover;
   color:@inverseButtonTextColor;
 }
 
-.button:hover{
-  cursor:pointer;
-  background-color:@buttonBGColorHover;
-  color:@inverseButtonTextColor;
-}
+
 
 .course .add-lesson-note-plus{
   font-size:120px;
@@ -356,7 +412,7 @@ iframe {
 
 .course #updates-list-el{
   margin-top:20px;
-  .float-left;
+  float:left;
 }
 
 textarea{
@@ -424,10 +480,6 @@ textarea.week-title{
   margin-top:5px;
 }
 
-.course .edit-update-buttons{
-  margin:20px;
-}
-
 .course .edit-week-buttons .button,
 .course .edit-lesson-buttons .button,
 .course .edit-update-buttons .button{
@@ -435,8 +487,5 @@ textarea.week-title{
   margin:@buttonMargin;
 }
 
-.course .delete,
-.course .cancel{
-  .hidden;
-}
+
 

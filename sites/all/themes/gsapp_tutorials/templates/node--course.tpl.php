@@ -73,11 +73,11 @@
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman">
     <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
       <h2 class="title">
-        Week <textarea readonly class="editable week-number"><%= field_week_number %></textarea>: <textarea <?php if(!($editable)){ print 'readonly '; }?>class="editable week-title"><%= title %></textarea>
+        Week <textarea readonly class="editable week-field week-number"><%= field_week_number %></textarea>: <textarea readonly class="editable week-field week-title"><%= title %></textarea>
       </h2>
     <% } %>
     <% if (typeof(field_description) != "undefined" ) { %>
-      <textarea readonly class="editable week-description brick standard"><%= field_description %></textarea>
+      <textarea readonly class="editable week-field week-description"><%= field_description %></textarea>
     <% } %>
 
     <div class="lessons-list-el"></div>

@@ -287,11 +287,8 @@ var pathArray = window.location.pathname.split('/');
             if($('.edit', this_selector).text() == "Edit"){
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
-              $('.delete, .cancel', this_selector).show();
-              $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
-              $('.button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
-              $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').hide();
               $(this_selector).addClass('edit-mode');
+              $(this_selector).closest('.week').addClass('child-edit-mode');
             }else{
               console.log('editLesson-save');
               this.model.set({
@@ -312,12 +309,9 @@ var pathArray = window.location.pathname.split('/');
             console.log('cancelEdit lesson');
             var this_selector = '#node-' + this.model.get('nid');
             $('.edit', this_selector).text('Edit');
-            $('.delete, .cancel', this_selector).hide();
-            $(this_selector).css('backgroundColor', '').css('color','');
-            $('.button', this_selector).css('backgroundColor', '').css('color','');
-            $(this_selector).closest('.week').find('.edit-week-buttons, .add-lesson-note-wrapper').show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
             $('.edit-mode').removeClass('edit-mode');
+            $(this_selector).closest('.week').removeClass('child-edit-mode');
             
             //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
             $('textarea.lesson-title', this_selector).val( this.model.get('title') );
@@ -389,19 +383,13 @@ var pathArray = window.location.pathname.split('/');
           editWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
-              console.log('editWeek-edit');
-              $('.edit-week-buttons .edit', this_selector).text('Save');
-              $('.edit-week-buttons .delete', this_selector).show();
-              $('.edit-week-buttons .cancel', this_selector).show();
-              $('.add-lesson-note-wrapper', this_selector).hide();
-              $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
-              $('.edit-week-buttons .button', this_selector).css('backgroundColor', 'whitesmoke').css('color','#aaa');
-              $('.lesson .edit-lesson-buttons', this_selector).hide();
-              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+              $('input[type="text"].week-field, textarea.week-field', this_selector).removeAttr('readonly');
+              $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
+              $('.lesson, .note', this_selector).addClass('disabled-mode');
             }else{
-              console.log('editWeek-save');
-              var weekNumber = $(this_selector + ' .week-number').val();
+              var weekNumber = $('.week-number', this_selector).val();
+              console.log('weekNumber: '+weekNumber);
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
                 weekNumber = '0' + weekNumber;
@@ -426,6 +414,11 @@ var pathArray = window.location.pathname.split('/');
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
+            $('.edit', this_selector).text('Edit');
+            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            $('.edit-mode').removeClass('edit-mode');
+            $('.disabled-mode').removeClass('disabled-mode');
+            /*
             $('.edit-week-buttons .edit', this_selector).text('Edit');
             $('.edit-week-buttons .delete', this_selector).hide();
             $('.edit-week-buttons .cancel', this_selector).hide();
@@ -435,6 +428,7 @@ var pathArray = window.location.pathname.split('/');
             $('.add-lesson-note-wrapper', this_selector).show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
             $('.edit-mode').removeClass('edit-mode');
+            */
             
             //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
             $('textarea.week-title', this_selector).val( this.model.get('title') );
@@ -461,6 +455,10 @@ var pathArray = window.location.pathname.split('/');
             console.log('editUpdate');
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
+              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+              $('.edit', this_selector).text('Save');
+              $(this_selector).addClass('edit-mode');
+              /*
               $('.edit', this_selector).text('Save');
               $('.delete, .cancel', this_selector).show();
               $(this_selector).css('backgroundColor', '#aaa').css('color','whitesmoke');
@@ -468,6 +466,7 @@ var pathArray = window.location.pathname.split('/');
               $('#add-update-container').hide();
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $(this_selector).addClass('edit-mode');
+              */
             }else{
               console.log('editUpdate-save');
               this.model.set({
@@ -488,12 +487,17 @@ var pathArray = window.location.pathname.split('/');
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
             $('.edit', this_selector).text('Edit');
+            $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
+            $('.edit-mode').removeClass('edit-mode');
+            /*
+            $('.edit', this_selector).text('Edit');
             $('.delete, .cancel', this_selector).hide();
             $(this_selector).css('backgroundColor', '').css('color','');
             $('.button', this_selector).css('backgroundColor', '').css('color','');
             $('#add-update-container').show();
             $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
             $('.edit-mode').removeClass('edit-mode');
+            */
             
             //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
             $('textarea.update-title', this_selector).val( this.model.get('title') );
@@ -660,6 +664,8 @@ var pathArray = window.location.pathname.split('/');
           //when the node is new... must be a better way!
           w.url = "/node";
           
+          //TODO TCT2003 THURS DEC 20, 2012: add a preloader here, and remove it upon success
+          $('.week-list-container').append('<div id="week-preloader" class="week preloader"></div>');
           var resp = w.save({}, {
             success: function(model, response, options){
               //not sure why the BB drupal module can't handle this
@@ -677,14 +683,15 @@ var pathArray = window.location.pathname.split('/');
               });
 
               w.save();
+              $('#week-preloader').remove();
 
-              //WeeksCollection.render();
+              $('#node-temp').attr('id', 'node-'+response.id);
+              var newWeekView = WeeksCollectionView.addOne(w);
+
+              newWeekView.editWeek();
             }
           });
-          //this can be asyncronous with the server save, meaning that
-          //it can update the display even before the server returns a 
-          //response (it doesn't have to be in the success callback)
-          WeeksCollectionView.addOne(w);
+          
        
         });
 
