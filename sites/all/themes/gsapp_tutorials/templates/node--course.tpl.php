@@ -52,76 +52,80 @@
 
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box">
+    <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">
           <textarea readonly class="editable lesson-title"><%= title %></textarea>
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable lesson-description"><%= field_description %></textarea>
+        <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
       <% } %>
       
       <?php if($editable){ ?>
-        <div class="edit-lesson-buttons">
+        <div class="edit-lesson-buttons collapsible">
           <div class="edit button">Edit</div>
           <div class="cancel button">Cancel</div>
           <div class="delete button">Delete</div>
         </div>
       <?php } ?>
+    </div><!-- /.inner -->
   </div>
 </script>
 
 <script type="text/template" id="bb_week_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman">
-    <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
-      <h2 class="title">
-        Week <textarea readonly class="editable week-field week-number"><%= field_week_number %></textarea>: <textarea readonly class="editable week-field week-title"><%= title %></textarea>
-      </h2>
-    <% } %>
-    <% if (typeof(field_description) != "undefined" ) { %>
-      <textarea readonly class="editable week-field week-description"><%= field_description %></textarea>
-    <% } %>
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman outer">
+    <div class="inner">
+      <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
+        <h2 class="title">
+          Week <textarea readonly class="editable week-field week-number"><%= field_week_number %></textarea>: <textarea readonly class="editable week-field week-title"><%= title %></textarea>
+        </h2>
+      <% } %>
+      <% if (typeof(field_description) != "undefined" ) { %>
+        <textarea readonly class="editable week-field week-description"><%= field_description %></textarea>
+      <% } %>
 
-    <div class="lessons-list-el"></div>
-    <div class="lesson brick standard preloader"></div>
-    
-    <?php if($editable){ ?>
-      <div class="add-lesson-note-wrapper brick standard">
-        <div class="add-lesson-note-plus">+</div>
-        <div class="add-lesson-note-container">
-          <div class="add-lesson-container button">Lesson</div>
-          <div class="add-note-container button">Note</div>
+      <div class="lessons-list-el"></div>
+      <div class="lesson brick standard preloader"></div>
+      
+      <?php if($editable){ ?>
+        <div class="add-lesson-note-wrapper brick standard collapsible">
+          <div class="add-lesson-note-plus">+</div>
+          <div class="add-lesson-note-container">
+            <div class="add-lesson-container button">Lesson</div>
+            <div class="add-note-container button">Note</div>
+          </div>
         </div>
-      </div>
-      <div class="edit-week-buttons">
-        <div class="edit button">Edit</div>
-        <div class="cancel button">Cancel</div>
-        <div class="delete button">Delete</div>
-      </div>
-    <?php } ?>
+        <div class="edit-week-buttons collapsible">
+          <div class="edit button">Edit</div>
+          <div class="cancel button">Cancel</div>
+          <div class="delete button">Delete</div>
+        </div>
+      <?php } ?>
+    </div><!-- /.inner -->
   </div>
 </script>
 
 <script type="text/template" id="bb_update_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="update brick glowing-box">
-  <div>
-    <% if ( typeof(title) != "undefined" ) { %>
-      <h2 class="title">
-        <textarea readonly class="editable update-title"><%= title %></textarea>
-      </h2>
-    <% } %>
-    <% if (typeof(field_description) != "undefined" ) { %>
-      <textarea readonly class="editable update-description"><%= field_description %></textarea>
-    <% } %>
-    
-    <?php if($editable){ ?>
-      <div class="edit-update-buttons">
-        <div class="edit button">Edit</div>
-        <div class="cancel button">Cancel</div>
-        <div class="delete button">Delete</div>
-      </div>
-    <?php } ?>
-    </div>
+    <div class="inner">
+      <% if ( typeof(title) != "undefined" ) { %>
+        <h2 class="title">
+          <textarea readonly class="editable update-title"><%= title %></textarea>
+        </h2>
+      <% } %>
+      <% if (typeof(field_description) != "undefined" ) { %>
+        <textarea readonly class="editable update-description"><%= field_description %></textarea>
+      <% } %>
+      
+      <?php if($editable){ ?>
+        <div class="edit-update-buttons">
+          <div class="edit button">Edit</div>
+          <div class="cancel button">Cancel</div>
+          <div class="delete button">Delete</div>
+        </div>
+      <?php } ?>
+    </div><!-- /.inner -->
   </div>
 </script>
 

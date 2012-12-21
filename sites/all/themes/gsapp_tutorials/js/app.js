@@ -362,7 +362,7 @@ var updates_detached;
           },
 
           openLesson: function(){
-            $('#schedule').removeClass('span9').addClass('span3');
+            $('#schedule').removeClass('span9').addClass('span3 collapsed');
             updates_detached = $('#updates').detach();
 
             var contentSectionHTML = 

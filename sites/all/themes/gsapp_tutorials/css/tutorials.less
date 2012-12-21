@@ -1,5 +1,38 @@
 @bgColor: white;
 
+@baseFontSize: 14px;
+@baseLineHeight: 20px;
+@baseFontFamily: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+
+@mobileScale: 0.6;
+
+
+@smallFontSize: 1em;
+@smallLineHeight: 1em;
+@mediumFontSize: 1.5714em;/*22px*/
+@mediumLineHeight: 1em;
+@largeFontSize: 2.1429em;/*30px*/
+@largeLineHeight: 1em;
+@xLargeFontSize: 3.5714em;/*50px*/
+@xLargeLineHeight: 1em;
+@xLargeFontWeight: bold;
+
+@smallFontSizeTablet: (@smallFontSize * 1.2857);/*18px*/
+@mediumFontSizeTablet: @smallFontSizeTablet;
+@largeFontSizeTablet: @mediumFontSize;
+@xLargeFontSizeTablet: (@xLargeFontSize * @mobileScale);/*30px*/
+
+
+@baseFont: @baseFontSize/@baseLineHeight @baseFontFamily;
+@smallFont: @smallFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
+@mediumFont: @xLargeFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
+@largeFont: @largeFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
+@xLargeFont: @xLargeFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
+
+
+@xLargeFontTablet: @xLargeFontWeight @xLargeFontSizeTablet/@xLargeLineHeight @baseFontFamily;
+
 
 @textColor: black;
 @editModeTextColor: whiteSmoke;
@@ -15,8 +48,8 @@
 
 @verticalpadding: 20px;
 @horizontalpadding: 0;
-@standardBrickWidth: 190px;
-@standardBrickHeight: 230px;
+@standardBrickWidth: 230px;
+@standardBrickHeight: 270px;
 @fullStandardBrickWidth: 230px;
 @fullStandardBrickHeight: 270px;
 @standardBrickPadding: 20px;
@@ -31,6 +64,9 @@
 
 
 @headerHeightAndMargin: 62px;
+
+
+
 
 
 
@@ -101,12 +137,22 @@
 }
 
 
+.collapsed .collapsible{
+  .hidden;
+}
+
+
+
+
+
+
+
+
 /* Landscape tablet */
 @media (min-width: 768px) and (max-width: 979px) {
   .brick.standard{
     width:@standardBrickWidth;
     height:@standardBrickHeight;
-    padding:@standardBrickPadding;
     margin: @standardBrickMargin;
   }
   .course .week .week-description{
@@ -122,20 +168,19 @@
   .jumbotron{
     border:5px solid black;
   }
-  .jumbotron h1 {
-    font-size: 30px;
+  .jumbotron h1{
+    font-size: @xLargeFontTablet;
   }
 }
 
 /* Landscape tablet or larger */
 @media (min-width: 768px) {
   .jumbotron h1 {
-    font-size: 50px;
+    font: @xLargeFont;
   }
   .brick.standard{
     width:@standardBrickWidth;
     height:@standardBrickHeight;
-    padding:@standardBrickPadding;
     margin: @standardBrickMargin;
   }
   .course .week .week-description{
@@ -152,7 +197,6 @@
   .brick.standard{
     width:@standardBrickWidth;
     height:@standardBrickHeight;
-    padding:@standardBrickPadding;
     margin: @standardBrickMargin;
   }
   .course .week .week-description{
@@ -165,10 +209,12 @@
 
 /* phone in portrait */
 @media (max-width: 480px) {
+  .jumbotron h1{
+    color: (@xLargeFontSize * @phoneScale);
+  }
   .brick.standard{
     width:100%;
     height:auto;
-    padding:@phoneBrickPadding;
     margin: 0 0 5px;
   }
   .course .week .week-description{
@@ -184,13 +230,15 @@
   .brick.standard{
     width:@standardBrickWidth;
     height:@standardBrickHeight;
-    padding:@standardBrickPadding;
     margin: @standardBrickMargin;
   }
 }
 
 /* all phone and tablet, all orientations */
 @media (max-width: 979px) {
+  .jumbotron h1{
+    color: (@xLargeFontSize * @tabletScale);
+  }
 }
 
 /* standard desktop */
@@ -205,10 +253,15 @@ body{
 }
 
 
+
+
+
+
+
 .brick{
   min-height: 20px;
   margin-bottom: @verticalpadding;
-  padding: @brickPadding;
+  padding: 0;
   border: @brickBorder;
   background-color:@brickBGColor;
   display:block;
@@ -234,6 +287,17 @@ body{
 .mortar-top{
   margin-top:@verticalpadding;
 }
+
+
+.collapsed .week .week-title,
+.collapsed .week .week-description,
+.collapsed .brick.standard {
+  height:auto;
+  width:100%;
+}
+
+
+
 
 .ajax-submission{
   display:block;
@@ -277,9 +341,7 @@ iframe {
 }
 
 .jumbotron h1 {
-  font-weight: bold;
   letter-spacing: -1px;
-  line-height: 1;
 }
 .jumbotron p {
   font-size: 24px;
@@ -322,10 +384,6 @@ iframe {
   float:right;
   width:10%;
   margin:0;
-}
-
-.course .weeks{
-  width:95%;
 }
 
 .course .week,
@@ -455,7 +513,7 @@ iframe {
 .course .add-lesson-note-container{
   position:absolute;
   bottom:@standardBrickPadding;
-  width:@lessonNoteButtonWidth;
+  width:100%;
 }
 
 .course .add-lesson-note-wrapper:hover{
@@ -518,7 +576,8 @@ textarea.week-title{
 }
 
 .course .edit-week-buttons,
-.course .edit-lesson-buttons{
+.course .edit-lesson-buttons,
+.course .edit-update-buttons{
   position:absolute;
   right:20px;
 }
@@ -527,7 +586,8 @@ textarea.week-title{
   top:20px;
 }
 
-.course .edit-lesson-buttons{
+.course .edit-lesson-buttons,
+.course .edit-update-buttons{
   bottom:20px;
   width:100%;
   margin-top:5px;
