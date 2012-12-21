@@ -38,7 +38,15 @@
   .box-shadow(@style, rgba(0, 0, 0, @alpha));
 }
 .glowing-box { 
-  .box-shadow(0 0 5px, 30%);
+  .box-shadow(0 0 7px, 30%);
+}
+
+.glowing-box-inset{
+  .box-shadow(inset 0 0 7px, 30%);
+}
+
+.noglow{
+  .box-shadow(0 0 0, 0%);
 }
 
 .el{
@@ -515,6 +523,31 @@ textarea.week-title{
 .course .edit-update-buttons .button{
   float:right;
   margin:@buttonMargin;
+}
+
+
+
+
+.lesson:hover,
+.note:hover{
+  cursor:pointer;
+  .glowing-box-inset;
+}
+
+.lesson textarea:hover,
+.note textarea:hover{
+  cursor:pointer;
+}
+
+.edit-mode.lesson:hover,
+.edit-mode.note:hover{
+  cursor:auto;
+  .glowing-box;
+}
+
+.edit-mode.lesson textarea:hover,
+.edit-mode.note textarea:hover{
+  cursor: auto;
 }
 
 
