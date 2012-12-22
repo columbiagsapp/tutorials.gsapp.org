@@ -34,7 +34,7 @@
     </section> <!-- /.node -->
 
 
-    <section id="updates" class="span3 outer" role="complementary">
+    <section id="updates" class="span3 collapsed outer" role="complementary">
       <h2 id="updates-button" class="heading float-left heading-button">Updates</h2>
         <?php if($editable){ ?>
           <div id="add-update-container" class="button">+</div>

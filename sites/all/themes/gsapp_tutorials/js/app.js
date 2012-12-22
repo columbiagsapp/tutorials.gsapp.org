@@ -15,15 +15,22 @@ var openLessonView = null;
       */
       function transitionSchedule(){
         if( $('#lesson-content').length){
-          $('#lesson-content').remove();
+          //remove the temporary lesson model and view
+          openLessonView.remove();
+          openLessonView = null;
+          openLessonModel.clear();
+          openLessonModel = null;
+
           $('.open').removeClass('open');
           $('.selected').removeClass('selected');
+
+          $('#lesson-content').remove();
+
+          //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
           $('#schedule').removeClass('span3 collapsed').addClass('span9');
           $('#main').append(updates_detached);
-          openLessonView.deleteLesson();
-        }else{
-          $('#updates').removeClass('span9').addClass('span3');
         }
+        $('#updates').removeClass('span9').addClass('span3');
         $('#schedule').removeClass('span3 collapsed').addClass('span9');
 
         return false;
@@ -330,6 +337,7 @@ var openLessonView = null;
             var this_selector = '#node-' + this.model.get('nid');
             var contentSectionHTML = 
             '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+
             //if a lesson is already open, make sure to close it and return it to the schedule
             if(openLessonModel != null){
               if( !$(this_selector).closest('.week').hasClass('selected') ){
@@ -346,7 +354,7 @@ var openLessonView = null;
               openLessonModel = null;
 
               //need to replace the el, the view.remove() clear s it
-              $('#lesson-content').prepend('<div id="lesson-content-el" class="el"></div>');
+              $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
             }
             
             if(!same_week){
@@ -420,16 +428,16 @@ var openLessonView = null;
           },
 
           deleteLesson: function(){
+            //delete the actual model from the database and its view
             var weekID = $('.open').closest('.week').attr('id');
             weekID = weekID.substr(5);
             LessonsCollectionView[weekID].remove(this.model);
             this.model.destroy();
             this.remove();
-            openLessonView = null;
-            openLessonModel = null;
-            if( $('#lesson-content').length){
-              transitionSchedule();
-            }
+
+            //clear the temporary lesson model and view and transition to 
+            //the main configuration
+            transitionSchedule();
           },
 
           cancelEdit: function(){
