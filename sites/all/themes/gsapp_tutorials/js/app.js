@@ -401,21 +401,11 @@ var openLessonView = null;
             }else{
               var this_selector = '#node-' + this.model.get('nid');
             }
-            console.log('editLesson() this_selector: '+this_selector);
             if($('.edit', this_selector).text() == "Edit"){
-              console.log('editLesson() edit version');
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
-              $('#lesson-content').addClass('edit-mode');
-              /*
-              if($(this_selector).hasClass('lesson')){
-                //else it's lesson-open, which doesn't have a week parent
-                $(this_selector).closest('.week').addClass('child-edit-mode');
-              }
-              */
-              
+              $(this_selector).addClass('edit-mode');              
             }else{
-              console.log('editLesson() save version');
               $(this_selector).removeClass('first-edit');
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
@@ -443,20 +433,23 @@ var openLessonView = null;
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
             if($(this_selector).hasClass('first-edit')){
-              console.log('canceling first-edit');
-              //$(this_selector).closest('.week').removeClass('child-edit-mode');
               this.model.save();
               this.deleteLesson();
             }else{
-              console.log('canceling not first-edit');
               $('.edit', this_selector).text('Edit');
               $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-              $('#lesson-content').removeClass('edit-mode');
-              //$(this_selector).closest('.week').removeClass('child-edit-mode');
+              $(this_selector).removeClass('edit-mode');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('textarea.lesson-title', this_selector).val( this.model.get('title') );
               $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
+
+              //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
+              $('.selected .lesson').each(function(){
+                if($(this).attr('id') == this_selector){
+                  $(this).addClass('open');
+                }
+              });
             }
           }
 
