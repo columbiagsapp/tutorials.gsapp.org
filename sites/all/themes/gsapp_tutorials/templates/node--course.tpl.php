@@ -23,6 +23,7 @@
 
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
+      <h2 id="schedule-button" class="heading float-left heading-button">Schedule</h2>
       <div class="weeks">
         <div id="weeks-list-el"></div>
         <div id="week-preloader" class="week brick roman preloader"></div>
@@ -34,14 +35,12 @@
 
 
     <section id="updates" class="span3 outer" role="complementary">
-        <div class="inner">
-          <h2 class="title float-left">Updates</h2>
-          <?php if($editable){ ?>
-            <div id="add-update-container" class="button">+</div>
-          <?php } ?>
-          <div id="updates-list-el" class="el"></div>
-          <div id="update-preloader" class="update brick standard preloader"></div>
-        </div>
+      <h2 id="updates-button" class="heading float-left heading-button">Updates</h2>
+        <?php if($editable){ ?>
+          <div id="add-update-container" class="button">+</div>
+        <?php } ?>
+        <div id="updates-list-el" class="el"></div>
+        <div id="update-preloader" class="update brick standard preloader"></div>
     </section>  <!-- /.span3 -->
 
   </div><!-- /.row-fluid -->
@@ -66,19 +65,12 @@
         <div class="editable collapsible lesson-youtube-icon"></div>
       <% } }%>
       
-      <?php if($editable){ ?>
-        <div class="edit-lesson-buttons collapsible">
-          <div class="edit button">Edit</div>
-          <div class="cancel button">Cancel</div>
-          <div class="delete button">Delete</div>
-        </div>
-      <?php } ?>
     </div><!-- /.inner -->
   </div>
 </script>
 
 <script type="text/template" id="bb_lesson_open_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson-open">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson-open brick roman">
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">
@@ -137,7 +129,7 @@
 </script>
 
 <script type="text/template" id="bb_update_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="update brick glowing-box">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="update brick roman">
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">

@@ -1,6 +1,7 @@
 @bgColor: white;
 @lightBGColor: #efefef;
 @darkBGColor: #aaa;
+@standardBrickHoverBG: #dfdfdf;
 
 @baseFontSize: 14px;
 @baseLineHeight: 20px;
@@ -56,7 +57,9 @@
 @fullStandardBrickHeight: 270px;
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
-@standardBrickHoverBG: #dfdfdf;
+
+
+@innerVerticalpadding: 10px;
 
 @weekStandardHeight: 420px;
 
@@ -66,6 +69,8 @@
 
 @preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
 @playBGURL25: url('/sites/all/themes/gsapp_tutorials/assets/play25x25.png');
+@videoIconWidth: 35%;
+@videoIconHeight: 50px;
 
 
 @headerHeightAndMargin: 62px;
@@ -100,6 +105,11 @@
   width:100%;
 }
 
+.heading{
+  margin:0 0 @brickPadding @brickPadding;
+  line-height: 1em;
+}
+
 .title{
   margin:0;
   line-height: 1em;
@@ -107,6 +117,10 @@
 
 .hidden{
   display:none;
+}
+
+.open{
+  display:none !important;
 }
 
 .float-left{
@@ -119,11 +133,11 @@
 
 .outer{
   width:100%;
-  background-color:@brickBGColor;
 }
 
 .inner{
   margin:@brickPadding;
+  position:relative;
 }
 
 .preloader{
@@ -147,8 +161,12 @@
   .hidden;
 }
 
-
-
+.heading-button:hover{
+  border:none;
+  text-decoration: none;
+  color:@darkBGColor;
+  cursor:pointer;
+}
 
 
 
@@ -277,7 +295,7 @@ body{
   color:@textColor;
 }
 
-.brick.edit-mode{
+.edit-mode{
   color:@editModeTextColor;
   background-color:@editModeBGColor;
 }
@@ -468,8 +486,7 @@ iframe {
   display:none !important;
 }
 
-.child-edit-mode .edit-week-buttons, 
-.child-edit-mode .add-lesson-note-wrapper,
+.child-edit-mode .button, 
 .edit-mode .add-lesson-note-wrapper{
   .hidden;
 }
@@ -526,11 +543,6 @@ iframe {
   .box-shadow(0 0 5px, 30%);
 }
 
-.course #updates-list-el{
-  margin-top:20px;
-  float:left;
-}
-
 textarea,
 textarea[readonly]{
   background-color: transparent;
@@ -585,19 +597,15 @@ textarea.week-title{
 .course .edit-lesson-buttons,
 .course .edit-update-buttons{
   position:absolute;
-  right:20px;
+  right:0;
 }
 
-.course .edit-week-buttons{
-  top:20px;
-}
-
+.course .edit-week-buttons,
 .course .edit-lesson-buttons,
 .course .edit-update-buttons{
-  bottom:20px;
-  width:100%;
-  margin-top:5px;
+  top:0;
 }
+
 
 .course .edit-week-buttons .button,
 .course .edit-lesson-buttons .button,
@@ -639,14 +647,20 @@ textarea.week-title{
 
 
 .course .lesson-youtube-icon{
-  margin-top:10px;
+  margin-top:@innerVerticalpadding;
   background:@darkBGColor @playBGURL25 no-repeat center;
-  width:48%;
-  height:50px;
+  width:@videoIconWidth;
+  height:@videoIconHeight;
 }
 
 
 /* LESSON OPEN */
+#lesson-content{
+  min-height:@weekStandardHeight;
+}
+.lesson-open{
+  position: relative;
+}
 
 .lesson-open textarea{
   width:100%;

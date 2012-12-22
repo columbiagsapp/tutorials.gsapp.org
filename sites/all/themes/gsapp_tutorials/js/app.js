@@ -1,12 +1,53 @@
 
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
-var updates_detached,
-    openLessonModel;
+var updates_detached = false;
+var openLessonModel = null;
+var openLessonView = null;
 
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
+
+      /*
+        This function transitions from any state to the main state
+        with Schedule in focus and Updates in the sidebar
+      */
+      function transitionSchedule(){
+        if( $('#lesson-content').length){
+          $('#lesson-content').remove();
+          $('.open').removeClass('open');
+          $('.selected').removeClass('selected');
+          $('#schedule').removeClass('span3 collapsed').addClass('span9');
+          $('#main').append(updates_detached);
+          openLessonView.deleteLesson();
+        }else{
+          $('#updates').removeClass('span9').addClass('span3');
+        }
+        $('#schedule').removeClass('span3 collapsed').addClass('span9');
+
+        return false;
+      }
+
+      function transitionUpdates(){
+        console.log('transitionUpdates()');
+
+        if( $('#lesson-content').length){
+          $('#lesson-content').remove();
+          $('.open').removeClass('.open');
+        }
+        if(updates_detached != false){
+          $('#main').append(updates_detached);
+        }
+        $('#updates').removeClass('span3').addClass('span9');
+        $('#schedule').removeClass('span9').addClass('span3 collapsed');
+
+        return false;
+      }
+
+      $('#schedule-button').bind('click', transitionSchedule);
+      $('#updates-button').bind('click', transitionUpdates);
+
 
       /*
         STEP 0
@@ -285,20 +326,46 @@ var updates_detached,
           },
 
           openLesson: function(){
+            var same_week = false;
             var this_selector = '#node-' + this.model.get('nid');
-            $(this_selector).closest('.week').addClass('selected');
-            $(this_selector).addClass('open').hide();
-            $('#schedule').removeClass('span9').addClass('span3 collapsed');
-            updates_detached = $('#updates').detach();
-
             var contentSectionHTML = 
-            '<section id="lesson-content" class="span9 outer" role="complementary"><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+            '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+            //if a lesson is already open, make sure to close it and return it to the schedule
+            if(openLessonModel != null){
+              if( !$(this_selector).closest('.week').hasClass('selected') ){
+                //if it's the same week, do nothing, otherwise clear the selected
+                $('.selected').removeClass('selected');
+                same_week = true;
+              }
+              $('.open').removeClass('open');
 
-            $('#main').append(contentSectionHTML);
+              contentSectionHTML = '';
+              openLessonView.remove();
+              openLessonModel.clear();
+              openLessonView = null;
+              openLessonModel = null;
+
+              //need to replace the el, the view.remove() clear s it
+              $('#lesson-content').prepend('<div id="lesson-content-el" class="el"></div>');
+            }
+            
+            if(!same_week){
+              //only add class if not the same week
+              $(this_selector).closest('.week').addClass('selected');
+            }
+
+            $(this_selector).addClass('open');
+
+            if(contentSectionHTML.length > 0){
+              //else it already exists
+              $('#schedule').removeClass('span9').addClass('span3 collapsed');
+              updates_detached = $('#updates').detach();
+              $('#main').prepend(contentSectionHTML);
+            }
 
             openLessonModel = this.model.clone();
 
-            var openLessonView = new LessonView({
+            openLessonView = new LessonView({
               model: this.model,
               el: '#lesson-content-el',
               templateSelector: '#bb_lesson_open_template'
@@ -306,22 +373,41 @@ var updates_detached,
 
             openLessonView.render(); 
 
+            return true;
+
           },
 
           firstEditLesson: function(){
-            var this_selector = '#node-' + this.model.get('nid');
-            $(this_selector).addClass('first-edit');
-            this.editLesson();
+            $('#lesson-content').addClass('first-edit');
+
+            //can't call edit lesson until finished with openLesson
+            if(this.openLesson()){
+              this.editLesson();
+            }
           },
 
           editLesson: function(){
-            var this_selector = '#node-' + this.model.get('nid');
+            //select either this model or it's clone for open-lesson
+            if(openLessonModel != null ){
+              var this_selector = '#node-' + openLessonModel.get('nid');
+            }else{
+              var this_selector = '#node-' + this.model.get('nid');
+            }
+            console.log('editLesson() this_selector: '+this_selector);
             if($('.edit', this_selector).text() == "Edit"){
+              console.log('editLesson() edit version');
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
-              $(this_selector).addClass('edit-mode');
-              $(this_selector).closest('.week').addClass('child-edit-mode');
+              $('#lesson-content').addClass('edit-mode');
+              /*
+              if($(this_selector).hasClass('lesson')){
+                //else it's lesson-open, which doesn't have a week parent
+                $(this_selector).closest('.week').addClass('child-edit-mode');
+              }
+              */
+              
             }else{
+              console.log('editLesson() save version');
               $(this_selector).removeClass('first-edit');
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
@@ -334,27 +420,31 @@ var updates_detached,
           },
 
           deleteLesson: function(){
-            var weekID = $('#node-'+this.model.get('nid')).closest('.week').attr('id')
-            console.log('weekID: '+weekID);
-            console.log("calling: $('#node-'+weekID).removeClass('child-edit-mode')");
-            $('#'+weekID).removeClass('child-edit-mode');
+            var weekID = $('.open').closest('.week').attr('id');
             weekID = weekID.substr(5);
             LessonsCollectionView[weekID].remove(this.model);
             this.model.destroy();
             this.remove();
+            openLessonView = null;
+            openLessonModel = null;
+            if( $('#lesson-content').length){
+              transitionSchedule();
+            }
           },
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
             if($(this_selector).hasClass('first-edit')){
-              $(this_selector).closest('.week').removeClass('child-edit-mode');
+              console.log('canceling first-edit');
+              //$(this_selector).closest('.week').removeClass('child-edit-mode');
               this.model.save();
               this.deleteLesson();
             }else{
+              console.log('canceling not first-edit');
               $('.edit', this_selector).text('Edit');
               $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-              $(this_selector).removeClass('edit-mode');
-              $(this_selector).closest('.week').removeClass('child-edit-mode');
+              $('#lesson-content').removeClass('edit-mode');
+              //$(this_selector).closest('.week').removeClass('child-edit-mode');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('textarea.lesson-title', this_selector).val( this.model.get('title') );
