@@ -397,18 +397,37 @@ var openLessonView = null;
             //select either this model or it's clone for open-lesson
             if(openLessonModel != null ){
               var this_selector = '#node-' + openLessonModel.get('nid');
+              var thisModel = openLessonModel;//pointer to the valid model
             }else{
               var this_selector = '#node-' + this.model.get('nid');
+              var thisModel = this.model;//pointer to the valid model
             }
-            if($('.edit', this_selector).text() == "Edit"){
+            
+            if($('.edit', this_selector).text() == "Edit"){//user clicked button to go into edit mode
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
-              $(this_selector).addClass('edit-mode');              
-            }else{
+              $(this_selector).addClass('edit-mode');
+              $('.lesson-video', this_selector).hide();
+              var videoEmbedTextareaArray = [];
+              videoEmbedTextareaArray.push('<textarea id="video-embed-textarea" class="editable lesson-video-edit">');
+              var videoEmbedText = thisModel.get('field_video_embed');
+              if(videoEmbedText != null){//if the field is empty, backbone returns null
+                videoEmbedTextareaArray.push( videoEmbedText );
+              }else{
+                videoEmbedTextareaArray.push( 'Add embed text here from Youtube or Vimeo' );
+              }
+              videoEmbedTextareaArray.push( '</textarea>' );
+              var videoEmbedTextarea = videoEmbedTextareaArray.join(''); 
+              $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
+              console.log('put this in there:');
+              console.log(videoEmbedTextarea);
+
+            }else{//user clicked button to save changes
               $(this_selector).removeClass('first-edit');
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
-                "field_description": $(this_selector + ' .lesson-description').val()
+                "field_description": $(this_selector + ' .lesson-description').val(),
+                "field_video_embed": $(this_selector + ' .lesson-video-edit').val()
               });
 
               this.model.save();

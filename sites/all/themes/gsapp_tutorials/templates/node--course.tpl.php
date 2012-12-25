@@ -60,9 +60,9 @@
       <% if (typeof(field_description) != "undefined" ) { %>
         <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
       <% } %>
-      <% if (typeof(field_youtube_embed) != "undefined" ) {
-            if(field_youtube_embed != null) { %>
-        <div class="editable collapsible lesson-youtube-icon"></div>
+      <% if (typeof(field_video_embed) != "undefined" ) {
+            if(field_video_embed != null) { %>
+        <div class="editable collapsible lesson-video-icon"></div>
       <% } }%>
       
     </div><!-- /.inner -->
@@ -80,9 +80,10 @@
       <% if (typeof(field_description) != "undefined" ) { %>
         <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
       <% } %>
-      <% if (typeof(field_youtube_embed) != "undefined" ) { %>
-        <div class="editable collapsible lesson-youtube"><%= field_youtube_embed %></div>
+      <% if (typeof(field_video_embed) != "undefined" ) { %>
+        <div class="editable collapsible lesson-video"><%= field_video_embed %></div>
       <% } %>
+      <div class="editable collapsible lesson-video-edit-container"></div>
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons collapsible">
