@@ -1,7 +1,7 @@
 
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
-var updates_detached = false;
+var updates_detached = null;
 var openLessonModel = null;
 var openLessonView = null;
 
@@ -30,23 +30,23 @@ var openLessonView = null;
           $('#schedule').removeClass('span3 collapsed').addClass('span9');
           $('#main').append(updates_detached);
         }
-        $('#updates').removeClass('span9').addClass('span3');
+        $('#updates').removeClass('span9').addClass('span3 collapsed');
         $('#schedule').removeClass('span3 collapsed').addClass('span9');
 
         return false;
       }
 
       function transitionUpdates(){
-        console.log('transitionUpdates()');
 
         if( $('#lesson-content').length){
           $('#lesson-content').remove();
           $('.open').removeClass('.open');
         }
-        if(updates_detached != false){
+        if(updates_detached != null){
           $('#main').append(updates_detached);
+          updates_detached = null;
         }
-        $('#updates').removeClass('span3').addClass('span9');
+        $('#updates').removeClass('span3 collapsed').addClass('span9');
         $('#schedule').removeClass('span9').addClass('span3 collapsed');
 
         return false;
@@ -54,7 +54,6 @@ var openLessonView = null;
 
       $('#schedule-button').bind('click', transitionSchedule);
       $('#updates-button').bind('click', transitionUpdates);
-
 
       /*
         STEP 0
@@ -585,12 +584,17 @@ var openLessonView = null;
           events: {
             "click .edit" : "editUpdate",
             "click .delete": "deleteUpdate",
-            "click .cancel": "cancelEdit"
+            "click .cancel": "cancelEdit",
+            "click .update": "transitionUpdate"
           },
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
             this.model.bind('change', this.render, this);//this calls the fetch 
+          },
+
+          transitionUpdate: function(){
+            transitionUpdates();
           },
 
           firstEditUpdate: function(){
@@ -666,7 +670,11 @@ var openLessonView = null;
         WeeksCollection.reset();
 
         var UpdateCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-          model: Update
+          model: Update,
+          comparator: function(update) {
+            return -update.get("created");//negative value to sort from greatest to least
+          }
+          
         });
 
         var UpdatesCollection = new UpdateCollectionPrototype();
@@ -708,8 +716,47 @@ var openLessonView = null;
         });
  
 
+        var _months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        var _days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
         var UpdateCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
+          },
+          
+          addOne: function(newModel, back){
+            //determines if added to front
+            back = typeof back !== 'undefined' ? back : false;
+
+            console.log('IS IT back???: '+back);
+
+            var newItemView = Drupal.Backbone.Views.CollectionView.prototype.addOne.call(this, newModel);
+            var this_selector = "#node-" + newItemView.model.get('nid');
+            console.log("((((((****** this_selector: "+ this_selector);
+
+            //take the new update and prepend it, rather than putting it at the end
+            if(back == false){
+              console.log('trying to prepend');
+              $('#updates-list-el').prepend($(this_selector));
+            }
+            
+            //convert the created unix date stamp to a JS Date object and print out user readable date
+            var date = new Date( newItemView.model.get('created')*1000 );
+            //date.setTime( newItemView.model.get('created')*1000 );
+            var dateStringArray = [];
+            dateStringArray.push('<div class="update-date date">');
+            dateStringArray.push( _days[ date.getDay() ] );
+            dateStringArray.push(', ');
+            dateStringArray.push( _months[ date.getMonth() ] );
+            dateStringArray.push(' ');
+            dateStringArray.push(date.getDate());
+            dateStringArray.push(', ');
+            dateStringArray.push(date.getFullYear());
+            dateStringArray.push('</div>');
+            dateString = dateStringArray.join('');
+
+            $('.inner', this_selector).prepend(dateString);
+
           }
         });
 
@@ -745,42 +792,45 @@ var openLessonView = null;
               $('.course .weeks .week').each(function(i){
                 $('#week-preloader').remove();
                 var weekID = $(this).attr('id');
-                weekID = weekID.substr(5);
+                console.log('weekID first: '+weekID);
+                if(weekID != "week-preloader"){
+                  weekID = weekID.substr(5);
 
-                LessonsCollection[weekID] = new LessonCollectionPrototype();
-                LessonsCollection[weekID].reset();
+                  LessonsCollection[weekID] = new LessonCollectionPrototype();
+                  LessonsCollection[weekID].reset();
 
-                var theEL = '#node-' + weekID + ' .lessons-list-el';
+                  var theEL = '#node-' + weekID + ' .lessons-list-el';
 
-                LessonsCollectionView[weekID] = new LessonCollectionViewPrototype({
-                  collection: LessonsCollection[weekID],
-                  templateSelector: '#lesson-list',
-                  renderer: 'underscore',
-                  el: theEL,
-                  ItemView: LessonView,
-                  //itemTag: 'li',
-                  itemParent: '.lesson-list-container'
-                });
+                  LessonsCollectionView[weekID] = new LessonCollectionViewPrototype({
+                    collection: LessonsCollection[weekID],
+                    templateSelector: '#lesson-list',
+                    renderer: 'underscore',
+                    el: theEL,
+                    ItemView: LessonView,
+                    //itemTag: 'li',
+                    itemParent: '.lesson-list-container'
+                  });
 
-                LessonsCollectionView[weekID].render();
+                  LessonsCollectionView[weekID].render();
+                  console.log('');
+                  console.log('weekID: '+ weekID);
+                  //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
+                  LessonsCollection[weekID].fetchQuery({
+                    "field_parent_week_nid":weekID,
+                    "type":"lesson"
+                  }, {
+                    success: function(model, response, options){
+                      //remove preloader for lesson for this particular week based on weekID
+                      $('.lesson.preloader', '#node-'+weekID).remove();
+                    },
+                    error: function(model, xhr, options){
+                      //remove preloader for lesson for this particular week based on weekID
+                      $('.lesson.preloader', '#node-'+weekID).remove();
+                    }
 
-                //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
-                LessonsCollection[weekID].fetchQuery({
-                  "field_parent_week_nid":weekID,
-                  "type":"lesson"
-                }, {
-                  success: function(model, response, options){
-                    //remove preloader for lesson for this particular week based on weekID
-                    $('.lesson.preloader', '#node-'+weekID).remove();
-                  },
-                  error: function(model, xhr, options){
-                    //remove preloader for lesson for this particular week based on weekID
-                    $('.lesson.preloader', '#node-'+weekID).remove();
-                  }
+                  });
 
-                });
-
-                
+                }
               });
             }
         });
@@ -790,7 +840,6 @@ var openLessonView = null;
           "type":"update"
           }, {
             success: function(model, response, options){
-
               $('#update-preloader').remove();
           }
         });
@@ -842,6 +891,7 @@ var openLessonView = null;
         });
 
         $('#add-update-container').bind('click',function(){
+          transitionUpdates();
           var u = new Update({
             "title": "Title",
             "field_description": "Text",
@@ -872,8 +922,9 @@ var openLessonView = null;
               u.save();
               $('#node-temp').attr('id', 'node-'+response.id);
               $('#update-preloader').remove();
-              var newUpdateView = UpdatesCollectionView.addOne(u);
+              var newUpdateView = UpdatesCollectionView.addOne(u, false);
               newUpdateView.firstEditUpdate();
+                
             }
           });
           //this can be asyncronous with the server save, meaning that

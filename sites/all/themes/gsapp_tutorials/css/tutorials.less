@@ -272,6 +272,9 @@
   }
 }
 
+
+
+
 body{
   color:@textColor;
 }
@@ -497,13 +500,10 @@ iframe {
 }
 
 
-
-.course #add-update-container{
-  float:right;
-}
-
+.course #add-update-container,
 .course #add-week-container{
-  float:left;
+  float:right;
+  margin-right:@standardBrickPadding;
 }
 
 .course .add-lesson-container,
@@ -618,8 +618,7 @@ textarea.week-title{
 
 
 .lesson:hover,
-.note:hover,
-.update:hover{
+.note:hover{
   cursor:pointer;
   .glowing-box-inset;
   background-color:@standardBrickHoverBG;
@@ -668,3 +667,18 @@ textarea.week-title{
   min-height:@weekStandardHeight;
 }
 
+
+/* UPDATES */
+.collapsed .edit-update-buttons{
+  .hidden;
+}
+
+.update:hover{
+  cursor:pointer;
+  background-color:@standardBrickHoverBG;
+}
+
+.date{
+  font:@smallFontSize;
+  margin-bottom:@verticalpadding;
+}

@@ -24,12 +24,12 @@
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
       <h2 id="schedule-button" class="heading float-left heading-button">Schedule</h2>
+      <?php if($editable){ ?>
+        <div id="add-week-container" class="button">+</div>
+      <?php } ?>
       <div class="weeks">
         <div id="weeks-list-el"></div>
         <div id="week-preloader" class="week brick roman preloader"></div>
-        <?php if($editable){ ?>
-          <div id="add-week-container" class="button">+ Week</div>
-        <?php } ?>
       </div>
     </section> <!-- /.node -->
 

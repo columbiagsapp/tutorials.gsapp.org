@@ -446,7 +446,7 @@
 
           // Store pointer to this view in a private variable.
           this._itemViews.push(myItemView);
-
+          
           // TODO: refactor using model view class
           // TODO: fix binding issue so we can just call render and have it use its own model
           //       (currently "this" in ItemView.render is pointing to the collection view)
