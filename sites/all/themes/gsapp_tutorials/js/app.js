@@ -407,12 +407,14 @@ var openLessonView = null;
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
+
               $('.lesson-video', this_selector).hide();
               var videoEmbedTextareaArray = [];
               videoEmbedTextareaArray.push('<textarea id="video-embed-textarea" class="editable lesson-video-edit">');
               var videoEmbedText = thisModel.get('field_video_embed');
-              if(videoEmbedText != null){//if the field is empty, backbone returns null
+              if( (videoEmbedText != null) && (videoEmbedText != '') ){//if the field is empty, backbone returns null
                 videoEmbedTextareaArray.push( videoEmbedText );
+                console.log('**** videoEmbedText: '+videoEmbedText);
               }else{
                 videoEmbedTextareaArray.push( 'Add embed text here from Youtube or Vimeo' );
               }
@@ -461,6 +463,7 @@ var openLessonView = null;
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('textarea.lesson-title', this_selector).val( this.model.get('title') );
               $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
+              $('.lesson-video', this_selector).val( this.model.get('field_video_embed') );
 
               //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
               $('.selected .lesson').each(function(){
