@@ -50,7 +50,7 @@
 
 
 <script type="text/template" id="bb_redirect_template">
-  <a href="<% if (typeof(field_link) != 'undefined' ) { %><%= field_link %><% } %>" target="_blank" id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="redirect brick FLW glowing-box open">
+  <a href="<% if (typeof(field_link) != 'undefined' ) { %><%= field_link %><% } %>" target="_blank" id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="redirect brick FLW glowing-box collapsible open">
     
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
