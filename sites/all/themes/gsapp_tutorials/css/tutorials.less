@@ -60,7 +60,7 @@
 
 @FLWbrickHeight: 80px;
 @FLWbrickWidth: @standardBrickWidth;
-@FLWbrickMargin: 0 0 15px;
+@FLWbrickMargin: 0 20px 15px 0;
 @FLWbrickPadding: 10px;
 
 
@@ -157,14 +157,10 @@
 }
 
 #update-preloader,
-.lesson.preloader{
+.lesson.preloader,
+.redirect.preloader{
   height:300px;
 }
-
-.redirect.preloader{
-  height:@FLWbrickHeight;
-}
-
 
 .collapsed .collapsible{
   .hidden;
@@ -306,6 +302,10 @@ body{
   width: @FLWbrickWidth;
   margin: @FLWbrickMargin;
   padding: 0;
+}
+
+.redirect-list-container{
+  float:left;
 }
 
 .edit-mode{
@@ -640,6 +640,14 @@ textarea.week-title{
   cursor:pointer;
   .glowing-box-inset;
   background-color:@standardBrickHoverBG;
+}
+
+.edit-mode .lesson:hover,
+.edit-mode .note:hover,
+.edit-mode .redirect:hover{
+  cursor:auto;
+  .glowing-box;
+  background-color:@brickBGColor;
 }
 
 .lesson textarea:hover,

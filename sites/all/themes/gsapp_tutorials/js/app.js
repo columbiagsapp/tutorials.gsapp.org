@@ -1204,6 +1204,19 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
                     "type":"redirect"
                   }, {
                     success: function(model, response, options){
+                      //wrap redirects into standard brick groups of 3
+                      var group = 0;
+                      var j;
+                      var total = $('.redirect', '#node-'+weekID).length;
+                      $('.redirect', '#node-'+weekID).each(function(i){                     
+                        if( ((i%3 == 0) && (i != 0)) || (i == total-1) ){
+                          console.log('wrapping group: '+group);
+                          $('.redirect-group-'+group).parent('div').wrapAll('<div class="brick standard" />');
+                          group++;
+                        }
+                        $(this).addClass('redirect-group-'+group);
+                      });
+
                       //remove preloader for lesson for this particular week based on weekID
                       $('.redirect.preloader', '#node-'+weekID).remove();
                       $('.open', '#node-'+weekID).removeClass('open');
