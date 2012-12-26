@@ -408,31 +408,62 @@ var openLessonView = null;
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
 
-              $('.lesson-video', this_selector).hide();
               var videoEmbedTextareaArray = [];
               videoEmbedTextareaArray.push('<textarea id="video-embed-textarea" class="editable lesson-video-edit">');
               var videoEmbedText = thisModel.get('field_video_embed');
               if( (videoEmbedText != null) && (videoEmbedText != '') ){//if the field is empty, backbone returns null
                 videoEmbedTextareaArray.push( videoEmbedText );
-                console.log('**** videoEmbedText: '+videoEmbedText);
               }else{
-                videoEmbedTextareaArray.push( 'Add embed text here from Youtube or Vimeo' );
+                videoEmbedTextareaArray.push( 'Paste embed text here from Youtube or Vimeo' );
               }
               videoEmbedTextareaArray.push( '</textarea>' );
               var videoEmbedTextarea = videoEmbedTextareaArray.join(''); 
-              $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
-              console.log('put this in there:');
+              console.log('should output: ');
               console.log(videoEmbedTextarea);
+              $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
 
             }else{//user clicked button to save changes
               $(this_selector).removeClass('first-edit');
+
+              var video_embed_code = $(this_selector + ' .lesson-video-edit').val();
+              var heightIdxStart = video_embed_code.indexOf('height=');
+              var widthIdxStart = video_embed_code.indexOf('width=');
+
+              //remove any given height in the embed code
+              if(heightIdxStart >= 0){
+                var heightIdxEnd = video_embed_code.indexOf('"', heightIdxStart+8);
+                var temp = video_embed_code.substring(0, heightIdxStart);
+                var temp2 = video_embed_code.substring(heightIdxEnd+1);
+                if(temp2.substr(0,1) == ' '){
+                  temp2 = temp2.substring(1);
+                }
+                video_embed_code = temp + temp2;
+              }
+              //remove any given width in the embed code
+              if(widthIdxStart >= 0){
+                var widthIdxEnd = video_embed_code.indexOf('"', widthIdxStart+7);
+                var temp = video_embed_code.substring(0, widthIdxStart);
+                var temp2 = video_embed_code.substring(widthIdxEnd+1);
+                if(temp2.substr(0,1) == ' '){
+                  temp2 = temp2.substring(1);
+                }
+                video_embed_code = temp + temp2;
+              }
+
+              console.log('setting video embed code: ');
+              console.log(video_embed_code);
+
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
                 "field_description": $(this_selector + ' .lesson-description').val(),
-                "field_video_embed": $(this_selector + ' .lesson-video-edit').val()
+                "field_video_embed": video_embed_code
               });
 
               this.model.save();
+
+              openLessonModel = null;
+              openLessonModel = this.model.clone();
+
               this.cancelEdit();
             }
           },
@@ -463,7 +494,11 @@ var openLessonView = null;
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('textarea.lesson-title', this_selector).val( this.model.get('title') );
               $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
+
+              console.log('&&&& cancel, val for .lesson-video: '+this.model.get('field_video_embed'));
+
               $('.lesson-video', this_selector).val( this.model.get('field_video_embed') );
+              $('.lesson-video-edit', this_selector).remove();
 
               //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
               $('.selected .lesson').each(function(){
