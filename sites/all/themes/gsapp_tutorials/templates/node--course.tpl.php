@@ -216,37 +216,37 @@
 
 
 <script type="text/template" id="bb_question_template">
-        <li class="question">
-          <% if (typeof(title) != "undefined" ) { %>
-            <h2><%= title %></h2>
-          <% } %>
-          <% if (typeof(field_description) != "undefined" ) { %>
-            <div><%= field_description %></div>
-          <% } %>
-          <% if (typeof(field_question_votes) != "undefined" ) { %>
-            <div><%= field_question_votes %></div>
-          <% } %>
-            <button class="voteup">&#43;</button>
-            <button class="votedown">&#45;</button>
-          </li>
-      </script>
+  <li class="question">
+    <% if (typeof(title) != "undefined" ) { %>
+      <h2><%= title %></h2>
+    <% } %>
+    <% if (typeof(field_description) != "undefined" ) { %>
+      <div><%= field_description %></div>
+    <% } %>
+    <% if (typeof(field_question_votes) != "undefined" ) { %>
+      <div><%= field_question_votes %></div>
+    <% } %>
+      <button class="voteup">&#43;</button>
+      <button class="votedown">&#45;</button>
+    </li>
+</script>
 
-      <script type="text/template" id="submit_question_template">
-        <div class="add-question">
-          <h4>Ask a question</h4>
-          <textarea name="newquestion" cols=40 rows=4>
-            Add your question text here
-          </textarea>
-          <button class="questionsubmit">Ask</button>
-        </div>
-      </script>
+<script type="text/template" id="submit_question_template">
+  <div class="add-question">
+    <h4>Ask a question</h4>
+    <textarea name="newquestion">
+      Add your question text here
+    </textarea>
+    <button class="questionsubmit">Ask</button>
+  </div>
+</script>
 
-      <script type="text/template" id="collection-list">
-        <div>
-          <ul class="collection-list-parent"></ul>
-        </div>
-        
-      </script>
+<script type="text/template" id="collection-list">
+  <div>
+    <ul class="collection-list-parent"></ul>
+  </div>
+  
+</script>
 
 
 
