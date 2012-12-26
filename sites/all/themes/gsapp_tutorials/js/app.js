@@ -146,26 +146,9 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
             return state;
             break;
         }
-      }
-      /*
-        STEP 0
-        Determine the page type from the url
-        tutorial or course
-      */
-      if(pathArray[1] === 'tutorial'){
+      }//end of getState()
 
-
-        /* 
-          STEP 1
-          create the tutorial node Backbone object
-          this will be used to fetch the tutorial node which can then tell us which questions
-          are related (through node refs), the related assignments, etc - ie. all the things
-          we want to load dynamically through Backbone so that the user can dynamically update them
-        */
-        var tutorialNid = pathArray[2];//nid from URL
-        var tutorial = new Drupal.Backbone.Models.Node({ nid: tutorialNid });//get this from the url eventually
-
-        
+      function attachQuestionAndAnswer(lessonNid){
         /*
           STEP 2
           create the question node Backbone Model by extending Backbone.Model
@@ -301,7 +284,7 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           Fetch the collection of Question nodes by sending the nid of the tutorial
         */
         QuestionsCollection.fetchQuery({
-          "field_parent_tutorial_nid":pathArray[2]
+          "field_parent_tutorial_nid":lessonNid
         });
 
 
@@ -335,7 +318,7 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
               q.id = response.id;
               q.url = "/node/" + response.id + ".json";
               q.set({
-                "field_parent_tutorial_nid":pathArray[2]
+                "field_parent_tutorial_nid":lessonNid
               });
 
               q.save();
@@ -349,10 +332,26 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           QuestionsCollectionView.addOne(q);
        
         });
-        
-      
-        
+      }//end of attachQuestionAndAnswer()
+      /*
+        STEP 0
+        Determine the page type from the url
+        tutorial or course
+      */
+      if(pathArray[1] === 'lesson'){
 
+
+        /* 
+          STEP 1
+          create the tutorial node Backbone object
+          this will be used to fetch the tutorial node which can then tell us which questions
+          are related (through node refs), the related assignments, etc - ie. all the things
+          we want to load dynamically through Backbone so that the user can dynamically update them
+        */
+        var lessonNid = pathArray[2];//nid from URL
+        var lesson = new Drupal.Backbone.Models.Node({ nid: lessonNid });//get this from the url eventually
+
+        attachQuestionAndAnswer(lessonNid);
       }//end if tutorial
 
       if(pathArray[1] === 'course'){
@@ -432,7 +431,8 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
 
           openLesson: function(){
             var same_week = false;
-            var this_selector = '#node-' + this.model.get('nid');
+            var NID = this.model.get('nid');
+            var this_selector = '#node-' + NID;
             var contentSectionHTML = 
             '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
 
@@ -478,6 +478,8 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
             });
 
             openLessonView.render(); 
+
+            attachQuestionAndAnswer(NID);
 
             return true;
 
