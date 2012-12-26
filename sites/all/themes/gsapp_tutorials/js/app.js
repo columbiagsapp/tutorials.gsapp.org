@@ -385,7 +385,8 @@ var openLessonView = null;
           },
 
           firstEditLesson: function(){
-            $('#lesson-content').addClass('first-edit');
+            $('#main').addClass('first-edit');
+            console.log('firstEditLesson()');
 
             //can't call edit lesson until finished with openLesson
             if(this.openLesson()){
@@ -418,8 +419,6 @@ var openLessonView = null;
               }
               videoEmbedTextareaArray.push( '</textarea>' );
               var videoEmbedTextarea = videoEmbedTextareaArray.join(''); 
-              console.log('should output: ');
-              console.log(videoEmbedTextarea);
               $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
 
             }else{//user clicked button to save changes
@@ -450,9 +449,6 @@ var openLessonView = null;
                 video_embed_code = temp + temp2;
               }
 
-              console.log('setting video embed code: ');
-              console.log(video_embed_code);
-
               this.model.set({
                 "title": $(this_selector + ' .lesson-title').val(),
                 "field_description": $(this_selector + ' .lesson-description').val(),
@@ -476,6 +472,9 @@ var openLessonView = null;
             this.model.destroy();
             this.remove();
 
+            if($('#main').hasClass('first-edit')){
+              $('.open').remove();
+            }
             //clear the temporary lesson model and view and transition to 
             //the main configuration
             transitionSchedule();
@@ -483,7 +482,9 @@ var openLessonView = null;
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            if($(this_selector).hasClass('first-edit')){
+            console.log('cancelEdit() this_selector: '+this_selector);
+            if($('#main').hasClass('first-edit')){
+              console.log('canceling to DELETE');
               this.model.save();
               this.deleteLesson();
             }else{
@@ -507,6 +508,8 @@ var openLessonView = null;
                 }
               });
             }
+
+            $('#main').removeClass('first-edit');
           }
 
         });
