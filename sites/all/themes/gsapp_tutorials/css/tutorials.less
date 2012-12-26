@@ -136,6 +136,11 @@
   float:right;
 }
 
+.center{
+  text-align: center;
+  margin:auto;
+}
+
 .outer{
   width:100%;
 }
@@ -309,7 +314,7 @@ body{
   background-color:@editModeBGColor;
 }
 
-.brick.roman{
+.roman{
   width:100%;
 }
 
@@ -721,4 +726,51 @@ textarea.week-title{
 /* REDIRECTS */
 .redirect-group{
   height: auto !important;
+}
+
+/* QUESTIONS */
+.question .votes-container{
+  width:10%;
+  float:left;
+}
+
+.question .vote-total{
+  font: @xLargeFont;
+}
+
+.question .question-container{
+  float:left;
+  width:64%;
+  margin:0 3% 0 3%;
+}
+
+.question .author-container{
+  float:left;
+  width:20%;
+}
+.question .question-buttons{
+  .center;
+  margin:0 auto;
+}
+
+.question .question-buttons .button{
+  width:10px;
+  float: left;
+  margin:@buttonMargin;
+  margin-bottom: @verticalpadding;
+}
+
+.add-question .submit-question-content-container{
+  clear:both;
+  margin:@verticalpadding 0;
+}
+
+.add-question .submit-question-content-container textarea{
+  display:block !important;
+  font-weight:inherit;
+  width:100%;
+}
+
+.add-question #submit-question-question{
+  min-height:300px;
 }

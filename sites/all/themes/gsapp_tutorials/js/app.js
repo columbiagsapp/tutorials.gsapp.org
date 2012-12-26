@@ -296,7 +296,7 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           var q = new Question({
             "title": $('#submitquestiontitle').val(),
             "field_question_votes":"0",
-            "field_description": $('#submitquestionquestion').val(),
+            "field_description": $('#submit-question-question').val(),
             "type": "question"
 
           });
@@ -332,6 +332,8 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           QuestionsCollectionView.addOne(q);
        
         });
+
+        return true;//TODO TCT2003 DEC 26, 2012 check for errors and throw them instead of returning true
       }//end of attachQuestionAndAnswer()
       /*
         STEP 0
@@ -479,7 +481,9 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
 
             openLessonView.render(); 
 
-            attachQuestionAndAnswer(NID);
+            if(attachQuestionAndAnswer(NID)){
+              $('#lesson-tab a:last').tab('show');
+            }
 
             return true;
 

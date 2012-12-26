@@ -108,22 +108,41 @@
     </div><!-- /.inner -->
   </div>
 
-  <div id="lesson-tabs" class="tab-content">
-    <div class="tab-pane active" id="questions">
+  <div id="lesson-tabs" class="roman">
+    <ul class="nav nav-tabs" id="lesson-tabs-nav">
+      <li class="active"><a href="#questions"><h2>Q&amp;A</h2></a></li>
+      <li><a href="#assignments"><h2>Assignments</h2></a></li>
+      <li><a href="#transcript"><h2>Transcript</h2></a></li>
+    </ul>
 
-      <div id="questions-list-el"></div>
-      <div class="add-question">
-        <h4>Ask a question</h4>
-        Title:
-        <textarea id="submitquestiontitle" cols=40 rows=1></textarea>
-        Question:
-        <textarea id="submitquestionquestion" name="submitquestionquestion" cols=40 rows=4>
-          Add your question text here
-        </textarea>
-        <button id="questionsubmit">Ask</button>
-      </div><!-- /.add-question -->
-    </div><!-- /.tab-pane #questions-->
-  </div><!-- /.tab-content -->
+    <div id="lesson-tabs-content" class="tab-content roman">
+      <div class="tab-pane active" id="questions">
+        
+          <div id="questions-list-el"></div>
+          <div class="add-question brick roman">
+            <div class="inner">
+              <h4 class="float-left">Ask a question</h4>
+              <div class="submit-question-buttons float-right">
+                <div id="questionsubmit" class="button save">Save</div>
+                <div id="question-submit-cancel" class="button cancel">Cancel</div>
+              </div>
+              <div class="roman float-left submit-question-content-container">
+                <h2><textarea id="submitquestiontitle">Add title here</textarea></h2>
+                <textarea id="submit-question-question" name="submit-question-question">Add your question text here</textarea>
+              </div>
+              
+            </div>
+          </div><!-- /.add-question -->
+
+      </div><!-- /.tab-pane #questions-->
+
+      <div class="tab-pane" id="assignments">assignments go here</div>
+      <div class="tab-pane" id="transcript">transcript goes here</div>
+    </div><!-- /.tab-content -->
+
+  </div><!-- /#lesson-tabs -->
+
+
 </script>
 
 <script type="text/template" id="bb_week_template">
@@ -216,24 +235,47 @@
 
 
 <script type="text/template" id="bb_question_template">
-  <li class="question">
-    <% if (typeof(title) != "undefined" ) { %>
-      <h2><%= title %></h2>
-    <% } %>
-    <% if (typeof(field_description) != "undefined" ) { %>
-      <div><%= field_description %></div>
-    <% } %>
-    <% if (typeof(field_question_votes) != "undefined" ) { %>
-      <div><%= field_question_votes %></div>
-    <% } %>
-      <button class="voteup">&#43;</button>
-      <button class="votedown">&#45;</button>
-    </li>
+  <div class="question brick roman">
+    <div class="inner">
+      <div class="votes-container center">
+        <div>Votes</div>
+        <div class="vote-total">
+          <% if (typeof(field_question_votes) != "undefined" ) { %>
+            <%= field_question_votes %>
+          <% }else{ %>
+            0
+          <% } %>
+        </div>
+
+        <div class="question-buttons">
+          <div class="voteup button">&#43;</div>
+          <div class="votedown button">&#45;</div>
+        </div>
+      </div><!-- /.votes-container -->
+
+      <div class="question-container">
+        <% if (typeof(title) != "undefined" ) { %>
+          <h2><%= title %></h2>
+        <% } %>
+        <% if (typeof(field_description) != "undefined" ) { %>
+          <div><%= field_description %></div>
+        <% } %>
+      </div>
+      
+      <div class="author-container center">
+        <div>Asked</div>
+        <div class="relative-date"></div>
+        <div>by</div>
+        <div class="author"></div>
+      </div>
+      
+    </div>
+  </div>
 </script>
 
 <script type="text/template" id="submit_question_template">
   <div class="add-question">
-    <h4>Ask a question</h4>
+    <h4 class="float-left">Ask a question</h4>
     <textarea name="newquestion">
       Add your question text here
     </textarea>
@@ -243,7 +285,7 @@
 
 <script type="text/template" id="collection-list">
   <div>
-    <ul class="collection-list-parent"></ul>
+    <div class="collection-list-parent"></div>
   </div>
   
 </script>
