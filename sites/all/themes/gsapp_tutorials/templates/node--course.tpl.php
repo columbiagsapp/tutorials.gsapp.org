@@ -50,7 +50,7 @@
 
 
 <script type="text/template" id="bb_lesson_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">

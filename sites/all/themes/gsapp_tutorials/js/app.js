@@ -5,6 +5,10 @@ var updates_detached = null;
 var openLessonModel = null;
 var openLessonView = null;
 
+var FIRST_EDIT_LESSON = 'first-edit-lesson';
+var FIRST_EDIT_WEEK = 'first-edit-week';
+var FIRST_EDIT_UPDATE = 'first-edit-update';
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
@@ -55,6 +59,93 @@ var openLessonView = null;
       $('#schedule-button').bind('click', transitionSchedule);
       $('#updates-button').bind('click', transitionUpdates);
 
+
+      /*
+        First-Edit state is applied when a new object is created but hasn't been saved yet
+      */
+      function setState(state){
+        switch(state){
+          case FIRST_EDIT_LESSON:
+            console.log('setting state FIRST_EDIT_LESSON');
+            $('#main').addClass('state-first-edit-lesson');
+            break;
+          case FIRST_EDIT_WEEK:
+            console.log('setting state FIRST_EDIT_WEEK');
+            $('#main').addClass('state-first-edit-week');
+            break;
+          case FIRST_EDIT_UPDATE:
+            console.log('setting state FIRST_EDIT_UPDATE');
+            $('#main').addClass('state-first-edit-update');
+            break;
+          default:
+            break;
+        }
+      }
+
+      function clearState(state){
+        switch(state){
+          case FIRST_EDIT_LESSON:
+            console.log('clearing state FIRST_EDIT_LESSON');
+            $('#main').removeClass('state-first-edit-lesson');
+            break;
+          case FIRST_EDIT_WEEK:
+            console.log('clearing state FIRST_EDIT_WEEK');
+            $('#main').removeClass('state-first-edit-week');
+            break;
+          case FIRST_EDIT_UPDATE:
+            console.log('clearing state FIRST_EDIT_UPDATE');
+            $('#main').removeClass('state-first-edit-update');
+            break;
+          default:
+            break;
+        }
+      }
+
+      function getState(state){
+        console.log('getState() state: '+state);
+
+        state = typeof state !== 'undefined' ? state : '';
+
+        switch(state){
+          case FIRST_EDIT_LESSON:
+            if($('#main').hasClass('state-first-edit-lesson')){
+              return true;
+            }else{
+              return false;
+            }
+            break;
+          case FIRST_EDIT_WEEK:
+            if($('#main').hasClass('state-first-edit-week')){
+              return true;
+            }else{
+              return false;
+            }
+            break;
+          case FIRST_EDIT_UPDATE:
+            if($('#main').hasClass('state-first-edit-update')){
+              return true;
+            }else{
+              return false;
+            }
+            break;
+          default:
+            console.log('no state given to check');
+            var state = $('#main').attr('class');
+            console.log('state classes: '+state);
+
+            var idxStart = state.indexOf('state-');
+            var idxEnd = state.indexOf(' ', idxStart+5);
+            if(idxEnd >= 0){
+              state = state.substring(idxStart, idxEnd);
+            }else{
+              state = state.substring(idxStart);
+            }
+            console.log('final state: '+state);
+
+            return state;
+            break;
+        }
+      }
       /*
         STEP 0
         Determine the page type from the url
@@ -385,8 +476,7 @@ var openLessonView = null;
           },
 
           firstEditLesson: function(){
-            $('#main').addClass('first-edit');
-            console.log('firstEditLesson()');
+            setState(FIRST_EDIT_LESSON);
 
             //can't call edit lesson until finished with openLesson
             if(this.openLesson()){
@@ -422,7 +512,7 @@ var openLessonView = null;
               $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
 
             }else{//user clicked button to save changes
-              $(this_selector).removeClass('first-edit');
+              clearState(FIRST_EDIT_LESSON);
 
               var video_embed_code = $(this_selector + ' .lesson-video-edit').val();
               var heightIdxStart = video_embed_code.indexOf('height=');
@@ -456,10 +546,8 @@ var openLessonView = null;
               });
 
               this.model.save();
-
               openLessonModel = null;
               openLessonModel = this.model.clone();
-
               this.cancelEdit();
             }
           },
@@ -472,7 +560,7 @@ var openLessonView = null;
             this.model.destroy();
             this.remove();
 
-            if($('#main').hasClass('first-edit')){
+            if( getState(FIRST_EDIT_LESSON) ){
               $('.open').remove();
             }
             //clear the temporary lesson model and view and transition to 
@@ -482,9 +570,7 @@ var openLessonView = null;
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            console.log('cancelEdit() this_selector: '+this_selector);
-            if($('#main').hasClass('first-edit')){
-              console.log('canceling to DELETE');
+            if( getState(FIRST_EDIT_LESSON) ){
               this.model.save();
               this.deleteLesson();
             }else{
@@ -495,8 +581,6 @@ var openLessonView = null;
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('textarea.lesson-title', this_selector).val( this.model.get('title') );
               $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
-
-              console.log('&&&& cancel, val for .lesson-video: '+this.model.get('field_video_embed'));
 
               $('.lesson-video', this_selector).val( this.model.get('field_video_embed') );
               $('.lesson-video-edit', this_selector).remove();
@@ -509,7 +593,8 @@ var openLessonView = null;
               });
             }
 
-            $('#main').removeClass('first-edit');
+            clearState(FIRST_EDIT_LESSON);
+            //$('#main').removeClass('first-edit');
           }
 
         });
@@ -539,7 +624,8 @@ var openLessonView = null;
           //vote up binding - just calls the related Question model's vote method
           //with the appropriate value (eg. +1)
           addLesson: function(){
-            var weekNID = this.model.get('nid');
+            var weekID = this.model.get('nid');
+
             var l = new Lesson({
               "title": "Lesson title",
               "field_description": "Optional description",
@@ -563,11 +649,37 @@ var openLessonView = null;
                 l.id = response.id;
                 l.url = "/node/" + response.id + ".json";
                 l.set({
-                  "field_parent_week_nid":weekNID,
+                  "field_parent_week_nid":weekID,
                   "nid":response.id
                 });
                 l.save();
-                var newLessonView = LessonsCollectionView[weekNID].addOne(l);
+
+                console.log('weeKNID: '+weekID);
+
+                if(LessonsCollectionView[weekID] == undefined){
+
+                  console.log('creating new LessonsCollectionView[]');
+
+                  LessonsCollection[weekID] = new LessonCollectionPrototype();
+                  LessonsCollection[weekID].reset();
+
+                  var theEL = '#node-' + weekID + ' .lessons-list-el';
+
+                  LessonsCollectionView[weekID] = new LessonCollectionViewPrototype({
+                    collection: LessonsCollection[weekID],
+                    templateSelector: '#lesson-list',
+                    renderer: 'underscore',
+                    el: theEL,
+                    ItemView: LessonView,
+                    //itemTag: 'li',
+                    itemParent: '.lesson-list-container'
+                  });
+
+                  LessonsCollectionView[weekID].render();
+                }
+
+                var newLessonView = LessonsCollectionView[weekID].addOne(l);
+
                 newLessonView.firstEditLesson();
               }
             });
@@ -579,7 +691,9 @@ var openLessonView = null;
           firstEditWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
             $('.lesson.preloader', this_selector).remove();
-            $(this_selector).addClass('first-edit');
+
+            setState(FIRST_EDIT_WEEK);
+            //$('#main').addClass('first-edit');
             this.editWeek();
           },
 
@@ -592,7 +706,8 @@ var openLessonView = null;
               $(this_selector).addClass('edit-mode');
               $('.lesson, .note', this_selector).addClass('disabled-mode');
             }else{
-              $(this_selector).removeClass('first-edit');
+              clearState(FIRST_EDIT_WEEK);
+              //$('#main').removeClass('first-edit');
               var weekNumber = $('.week-number', this_selector).val();
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
@@ -620,8 +735,7 @@ var openLessonView = null;
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            if($(this_selector).hasClass('first-edit')){
-              console.log('delete via cancelEdit()');
+            if( getState(FIRST_EDIT_WEEK) ){
               this.model.save();
               this.deleteWeek();
             }else{
@@ -658,19 +772,28 @@ var openLessonView = null;
           },
 
           firstEditUpdate: function(){
+            console.log('firstEditUpdate()');
             var this_selector = '#node-' + this.model.get('nid');
-            $(this_selector).addClass('first-edit');
+            console.log('this_selector: '+this_selector);
+            setState(FIRST_EDIT_UPDATE);
+            //$('#main').addClass('first-edit');
             this.editUpdate();
           },
 
           editUpdate: function(){
+            console.log('editUpdate()');
+
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
+              console.log('clicked edit');
+
               $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
             }else{
-              $(this_selector).removeClass('first-edit');
+              console.log('clicked save');
+              clearState(FIRST_EDIT_UPDATE);
+              //$('#main').removeClass('first-edit');
               this.model.set({
                 "title": $(this_selector + ' .update-title').val(),
                 "field_description": $(this_selector + ' .update-description').val()
@@ -683,15 +806,20 @@ var openLessonView = null;
 
 
           deleteUpdate: function(){
+            console.log('deleteUpdate()');
+
             UpdatesCollectionView.remove(this.model);
             this.model.destroy();
             this.remove();
           },
 
           cancelEdit: function(){
+            console.log('cancelUpdate()');
+
             var this_selector = '#node-' + this.model.get('nid');
-            if($(this_selector).hasClass('first-edit')){
-              this.model.save();
+            if( getState(FIRST_EDIT_UPDATE) ){
+              console.log('first edit - therefore delete');
+              // this.model.save();
               this.deleteUpdate();
             }else{
               $('.edit', this_selector).text('Edit');
@@ -782,27 +910,35 @@ var openLessonView = null;
 
         var UpdateCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
-          },
+          }
+          
+          ,
           
           addOne: function(newModel, back){
             //determines if added to front
             back = typeof back !== 'undefined' ? back : false;
 
-            console.log('IS IT back???: '+back);
-
             var newItemView = Drupal.Backbone.Views.CollectionView.prototype.addOne.call(this, newModel);
             var this_selector = "#node-" + newItemView.model.get('nid');
-            console.log("((((((****** this_selector: "+ this_selector);
 
             //take the new update and prepend it, rather than putting it at the end
+            /*
             if(back == false){
-              console.log('trying to prepend');
-              $('#updates-list-el').prepend($(this_selector));
+              var tempNode = $(this_selector).detach();
+              $('#updates-list-el').prepend(tempNode);
             }
+            */
+
+            console.log('addOne(), created: '+newItemView.model.get('created'));
             
-            //convert the created unix date stamp to a JS Date object and print out user readable date
-            var date = new Date( newItemView.model.get('created')*1000 );
-            //date.setTime( newItemView.model.get('created')*1000 );
+            if(newItemView.model.get('created') != undefined){
+              //convert the created unix date stamp to a JS Date object and print out user readable date
+              var date = new Date( newItemView.model.get('created')*1000 );
+            }else{//if it's a new update, set to current time
+              var date = new Date();
+            }
+
+            //parse date object
             var dateStringArray = [];
             dateStringArray.push('<div class="update-date date">');
             dateStringArray.push( _days[ date.getDay() ] );
@@ -817,6 +953,7 @@ var openLessonView = null;
 
             $('.inner', this_selector).prepend(dateString);
 
+            return newItemView;
           }
         });
 
@@ -852,7 +989,6 @@ var openLessonView = null;
               $('.course .weeks .week').each(function(i){
                 $('#week-preloader').remove();
                 var weekID = $(this).attr('id');
-                console.log('weekID first: '+weekID);
                 if(weekID != "week-preloader"){
                   weekID = weekID.substr(5);
 
@@ -872,8 +1008,6 @@ var openLessonView = null;
                   });
 
                   LessonsCollectionView[weekID].render();
-                  console.log('');
-                  console.log('weekID: '+ weekID);
                   //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
                   LessonsCollection[weekID].fetchQuery({
                     "field_parent_week_nid":weekID,
@@ -882,10 +1016,12 @@ var openLessonView = null;
                     success: function(model, response, options){
                       //remove preloader for lesson for this particular week based on weekID
                       $('.lesson.preloader', '#node-'+weekID).remove();
+                      $('.open', '#node-'+weekID).removeClass('open');
                     },
                     error: function(model, xhr, options){
                       //remove preloader for lesson for this particular week based on weekID
                       $('.lesson.preloader', '#node-'+weekID).remove();
+                      $('.open', '#node-'+weekID).removeClass('open');
                     }
 
                   });
@@ -983,6 +1119,7 @@ var openLessonView = null;
               $('#node-temp').attr('id', 'node-'+response.id);
               $('#update-preloader').remove();
               var newUpdateView = UpdatesCollectionView.addOne(u, false);
+              //var newUpdateView = UpdatesCollectionView.addOne(u);
               newUpdateView.firstEditUpdate();
                 
             }
