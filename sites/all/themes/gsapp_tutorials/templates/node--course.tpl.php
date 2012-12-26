@@ -49,18 +49,17 @@
 </div><!-- /.course -->
 
 
-<script type="text/template" id="bb_link_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="link brick FLW glowing-box open">
+<script type="text/template" id="bb_redirect_template">
+  <a href="<% if (typeof(field_link) != 'undefined' ) { %><%= field_link %><% } %>" target="_blank" id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="redirect brick FLW glowing-box open">
+    
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
-        <textarea readonly class="editable link-title"><%= title %></textarea>
-      <% } %>
-      <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable collapsible link-description"><%= field_description %></textarea>
+        <textarea readonly class="editable redirect-title"><%= title %></textarea>
       <% } %>
       
+      
     </div><!-- /.inner -->
-  </div>
+    </a>
 </script>
 
 <script type="text/template" id="bb_lesson_template">
@@ -133,6 +132,12 @@
             <div class="add-note-container button">Note</div>
           </div>
         </div>
+      <?php } ?>
+
+      <div class="redirects-list-el"></div>
+      <div class="redirect brick FLW preloader"></div>
+
+      <?php if($editable){ ?>
         <div class="edit-week-buttons collapsible">
           <div class="edit button">Edit</div>
           <div class="cancel button">Cancel</div>
@@ -169,6 +174,12 @@
 <script type="text/template" id="lesson-list">
   <div>
     <div class="lesson-list-container"></div>
+  </div>
+</script>
+
+<script type="text/template" id="redirect-list">
+  <div>
+    <div class="redirect-list-container"></div>
   </div>
 </script>
 

@@ -58,9 +58,9 @@
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
 
-@FLWbrickHeight: 50px;
+@FLWbrickHeight: 80px;
 @FLWbrickWidth: @standardBrickWidth;
-@FLWbrickMargin: 0 0 5px;
+@FLWbrickMargin: 0 0 15px;
 @FLWbrickPadding: 10px;
 
 
@@ -159,6 +159,10 @@
 #update-preloader,
 .lesson.preloader{
   height:300px;
+}
+
+.redirect.preloader{
+  height:@FLWbrickHeight;
 }
 
 
@@ -297,6 +301,13 @@ body{
   color:@textColor;
 }
 
+.brick.FLW{
+  height: @FLWbrickHeight;
+  width: @FLWbrickWidth;
+  margin: @FLWbrickMargin;
+  padding: 0;
+}
+
 .edit-mode{
   color:@editModeTextColor;
   background-color:@editModeBGColor;
@@ -413,12 +424,14 @@ iframe {
 }
 
 .course .week,
-.course .lesson{
+.course .lesson,
+.course .redirect{
   position:relative;
 }
 
 .course .week-list-container,
-.course .lesson-list-container{
+.course .lesson-list-container,
+.course .redirect-list-container{
   margin:0;
   padding:0;
 }
@@ -622,7 +635,8 @@ textarea.week-title{
 }
 
 .lesson:hover,
-.note:hover{
+.note:hover,
+.redirect:hover{
   cursor:pointer;
   .glowing-box-inset;
   background-color:@standardBrickHoverBG;
@@ -630,7 +644,8 @@ textarea.week-title{
 
 .lesson textarea:hover,
 .note textarea:hover,
-.update textarea:hover{
+.update textarea:hover,
+.redirect textarea:hover{
   cursor:pointer;
 }
 
