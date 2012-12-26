@@ -52,15 +52,15 @@
 @verticalpadding: 20px;
 @horizontalpadding: 0;
 @standardBrickWidth: 230px;
-@standardBrickHeight: 270px;
+@standardBrickHeight: 280px;
 @fullStandardBrickWidth: 230px;
-@fullStandardBrickHeight: 270px;
+@fullStandardBrickHeight: 280px;
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
 
 @FLWbrickHeight: 80px;
 @FLWbrickWidth: @standardBrickWidth;
-@FLWbrickMargin: 0 20px 15px 0;
+@FLWbrickMargin: @standardBrickMargin;
 @FLWbrickPadding: 10px;
 
 
@@ -302,10 +302,6 @@ body{
   width: @FLWbrickWidth;
   margin: @FLWbrickMargin;
   padding: 0;
-}
-
-.redirect-list-container{
-  float:left;
 }
 
 .edit-mode{
@@ -716,4 +712,9 @@ textarea.week-title{
 .date{
   font:@smallFontSize;
   margin-bottom:@verticalpadding;
+}
+
+/* REDIRECTS */
+.redirect-group{
+  height: auto !important;
 }
