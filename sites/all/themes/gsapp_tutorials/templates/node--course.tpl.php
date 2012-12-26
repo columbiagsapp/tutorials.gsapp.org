@@ -49,6 +49,20 @@
 </div><!-- /.course -->
 
 
+<script type="text/template" id="bb_link_template">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="link brick FLW glowing-box open">
+    <div class="inner">
+      <% if ( typeof(title) != "undefined" ) { %>
+        <textarea readonly class="editable link-title"><%= title %></textarea>
+      <% } %>
+      <% if (typeof(field_description) != "undefined" ) { %>
+        <textarea readonly class="editable collapsible link-description"><%= field_description %></textarea>
+      <% } %>
+      
+    </div><!-- /.inner -->
+  </div>
+</script>
+
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
     <div class="inner">

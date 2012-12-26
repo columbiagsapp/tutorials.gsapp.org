@@ -58,6 +58,11 @@
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
 
+@FLWbrickHeight: 50px;
+@FLWbrickWidth: @standardBrickWidth;
+@FLWbrickMargin: 0 0 5px;
+@FLWbrickPadding: 10px;
+
 
 @innerVerticalpadding: 10px;
 
@@ -535,10 +540,6 @@ iframe {
   width:100%;
 }
 
-.course .add-lesson-note-wrapper:hover{
-  .box-shadow(0 0 5px, 30%);
-}
-
 textarea,
 textarea[readonly]{
   background-color: transparent;
@@ -611,7 +612,14 @@ textarea.week-title{
 }
 
 
+.course .add-lesson-note-wrapper{
+  .glowing-box;
+}
 
+.course .add-lesson-note-wrapper:hover{
+  .glowing-box-inset;
+  background-color:@standardBrickHoverBG;
+}
 
 .lesson:hover,
 .note:hover{
