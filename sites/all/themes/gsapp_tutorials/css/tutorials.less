@@ -658,10 +658,10 @@ textarea.week-title{
   cursor:pointer;
 }
 
-.edit-mode.lesson:hover,
-.edit-mode.note:hover,
-.edit-mode.update:hover{
-  cursor:auto;
+.edit-mode .lesson:hover,
+.edit-mode .note:hover,
+.edit-mode .update:hover{
+  cursor:default;
   background-color:@editModeBGColor;
   .glowing-box;
 }
@@ -681,7 +681,11 @@ textarea.week-title{
 }
 
 
-/* LESSON OPEN */
+/* LESSON */
+.edit-mode .lesson{
+  background-color:@editModeBGColor;
+}
+
 .lesson-open{
   position: relative;
   min-height:@weekStandardHeight;
