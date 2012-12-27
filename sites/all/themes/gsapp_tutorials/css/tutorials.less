@@ -80,8 +80,9 @@
 
 @headerHeightAndMargin: 62px;
 
+@inlineMarginRight: 1em;
 
-
+@attachmentMarginTop: 40px;
 
 
 
@@ -141,6 +142,16 @@
   margin:auto;
 }
 
+.inactive{
+  color:@darkBGColor;
+}
+
+.inline{
+  list-style: none;
+  display:inline;
+  margin-right:@inlineMarginRight;
+}
+
 .outer{
   width:100%;
 }
@@ -162,8 +173,7 @@
 }
 
 #update-preloader,
-.lesson.preloader,
-.redirect.preloader{
+.lesson.preloader{
   height:300px;
 }
 
@@ -425,14 +435,12 @@ iframe {
 }
 
 .course .week,
-.course .lesson,
-.course .redirect{
+.course .lesson{
   position:relative;
 }
 
 .course .week-list-container,
-.course .lesson-list-container,
-.course .redirect-list-container{
+.course .lesson-list-container{
   margin:0;
   padding:0;
 }
@@ -508,12 +516,6 @@ iframe {
 .edit-mode .add-lesson-note-wrapper{
   .hidden;
 }
-
-.disabled-mode .button{
-  .hidden;
-  color:@editModeTextColor;
-}
-
 
 .course #add-update-container,
 .course #add-week-container{
@@ -636,16 +638,14 @@ textarea.week-title{
 }
 
 .lesson:hover,
-.note:hover,
-.redirect:hover{
+.note:hover{
   cursor:pointer;
   .glowing-box-inset;
   background-color:@standardBrickHoverBG;
 }
 
 .edit-mode .lesson:hover,
-.edit-mode .note:hover,
-.edit-mode .redirect:hover{
+.edit-mode .note:hover{
   cursor:auto;
   .glowing-box;
   background-color:@brickBGColor;
@@ -653,8 +653,7 @@ textarea.week-title{
 
 .lesson textarea:hover,
 .note textarea:hover,
-.update textarea:hover,
-.redirect textarea:hover{
+.update textarea:hover{
   cursor:pointer;
 }
 
@@ -680,6 +679,9 @@ textarea.week-title{
   height:@videoIconHeight;
 }
 
+.week.selected{
+  background-color:@darkBGColor;
+}
 
 /* LESSON */
 .edit-mode .lesson{
@@ -711,6 +713,11 @@ textarea.week-title{
   float:left;
 }
 
+#lesson-attachment{
+  margin-top:@attachmentMarginTop;
+  .float-left;
+}
+
 
 /* UPDATES */
 .collapsed .edit-update-buttons{
@@ -727,10 +734,6 @@ textarea.week-title{
   margin-bottom:@verticalpadding;
 }
 
-/* REDIRECTS */
-.redirect-group{
-  height: auto !important;
-}
 
 /* QUESTIONS */
 .question .votes-container{

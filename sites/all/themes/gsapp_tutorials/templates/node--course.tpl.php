@@ -49,18 +49,6 @@
 </div><!-- /.course -->
 
 
-<script type="text/template" id="bb_redirect_template">
-  <a href="<% if (typeof(field_link) != 'undefined' ) { %><%= field_link %><% } %>" target="_blank" id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="redirect brick FLW glowing-box collapsible open">
-    
-    <div class="inner">
-      <% if ( typeof(title) != "undefined" ) { %>
-        <textarea readonly class="editable redirect-title"><%= title %></textarea>
-      <% } %>
-      
-      
-    </div><!-- /.inner -->
-    </a>
-</script>
 
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
@@ -108,40 +96,31 @@
     </div><!-- /.inner -->
   </div>
 
-  <div id="lesson-tabs" class="roman">
-    <ul class="nav nav-tabs" id="lesson-tabs-nav">
-      <li class="active"><a href="#questions"><h2>Q&amp;A</h2></a></li>
-      <li><a href="#assignments"><h2>Assignments</h2></a></li>
-      <li><a href="#transcript"><h2>Transcript</h2></a></li>
+  <div id="lesson-attachment">
+    <ul id="lesson-nav" class="roman">
+      <li class="inline"><h2 class="inline">Q&amp;A</h2></li>
+      <li class="inline inactive"><h2 class="inline">Assignments</h2></li>
+      <li class="inline inactive"><h2 class="inline">Transcript</h2></li>
     </ul>
 
-    <div id="lesson-tabs-content" class="tab-content roman">
-      <div class="tab-pane active" id="questions">
-        
-          <div id="questions-list-el"></div>
-          <div class="add-question brick roman">
-            <div class="inner">
-              <h4 class="float-left">Ask a question</h4>
-              <div class="submit-question-buttons float-right">
-                <div id="questionsubmit" class="button save">Save</div>
-                <div id="question-submit-cancel" class="button cancel">Cancel</div>
-              </div>
-              <div class="roman float-left submit-question-content-container">
-                <h2><textarea id="submitquestiontitle">Add title here</textarea></h2>
-                <textarea id="submit-question-question" name="submit-question-question">Add your question text here</textarea>
-              </div>
-              
+    <div id="lesson-content" class="roman">
+      <div id="questions-list-el"></div>
+        <div class="add-question brick roman">
+          <div class="inner">
+            <h4 class="float-left">Ask a question</h4>
+            <div class="submit-question-buttons float-right">
+              <div id="questionsubmit" class="button save">Save</div>
+              <div id="question-submit-cancel" class="button cancel">Cancel</div>
             </div>
-          </div><!-- /.add-question -->
-
-      </div><!-- /.tab-pane #questions-->
-
-      <div class="tab-pane" id="assignments">assignments go here</div>
-      <div class="tab-pane" id="transcript">transcript goes here</div>
-    </div><!-- /.tab-content -->
-
-  </div><!-- /#lesson-tabs -->
-
+            <div class="roman float-left submit-question-content-container">
+              <h2><textarea id="submitquestiontitle">Add title here</textarea></h2>
+              <textarea id="submit-question-question" name="submit-question-question">Add your question text here</textarea>
+            </div>
+          </div><!-- /.inner -->
+        </div><!-- /.add-question -->
+      </div><!-- /#questions-list-el-->
+    </div><!-- /#lesson-content -->
+  </div><!-- /#lesson-attachment -->
 
 </script>
 
@@ -169,9 +148,6 @@
           </div>
         </div>
       <?php } ?>
-
-      <div class="redirects-list-el"></div>
-      <div class="redirect brick FLW preloader"></div>
 
       <?php if($editable){ ?>
         <div class="edit-week-buttons collapsible">
@@ -210,12 +186,6 @@
 <script type="text/template" id="lesson-list">
   <div>
     <div class="lesson-list-container"></div>
-  </div>
-</script>
-
-<script type="text/template" id="redirect-list">
-  <div>
-    <div class="redirect-list-container"></div>
   </div>
 </script>
 

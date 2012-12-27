@@ -8,7 +8,6 @@ var openLessonView = null;
 var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
 var FIRST_EDIT_UPDATE = 'first-edit-update';
-var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
 
 (function ($){
   Drupal.behaviors.app = {
@@ -383,13 +382,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
             this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
           }
         });
-
-        var Redirect = Drupal.Backbone.Models.Node.extend({
-          initialize: function(opts){
-            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
-            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
-          }
-        });
         
         var Week = Drupal.Backbone.Models.Node.extend({
           initialize: function(opts){
@@ -438,7 +430,7 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
 
             //don't click through if in edit mode
             if(!$(this_selector).closest('.week').hasClass('edit-mode')){
-              var same_week = false;
+              var different_week = true;
               var contentSectionHTML = 
               '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
 
@@ -447,7 +439,9 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
                 if( !$(this_selector).closest('.week').hasClass('selected') ){
                   //if it's the same week, do nothing, otherwise clear the selected
                   $('.selected').removeClass('selected');
-                  same_week = true;
+                  different_week = true;
+                }else{
+                  different_week = false;
                 }
                 $('.open').removeClass('open');
 
@@ -461,7 +455,7 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
                 $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
               }
               
-              if(!same_week){
+              if(different_week){
                 //only add class if not the same week
                 $(this_selector).closest('.week').addClass('selected');
               }
@@ -485,9 +479,7 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
 
               openLessonView.render(); 
 
-              if(attachQuestionAndAnswer(NID)){
-                $('#lesson-tab a:last').tab('show');
-              }
+              attachQuestionAndAnswer(NID)
 
               return true;
             }else{
@@ -620,142 +612,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
 
         });
 
-
-        var RedirectView = Drupal.Backbone.Views.Base.extend({
-          //the Underscore formated template in node--tutorial.tpl.php stored in a 
-          //<script> tag and identified by its id
-          templateSelector: '#bb_redirect_template',
-
-          //bind vote up and down events to the buttons and tie these to local functions
-          events: {
-            "click .edit" : "editRedirect",
-            "click .delete": "deleteRedirect",
-            "click .cancel": "cancelEdit"
-          },
-
-          initialize: function(opts) {
-            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            this.model.bind('change', this.render, this);//this calls the fetch 
-          },
-
-          firstEditRedirect: function(){
-            setState(FIRST_EDIT_REDIRECT);
-
-            //can't call edit lesson until finished with openLesson
-            this.editRedirect();
-            
-          },
-
-          editRedirect: function(){
-            //select either this model or it's clone for open-lesson
-            var this_selector = '#node-' + this.model.get('nid');
-            var thisModel = this.model;//pointer to the valid model
-            
-            
-            if($('.edit', this_selector).text() == "Edit"){//user clicked button to go into edit mode
-              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
-              $('.edit', this_selector).text('Save');
-              $(this_selector).addClass('edit-mode');
-
-              var videoEmbedTextareaArray = [];
-              videoEmbedTextareaArray.push('<textarea id="video-embed-textarea" class="editable lesson-video-edit">');
-              var videoEmbedText = thisModel.get('field_video_embed');
-              if( (videoEmbedText != null) && (videoEmbedText != '') ){//if the field is empty, backbone returns null
-                videoEmbedTextareaArray.push( videoEmbedText );
-              }else{
-                videoEmbedTextareaArray.push( 'Paste embed text here from Youtube or Vimeo' );
-              }
-              videoEmbedTextareaArray.push( '</textarea>' );
-              var videoEmbedTextarea = videoEmbedTextareaArray.join(''); 
-              $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
-
-            }else{//user clicked button to save changes
-              clearState(FIRST_EDIT_LESSON);
-
-              var video_embed_code = $(this_selector + ' .lesson-video-edit').val();
-              var heightIdxStart = video_embed_code.indexOf('height=');
-              var widthIdxStart = video_embed_code.indexOf('width=');
-
-              //remove any given height in the embed code
-              if(heightIdxStart >= 0){
-                var heightIdxEnd = video_embed_code.indexOf('"', heightIdxStart+8);
-                var temp = video_embed_code.substring(0, heightIdxStart);
-                var temp2 = video_embed_code.substring(heightIdxEnd+1);
-                if(temp2.substr(0,1) == ' '){
-                  temp2 = temp2.substring(1);
-                }
-                video_embed_code = temp + temp2;
-              }
-              //remove any given width in the embed code
-              if(widthIdxStart >= 0){
-                var widthIdxEnd = video_embed_code.indexOf('"', widthIdxStart+7);
-                var temp = video_embed_code.substring(0, widthIdxStart);
-                var temp2 = video_embed_code.substring(widthIdxEnd+1);
-                if(temp2.substr(0,1) == ' '){
-                  temp2 = temp2.substring(1);
-                }
-                video_embed_code = temp + temp2;
-              }
-
-              this.model.set({
-                "title": $(this_selector + ' .lesson-title').val(),
-                "field_description": $(this_selector + ' .lesson-description').val(),
-                "field_video_embed": video_embed_code
-              });
-
-              this.model.save();
-              openLessonModel = null;
-              openLessonModel = this.model.clone();
-              this.cancelEdit();
-            }
-          },
-
-          deleteRedirect: function(){
-            //delete the actual model from the database and its view
-            var weekID = $('.open').closest('.week').attr('id');
-            weekID = weekID.substr(5);
-            LessonsCollectionView[weekID].remove(this.model);
-            this.model.destroy();
-            this.remove();
-
-            if( getState(FIRST_EDIT_LESSON) ){
-              $('.open').remove();
-            }
-            //clear the temporary lesson model and view and transition to 
-            //the main configuration
-            transitionSchedule();
-          },
-
-          cancelEdit: function(){
-            var this_selector = '#node-' + this.model.get('nid');
-            if( getState(FIRST_EDIT_LESSON) ){
-              this.model.save();
-              this.deleteLesson();
-            }else{
-              $('.edit', this_selector).text('Edit');
-              $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
-              $(this_selector).removeClass('edit-mode');
-              
-              //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
-              $('textarea.lesson-title', this_selector).val( this.model.get('title') );
-              $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
-
-              $('.lesson-video', this_selector).val( this.model.get('field_video_embed') );
-              $('.lesson-video-edit', this_selector).remove();
-
-              //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
-              $('.selected .lesson').each(function(){
-                if($(this).attr('id') == this_selector){
-                  $(this).addClass('open');
-                }
-              });
-            }
-
-            clearState(FIRST_EDIT_LESSON);
-            //$('#main').removeClass('first-edit');
-          }
-
-        });
 
         var WeekView = Drupal.Backbone.Views.Base.extend({
           //the Underscore formated template in node--tutorial.tpl.php stored in a 
@@ -1000,10 +856,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           model: Lesson
         });
 
-        var RedirectCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-          model: Redirect
-        });
-
         var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Week,
           comparator: function(question) {
@@ -1041,12 +893,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           resort: function(opts){
           }
         });
-
-        var RedirectCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
-          resort: function(opts){
-          }
-        });
-
 
         var WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
@@ -1143,8 +989,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
         var LessonsCollection = [];
         var LessonsCollectionView = [];
 
-        var RedirectsCollection = [];
-        var RedirectsCollectionView = [];
         /* 
           STEP 7
           Fetch the collection of Question nodes by sending the nid of the tutorial
@@ -1190,53 +1034,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
                       //remove preloader for lesson for this particular week based on weekID
                       $('.lesson.preloader', '#node-'+weekID).remove();
                       $('.lesson.open', '#node-'+weekID).removeClass('open');
-                    }
-
-                  });
-
-                  RedirectsCollection[weekID] = new RedirectCollectionPrototype();
-                  RedirectsCollection[weekID].reset();
-
-                  var theRedirectEL = '#node-' + weekID + ' .redirects-list-el';
-
-                  RedirectsCollectionView[weekID] = new RedirectCollectionViewPrototype({
-                    collection: RedirectsCollection[weekID],
-                    templateSelector: '#redirect-list',
-                    renderer: 'underscore',
-                    el: theRedirectEL,
-                    ItemView: RedirectView,
-                    itemParent: '.redirect-list-container'
-                  });
-
-                  RedirectsCollectionView[weekID].render();
-                  //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
-                  RedirectsCollection[weekID].fetchQuery({
-                    "field_parent_week_nid":weekID,
-                    "type":"redirect"
-                  }, {
-                    success: function(model, response, options){
-                      /*
-                      //wrap redirects into standard brick groups of 3
-                      var group = 0;
-                      var j;
-                      var total = $('.redirect', '#node-'+weekID).length;
-                      $('.redirect', '#node-'+weekID).each(function(i){                     
-                        if( ((i%3 == 0) && (i != 0)) || (i == total-1) ){
-                          console.log('wrapping group: '+group);
-                          $('.redirect-group-'+group).parent('div').wrapAll('<div class="brick standard redirect-group collapsible" />');
-                          group++;
-                        }
-                        $(this).addClass('redirect-group-'+group);
-                      });
-                      */
-                      //remove preloader for lesson for this particular week based on weekID
-                      $('.redirect.preloader', '#node-'+weekID).remove();
-                      $('.open', '#node-'+weekID).removeClass('open');
-                    },
-                    error: function(model, xhr, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      $('.redirect.preloader', '#node-'+weekID).remove();
-                      $('.redirect.open', '#node-'+weekID).removeClass('open');
                     }
 
                   });
