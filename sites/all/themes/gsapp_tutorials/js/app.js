@@ -432,60 +432,67 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
           },
 
           openLesson: function(){
-            var same_week = false;
+
             var NID = this.model.get('nid');
             var this_selector = '#node-' + NID;
-            var contentSectionHTML = 
-            '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
 
-            //if a lesson is already open, make sure to close it and return it to the schedule
-            if(openLessonModel != null){
-              if( !$(this_selector).closest('.week').hasClass('selected') ){
-                //if it's the same week, do nothing, otherwise clear the selected
-                $('.selected').removeClass('selected');
-                same_week = true;
+            //don't click through if in edit mode
+            if(!$(this_selector).closest('.week').hasClass('edit-mode')){
+              var same_week = false;
+              var contentSectionHTML = 
+              '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+
+              //if a lesson is already open, make sure to close it and return it to the schedule
+              if(openLessonModel != null){
+                if( !$(this_selector).closest('.week').hasClass('selected') ){
+                  //if it's the same week, do nothing, otherwise clear the selected
+                  $('.selected').removeClass('selected');
+                  same_week = true;
+                }
+                $('.open').removeClass('open');
+
+                contentSectionHTML = '';
+                openLessonView.remove();
+                openLessonModel.clear();
+                openLessonView = null;
+                openLessonModel = null;
+
+                //need to replace the el, the view.remove() clear s it
+                $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
               }
-              $('.open').removeClass('open');
+              
+              if(!same_week){
+                //only add class if not the same week
+                $(this_selector).closest('.week').addClass('selected');
+              }
 
-              contentSectionHTML = '';
-              openLessonView.remove();
-              openLessonModel.clear();
-              openLessonView = null;
-              openLessonModel = null;
+              $(this_selector).addClass('open');
 
-              //need to replace the el, the view.remove() clear s it
-              $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
+              if(contentSectionHTML.length > 0){
+                //else it already exists
+                $('#schedule').removeClass('span9').addClass('span3 collapsed');
+                updates_detached = $('#updates').detach();
+                $('#main').prepend(contentSectionHTML);
+              }
+
+              openLessonModel = this.model.clone();
+
+              openLessonView = new LessonView({
+                model: this.model,
+                el: '#lesson-content-el',
+                templateSelector: '#bb_lesson_open_template'
+              });
+
+              openLessonView.render(); 
+
+              if(attachQuestionAndAnswer(NID)){
+                $('#lesson-tab a:last').tab('show');
+              }
+
+              return true;
+            }else{
+              return false;
             }
-            
-            if(!same_week){
-              //only add class if not the same week
-              $(this_selector).closest('.week').addClass('selected');
-            }
-
-            $(this_selector).addClass('open');
-
-            if(contentSectionHTML.length > 0){
-              //else it already exists
-              $('#schedule').removeClass('span9').addClass('span3 collapsed');
-              updates_detached = $('#updates').detach();
-              $('#main').prepend(contentSectionHTML);
-            }
-
-            openLessonModel = this.model.clone();
-
-            openLessonView = new LessonView({
-              model: this.model,
-              el: '#lesson-content-el',
-              templateSelector: '#bb_lesson_open_template'
-            });
-
-            openLessonView.render(); 
-
-            if(attachQuestionAndAnswer(NID)){
-              $('#lesson-tab a:last').tab('show');
-            }
-
-            return true;
 
           },
 
@@ -855,7 +862,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
               $('input[type="text"].week-field, textarea.week-field', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
-              $('.lesson, .note', this_selector).addClass('disabled-mode');
             }else{
               clearState(FIRST_EDIT_WEEK);
               //$('#main').removeClass('first-edit');
@@ -893,7 +899,6 @@ var FIRST_EDIT_REDIRECT = 'first-edit-redirect';
               $('.edit', this_selector).text('Edit');
               $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
               $(this_selector).removeClass('edit-mode');
-              $('.disabled-mode').removeClass('disabled-mode');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('textarea.week-title', this_selector).val( this.model.get('title') );
