@@ -115,7 +115,6 @@ function restws_format($name) {
  *   One of 'create', 'update', 'delete' or 'view'.
  */
 function restws_handle_request($op, $format, $resource_name, $id = NULL, $payload = NULL) {
-
   if ($resource = restws_resource_controller($resource_name)) {
     // Allow other modules to change the web service request or react upon it.
     $request = array(
@@ -155,18 +154,6 @@ function restws_handle_request($op, $format, $resource_name, $id = NULL, $payloa
     }
     else {
       echo '403 Forbidden';
-
-      echo ' $op: ';
-      echo($op);
-      echo '  $resource_name: ';
-      echo($resource_name);
-      echo '  $id: ';
-      echo($id);
-      echo '  $id: ';
-      echo($id);
-      echo '  $payload: ';
-      echo($payload);
-
       drupal_add_http_header('Status', '403 Forbidden');
       watchdog('access denied', check_plain($_GET['q']), NULL, WATCHDOG_WARNING);
     }
@@ -280,12 +267,13 @@ function restws_page_callback($resource, $page_callback = NULL) {
   $resource_arg = arg(0);
   $format = FALSE;
   $id = NULL;
-  // Check for an appended .format string.
-  if (($pos = strpos($id_arg, '.')) && $format_name = substr($id_arg, $pos + 1)) {
+  // Check for an appended .format string on GET requests only to avoid CSRF
+  // attacks on POST requests.
+  if ($_SERVER['REQUEST_METHOD'] == 'GET' && ($pos = strpos($id_arg, '.')) && $format_name = substr($id_arg, $pos + 1)) {
     $id = substr($id_arg, 0, $pos);
     $format = restws_format($format_name);
   }
-  elseif (($pos = strpos($resource_arg, '.')) && $format_name = substr($resource_arg, $pos + 1)) {
+  elseif ($_SERVER['REQUEST_METHOD'] == 'GET' && ($pos = strpos($resource_arg, '.')) && $format_name = substr($resource_arg, $pos + 1)) {
     $format = restws_format($format_name);
   }
   else {

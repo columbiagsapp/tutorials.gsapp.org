@@ -84,6 +84,8 @@
 
 @attachmentMarginTop: 40px;
 
+@arrowUpSmallURL: url('/sites/all/themes/gsapp_tutorials/assets/arrow_up.png');
+@arrowDownSmallURL: url('/sites/all/themes/gsapp_tutorials/assets/arrow_down.png');
 
 
 .box-shadow(@style, @c) when (iscolor(@c)) {
@@ -146,6 +148,11 @@
   color:@darkBGColor;
 }
 
+.inactive:hover{
+  cursor:pointer;
+  color:@textColor;
+}
+
 .inline{
   list-style: none;
   display:inline;
@@ -159,6 +166,17 @@
 .inner{
   margin:@brickPadding;
   position:relative;
+}
+
+.inner-sides{
+  margin:0 @brickPadding;
+  position:relative;
+}
+
+.flatten{
+  margin:0 !important;
+  padding:0 !important;
+  line-height: 1em;
 }
 
 .preloader{
@@ -622,7 +640,8 @@ textarea.week-title{
 
 .course .edit-week-buttons .button,
 .course .edit-lesson-buttons .button,
-.course .edit-update-buttons .button{
+.course .edit-update-buttons .button,
+.course .submit-question-buttons .button{
   float:right;
   margin:@buttonMargin;
 }
@@ -736,35 +755,44 @@ textarea.week-title{
 
 
 /* QUESTIONS */
+.question{
+  margin-bottom:10px;
+}
+
 .question .votes-container{
   width:10%;
   float:left;
+  margin-bottom:@verticalpadding;
 }
 
 .question .vote-total{
   font: @xLargeFont;
+  line-height: @xLargeLineHeight;
 }
 
 .question .question-container{
   float:left;
   width:64%;
-  margin:0 3% 0 3%;
+  margin:0 3% @verticalpadding 3%;
 }
 
 .question .author-container{
   float:left;
   width:20%;
 }
-.question .question-buttons{
-  .center;
+
+.question .voteup{
+  width:25px;
+  height:16px;
   margin:0 auto;
+  background: transparent @arrowUpSmallURL no-repeat center;
 }
 
-.question .question-buttons .button{
-  width:10px;
-  float: left;
-  margin:@buttonMargin;
-  margin-bottom: @verticalpadding;
+.question .votedown{
+  width:25px;
+  height:16px;
+  margin:0 auto;
+  background: transparent @arrowDownSmallURL no-repeat center;
 }
 
 .add-question .submit-question-content-container{
@@ -780,4 +808,10 @@ textarea.week-title{
 
 .add-question #submit-question-question{
   min-height:300px;
+}
+
+/* RESPONSE */
+.response{
+  margin-bottom:30px;
+  float:left;
 }

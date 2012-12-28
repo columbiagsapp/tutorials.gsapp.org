@@ -34,7 +34,7 @@
       // These are defaults for interfacing with all Service module's providers.
       Drupal.Backbone.Models.Base = Backbone.Model.extend({
         // Base endpoint, used to create full url for each collection.
-        restEndpoint: Drupal.settings.backbone.endpoint || "",
+        restEndpoint: "",
 
         // #### initialize()
         //
@@ -134,7 +134,7 @@
       //  e.g. if you have two NodeViewCollections, setting limit on one sets on both.
       Drupal.Backbone.Collections.Base = Backbone.Collection.extend({
         // Base endpoint, used to create full url for each collection.
-        restEndpoint: Drupal.settings.backbone.endpoint || "",
+        restEndpoint: "",
 
         // #### initialize()
         //

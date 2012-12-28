@@ -22,7 +22,7 @@
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
   <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 </head>
-<body class="<?php print $classes; 
+<body class="<?php print $classes; print ' user-uid-'.$user->uid;
   foreach($user->roles as $key => $value){
     print ' '.$value;
   }?>" <?php print $attributes;?>>

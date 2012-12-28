@@ -96,16 +96,16 @@
     </div><!-- /.inner -->
   </div>
 
-  <div id="lesson-attachment">
-    <ul id="lesson-nav" class="roman">
+  <div id="lesson-attachment" class="roman">
+    <ul id="lesson-nav">
       <li class="inline"><h2 class="inline">Q&amp;A</h2></li>
       <li class="inline inactive"><h2 class="inline">Assignments</h2></li>
       <li class="inline inactive"><h2 class="inline">Transcript</h2></li>
     </ul>
 
-    <div id="lesson-content" class="roman">
+    <div id="lesson-content">
       <div id="questions-list-el"></div>
-        <div class="add-question brick roman">
+        <div class="add-question brick roman edit-mode">
           <div class="inner">
             <h4 class="float-left">Ask a question</h4>
             <div class="submit-question-buttons float-right">
@@ -208,7 +208,7 @@
   <div class="question brick roman">
     <div class="inner">
       <div class="votes-container center">
-        <div>Votes</div>
+        <div class="voteup button"></div>
         <div class="vote-total">
           <% if (typeof(field_question_votes) != "undefined" ) { %>
             <%= field_question_votes %>
@@ -216,11 +216,8 @@
             0
           <% } %>
         </div>
-
-        <div class="question-buttons">
-          <div class="voteup button">&#43;</div>
-          <div class="votedown button">&#45;</div>
-        </div>
+        <div>Votes</div>
+        <div class="votedown button"></div>
       </div><!-- /.votes-container -->
 
       <div class="question-container">
@@ -239,8 +236,13 @@
         <div class="author"></div>
       </div>
       
-    </div>
-  </div>
+    </div><!-- /.inner -->
+  </div><!-- /.question -->
+  <div class="response roman">
+    <div class="inner-sides">
+      <h3 class="inactive flatten float-left">View Responses</h3>
+    </div><!-- /.inner-sides -->
+  </div><!-- /.response -->
 </script>
 
 <script type="text/template" id="submit_question_template">

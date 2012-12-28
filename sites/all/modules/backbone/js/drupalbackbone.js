@@ -377,12 +377,9 @@
         // this.el or other specified el.
         // TODO: refactor model rendering into separate view class
         render: function(variables, el){
-          console.log('REDNERINGSSSSS!!!!');
 
+          console.log('vars:****');
           console.dir(variables);
-          console.dir(el);
-
-
           variables = (typeof variables === "object") ? variables : {};
           el = (typeof el === "undefined") ? this.el : el;
           if (this.model && (variables !=={})) {
@@ -391,7 +388,8 @@
 
 
           var content = this.executeTemplate(variables);
-          //console.log('D.Bb.Views.Base.render() | content: '+ content);
+          console.log('D.Bb.Views.Base.render() | content: '+ content);
+          if(el != undefined){console.log('**********adding to el: '.el);}
           //console.log('should be attaching to this.el: '+ this.el);
           $(this.el).html(content);
 

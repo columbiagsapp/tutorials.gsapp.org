@@ -13,6 +13,19 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
   Drupal.behaviors.app = {
     attach: function() {
 
+      function extractBodyProperty(property){
+        var bodyClasses = $('body').attr('class');
+        var idxStart = bodyClasses.indexOf(property);
+        var idxEnd = bodyClasses.indexOf(' ', idxStart);
+        if(idxEnd >= 0){
+          var returnVal = bodyClasses.substring(idxStart, idxEnd);
+          console.log('has an end: '+ returnVal);
+        }else{
+          var returnVal = bodyClasses.substring(idxStart);
+          console.log('has NO end: '+ returnVal);
+        }
+        return returnVal;
+      }
       /*
         This function transitions from any state to the main state
         with Schedule in focus and Updates in the sidebar
@@ -292,6 +305,9 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
           Create an empty question for new question to be asked
         */
         $('#questionsubmit').bind('click',function(){
+          //var uid = extractBodyProperty('user-uid-');
+          console.log('uid: ');
+
           var q = new Question({
             "title": $('#submitquestiontitle').val(),
             "field_question_votes":"0",
@@ -321,8 +337,6 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
               });
 
               q.save();
-
-              QuestionsCollection.render();
             }
           });
           //this can be asyncronous with the server save, meaning that
