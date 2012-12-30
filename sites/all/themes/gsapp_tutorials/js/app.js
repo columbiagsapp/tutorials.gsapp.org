@@ -16,6 +16,7 @@ lessonEditHallo.placeholder = {};
 lessonEditHallo.placeholder.field_description = 'Add description here';
 lessonEditHallo.placeholder.title = 'Add title here';
 lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
+lessonEditHallo.placeholder.number = "##";
 
 (function ($){
   Drupal.behaviors.app = {
@@ -620,23 +621,6 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                 video_embed_code = temp + temp2;
               }
 
-
-              //disable Hallo.js editors
-              $('.lesson-open .lesson-title').hallo({
-                editable: false
-              });
-
-              $('.lesson-open .lesson-description').hallo({
-                editable: false
-              });
-
-              $('.lesson-open .lesson-video-edit-container').hallo({
-                editable: false
-              });
-
-              $('.lesson-open .lesson-video-edit-container').addClass('hidden');
-              $('.lesson-open .lesson-video').removeClass('hidden');
-
               //strip html from description for the schedule/week lesson description summary
 
               var description = $(this_selector + ' .lesson-description').html();
@@ -679,6 +663,22 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
+            //disable Hallo.js editors
+            $('.lesson-open .lesson-title').hallo({
+              editable: false
+            });
+
+            $('.lesson-open .lesson-description').hallo({
+              editable: false
+            });
+
+            $('.lesson-open .lesson-video-edit-container').hallo({
+              editable: false
+            });
+
+            $('.lesson-open .lesson-video-edit-container').addClass('hidden');
+            $('.lesson-open .lesson-video').removeClass('hidden');
+              
             if( getState(FIRST_EDIT_LESSON) ){
               this.model.save();
               this.deleteLesson();
@@ -814,10 +814,45 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               $('input[type="text"].week-field, textarea.week-field', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
+
+              //launch Hallo.js
+              $('.week .week-number').hallo({
+                plugins: {
+                  'halloreundo': {}
+                },
+                editable: true,
+                toolbar: 'halloToolbarFixed',
+                placeholder: lessonEditHallo.placeholder.number
+              });
+
+              $('.week .week-title').hallo({
+                plugins: {
+                  'halloreundo': {}
+                },
+                editable: true,
+                toolbar: 'halloToolbarFixed',
+                placeholder: lessonEditHallo.placeholder.title
+              });
+
+              $('.week .week-description').hallo({
+                plugins: {
+                  'halloformat': {},
+                  'halloimage': {},
+                  'hallolists': {},
+                  'hallolink': {},
+                  'halloreundo': {}
+                },
+                editable: true,
+                toolbar: 'halloToolbarFixed',
+                placeholder: lessonEditHallo.placeholder.field_description
+              });
+
+
+
             }else{
               clearState(FIRST_EDIT_WEEK);
               //$('#main').removeClass('first-edit');
-              var weekNumber = $('.week-number', this_selector).val();
+              var weekNumber = $('.week-number', this_selector).text();
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
                 weekNumber = '0' + weekNumber;
@@ -826,9 +861,9 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               }
               
               this.model.set({
-                "title": $(this_selector + ' .week-title').val(),
+                "title": $(this_selector + ' .week-title').text(),
                 "field_week_number": weekNumber,
-                "field_description": $(this_selector + ' .week-description').val()
+                "field_description": $(this_selector + ' .week-description').html()
               });//TODO TCT2003 should have {silent: true}, see TODO DEC 20 in initialize
 
               this.model.save();
@@ -844,6 +879,19 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
+            //disable hallo.js editors
+            $('.week .week-number').hallo({
+              editable: false
+            });
+
+            $('.week .week-title').hallo({
+              editable: false
+            });
+
+            $('.week .week-description').hallo({
+              editable: false
+            });
+
             if( getState(FIRST_EDIT_WEEK) ){
               this.model.save();
               this.deleteWeek();

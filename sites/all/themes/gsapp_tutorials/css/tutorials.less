@@ -73,8 +73,6 @@
 
 @preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
 @playBGURL25: url('/sites/all/themes/gsapp_tutorials/assets/play25x25.png');
-@videoIconWidth: 35%;
-@videoIconHeight: 50px;
 
 
 @headerHeightAndMargin: 62px;
@@ -88,8 +86,9 @@
 
 
 /* Lesson */
-@lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @videoIconHeight - @innerPadding );
 @lessonIconHeight = 16px;
+@lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @lessonIconHeight - @innerPadding );
+
 
 
 
@@ -212,8 +211,8 @@
 
 
 .inEditMode{
-  background-color:@lightBGColor;
-  color:@textColor;
+  background-color:@lightBGColor !important;
+  color:@textColor !important;
 }
 
 .voteup,
@@ -233,6 +232,16 @@
   cursor:pointer;
 }
 
+.disabled{
+  background:@darkBGColor;
+  color:@textColor;
+}
+
+.glowing-box.disabledHover{
+  cursor: default !important;
+  .glowing-box;
+}
+
 
 
 /* Landscape tablet */
@@ -240,12 +249,6 @@
   .brick.standard{
     width:@standardBrickWidth;
     height:@standardBrickHeight;
-    margin: @standardBrickMargin;
-  }
-  .course .week .week-description{
-    width:@fullStandardBrickWidth;
-    height:@fullStandardBrickHeight;
-    padding:0;
     margin: @standardBrickMargin;
   }
 }
@@ -267,12 +270,6 @@
     height:@standardBrickHeight;
     margin: @standardBrickMargin;
   }
-  .course .week .week-description{
-    width:@fullStandardBrickWidth;
-    height:@fullStandardBrickHeight;
-    padding:0;
-    margin: @standardBrickMargin;
-  }
 }
 
 
@@ -283,12 +280,6 @@
     height:@standardBrickHeight;
     margin: @standardBrickMargin;
   }
-  .course .week .week-description{
-    width:@fullStandardBrickWidth;
-    height:@fullStandardBrickHeight;
-    padding:0;
-    margin: @standardBrickMargin;
-  }
 }
 
 /* phone in portrait */
@@ -296,12 +287,6 @@
   .brick.standard{
     width:100%;
     height:auto;
-    margin: 0 0 5px;
-  }
-  .course .week .week-description{
-    width:100%;
-    height:auto;
-    padding:0;
     margin: 0 0 5px;
   }
 }
@@ -387,7 +372,20 @@ body{
   width:100%;
 }
 
+.week .week-header{
+  width:100%;
+  margin-bottom:@verticalpadding;
+}
 
+.week .week-header-top{
+  width:70%;
+  margin-bottom:@verticalpadding;
+}
+
+.week .week-header-top div{
+  display:inline-block;
+  margin-left:@innerPadding;
+}
 
 
 .ajax-submission{
@@ -487,16 +485,6 @@ iframe {
   margin:0;
   padding:0;
 }
-
-
-.course .week-description{
-  float:left;
-}
-.course .edit-mode .week-description{
-  color:@editModeTextColor;
-}
-
-
 
 
 
@@ -615,11 +603,11 @@ textarea[readonly]{
   border-bottom: @editableBorder;
 }
 
-textarea.week-number{
+.week-number{
   max-width:40px;
 }
 
-textarea.week-title{
+.week-title{
   width:50%;
 }
 
@@ -662,32 +650,20 @@ textarea.week-title{
   background-color:@standardBrickHoverBG;
 }
 
-.edit-mode .lesson:hover,
-.edit-mode .note:hover{
-  cursor:auto;
-  .glowing-box;
-  background-color:@brickBGColor;
+.edit-mode .lesson{
+  .disabled;
 }
 
-.lesson textarea:hover,
-.note textarea:hover,
-.update textarea:hover{
-  cursor:pointer;
+.edit-mode .add-lesson{
+  .hidden;
 }
 
 .edit-mode .lesson:hover,
-.edit-mode .note:hover,
-.edit-mode .update:hover{
-  cursor:default;
-  background-color:@editModeBGColor;
-  .glowing-box;
+.edit-mode .add-lesson:hover{
+  .glowing-box.disabledHover;
 }
 
-.edit-mode.lesson textarea:hover,
-.edit-mode.note textarea:hover,
-.edit-mode.update textarea:hover{
-  cursor: auto;
-}
+
 
 .week.selected{
   background-color:@darkBGColor;
@@ -707,12 +683,30 @@ textarea.week-title{
   margin-bottom:@innerPadding;
 }
 
+.collapsed .lesson .lesson-title{
+  margin-bottom:0;
+}
+
 .lesson .icon-wrapper{
   height: @lessonIconHeight;
   width:100%;
   overflow: hidden;
   position:absolute;
   bottom:@verticalpadding;
+}
+
+.collapsed .lesson .text-wrapper,
+.collapsed .lesson .icon-wrapper{
+  position:relative;
+  width:100%;
+  float:left;
+}
+
+.collapsed .lesson .icon-wrapper{
+  bottom:auto;
+  display:block;
+  height:auto;
+  margin-top:@innerPadding;
 }
 
 .lesson-open{
@@ -777,7 +771,7 @@ textarea.week-title{
 }
 
 .question .votes-container{
-  width:10%;
+  width:7%;
   float:left;
   margin-bottom:@verticalpadding;
 }
@@ -789,7 +783,7 @@ textarea.week-title{
 
 .question .question-container{
   float:left;
-  width:64%;
+  width:67%;
   margin:0 3% @verticalpadding 3%;
 }
 
@@ -818,3 +812,7 @@ textarea.week-title{
   margin-bottom:30px;
   float:left;
 }
+
+
+
+/* OVERRIDES - THESE MUST STAY AT THE BOTTOM OF THIS FILE */

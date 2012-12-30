@@ -52,7 +52,7 @@
 
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
-    <div class="inner">
+    <div class="inner float-left">
       <div class="text-wrapper">
         <% if ( typeof(title) != "undefined" ) { %>
           <h2 class="title">
@@ -68,7 +68,7 @@
       <div class="icon-wrapper">
         <% if (typeof(field_video_embed) != "undefined" ) {
               if(field_video_embed != null) { %>
-          <div class="collapsible"><i class="icon-play"></i></div>
+          <i class="icon-play"></i>
         <% } }%>
       </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
@@ -136,14 +136,18 @@
 <script type="text/template" id="bb_week_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman outer">
     <div class="inner">
-      <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
-        <h2 class="title">
-          Week <textarea readonly class="editable week-field week-number"><%= field_week_number %></textarea>: <textarea readonly class="editable week-field week-title"><%= title %></textarea>
-        </h2>
-      <% } %>
-      <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable collapsible week-field week-description"><%= field_description %></textarea>
-      <% } %>
+      <div class="week-header">
+        <div class="week-header-top">
+          <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
+            <h2 class="title">
+              Week<div class="editable week-field week-number"><%= field_week_number %></div>: <div class="editable week-field week-title"><%= title %></div>
+            </h2>
+          <% } %>
+        </div><!-- /.week-header-top -->
+        <% if (typeof(field_description) != "undefined" ) { %>
+          <div class="editable collapsible week-field week-description"><%= field_description %></div>
+        <% } %>
+      </div><!-- /.week-header -->
 
       <div class="lessons-list-el"></div>
       <div class="lesson brick standard preloader"></div>
