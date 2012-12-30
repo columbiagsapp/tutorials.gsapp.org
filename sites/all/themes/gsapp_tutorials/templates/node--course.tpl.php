@@ -213,7 +213,7 @@
   <div class="question brick roman">
     <div class="inner">
       <div class="votes-container center">
-        <div class="voteup button"></div>
+        <div class="voteup"><i class="icon-chevron-up"></i></div>
         <div class="vote-total">
           <% if (typeof(field_question_votes) != "undefined" ) { %>
             <%= field_question_votes %>
@@ -222,7 +222,7 @@
           <% } %>
         </div>
         <div>Votes</div>
-        <div class="votedown button"></div>
+        <div class="votedown"><i class="icon-chevron-down"></i></div>
       </div><!-- /.votes-container -->
 
       <div class="question-container">

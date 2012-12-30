@@ -19,7 +19,6 @@
 @largeLineHeight: 1em;
 @xLargeFontSize: 3.5714em;/*50px*/
 @xLargeLineHeight: 1em;
-@xLargeFontWeight: bold;
 
 @smallFontSizeTablet: (@smallFontSize * 1.2857);/*18px*/
 @mediumFontSizeTablet: @smallFontSizeTablet;
@@ -28,13 +27,13 @@
 
 
 @baseFont: @baseFontSize/@baseLineHeight @baseFontFamily;
-@smallFont: @smallFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
-@mediumFont: @xLargeFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
-@largeFont: @largeFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
-@xLargeFont: @xLargeFontWeight @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
+@smallFont: @smallFontSize/@smallLineHeight @baseFontFamily;
+@mediumFont: bold @mediumFontSize/@mediumLineHeight @baseFontFamily;
+@largeFont: bold @largeFontSize/@largeLineHeight @baseFontFamily;
+@xLargeFont: bold @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
 
 
-@xLargeFontTablet: @xLargeFontWeight @xLargeFontSizeTablet/@xLargeLineHeight @baseFontFamily;
+@xLargeFontTablet: bold @xLargeFontSizeTablet/@xLargeLineHeight @baseFontFamily;
 
 
 @textColor: black;
@@ -215,6 +214,23 @@
 .inEditMode{
   background-color:@lightBGColor;
   color:@textColor;
+}
+
+.voteup,
+.votedown{
+  width:50px;
+  height:25px;
+  text-align: center;
+  margin:0 auto;
+  color:@textColor;
+  background: transparent;
+}
+
+.voteup:hover,
+.votedown:hover{
+  color:@darkBGColor;
+  background: transparent;
+  cursor:pointer;
 }
 
 
@@ -767,8 +783,8 @@ textarea.week-title{
 }
 
 .question .vote-total{
-  font: @xLargeFont;
-  line-height: @xLargeLineHeight;
+  font: @largeFont;
+  font-weight:bold;
 }
 
 .question .question-container{
@@ -780,20 +796,6 @@ textarea.week-title{
 .question .author-container{
   float:left;
   width:20%;
-}
-
-.question .voteup{
-  width:25px;
-  height:16px;
-  margin:0 auto;
-  background: transparent @arrowUpSmallURL no-repeat center;
-}
-
-.question .votedown{
-  width:25px;
-  height:16px;
-  margin:0 auto;
-  background: transparent @arrowDownSmallURL no-repeat center;
 }
 
 .add-question .submit-question-content-container{
