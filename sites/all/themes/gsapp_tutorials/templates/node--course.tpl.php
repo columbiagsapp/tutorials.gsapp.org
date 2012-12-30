@@ -68,7 +68,7 @@
       <div class="icon-wrapper">
         <% if (typeof(field_video_embed) != "undefined" ) {
               if(field_video_embed != null) { %>
-          <div class="editable collapsible lesson-video-icon"></div>
+          <div class="collapsible"><i class="icon-play"></i></div>
         <% } }%>
       </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
@@ -142,7 +142,7 @@
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable week-field week-description"><%= field_description %></textarea>
+        <textarea readonly class="editable collapsible week-field week-description"><%= field_description %></textarea>
       <% } %>
 
       <div class="lessons-list-el"></div>

@@ -64,7 +64,7 @@
 @FLWbrickPadding: 10px;
 
 
-@innerVerticalpadding: 10px;
+@innerPadding: 10px;
 
 @weekStandardHeight: 420px;
 
@@ -89,7 +89,8 @@
 
 
 /* Lesson */
-@lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @videoIconHeight - @innerVerticalpadding );
+@lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @videoIconHeight - @innerPadding );
+@lessonIconHeight = 16px;
 
 
 
@@ -170,7 +171,6 @@
 
 .inner{
   margin:@brickPadding;
-  position:relative;
 }
 
 .inner-sides{
@@ -621,13 +621,13 @@ textarea.week-title{
 .course .edit-lesson-buttons,
 .course .edit-update-buttons{
   position:absolute;
-  right:0;
+  right:@brickPadding;
 }
 
 .course .edit-week-buttons,
 .course .edit-lesson-buttons,
 .course .edit-update-buttons{
-  top:0;
+  top:@brickPadding;
 }
 
 
@@ -673,14 +673,6 @@ textarea.week-title{
   cursor: auto;
 }
 
-
-.course .lesson-video-icon{
-  margin-top:@innerVerticalpadding;
-  background:@darkBGColor @playBGURL25 no-repeat center;
-  width:@videoIconWidth;
-  height:@videoIconHeight;
-}
-
 .week.selected{
   background-color:@darkBGColor;
 }
@@ -695,9 +687,16 @@ textarea.week-title{
   overflow:hidden;
 }
 
+.lesson .lesson-title{
+  margin-bottom:@innerPadding;
+}
+
 .lesson .icon-wrapper{
-  max-height: 50px;
+  height: @lessonIconHeight;
+  width:100%;
   overflow: hidden;
+  position:absolute;
+  bottom:@verticalpadding;
 }
 
 .lesson-open{
