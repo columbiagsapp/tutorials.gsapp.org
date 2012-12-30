@@ -13,10 +13,21 @@ regions[footer]         = 'Footer'
 stylesheets[all][] = css/twitter_bootstrap.css
 stylesheets[all][] = css/tutorials.less
 
+stylesheets[all][] = hallo/examples/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.8.16.custom.css
+stylesheets[all][] = hallo/examples/hallo.css
+stylesheets[all][] = hallo/examples/image.css
+stylesheets[all][] = hallo/examples/overlay.css
+stylesheets[all][] = hallo/examples/annotate.css
+stylesheets[all][] = hallo/examples/fontawesome/css/font-awesome.css
+
+
 scripts[] = js/underscore-min.js
 scripts[] = js/backbone.js
 scripts[] = js/drupalbackbone.js
 scripts[] = js/drupalbackbone-restws.js
+
+scripts[] = hallo/deps/rangy-core-1.2.3.js
+scripts[] = hallo/examples/hallo.js
 
 scripts[] = js/app.js
 scripts[] = js/script.js

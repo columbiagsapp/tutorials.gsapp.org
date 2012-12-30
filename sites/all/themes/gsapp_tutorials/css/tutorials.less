@@ -88,6 +88,11 @@
 @arrowDownSmallURL: url('/sites/all/themes/gsapp_tutorials/assets/arrow_down.png');
 
 
+/* Lesson */
+@lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @videoIconHeight - @innerVerticalpadding );
+
+
+
 .box-shadow(@style, @c) when (iscolor(@c)) {
   box-shadow:         @style @c;
   -webkit-box-shadow: @style @c;
@@ -207,6 +212,10 @@
 }
 
 
+.inEditMode{
+  background-color:@lightBGColor;
+  color:@textColor;
+}
 
 
 
@@ -483,7 +492,7 @@ iframe {
 @buttonTextSize: 16px;
 @buttonTextWeight: 500;
 @buttonWidth: auto;
-@buttonMargin: 10px 0 0 10px;
+@buttonMargin: 0 0 @verticalpadding 10px;
 
 @lessonNoteButtonWidth: 80%;
 
@@ -530,8 +539,7 @@ iframe {
   display:none !important;
 }
 
-.child-edit-mode .button, 
-.edit-mode .add-lesson-note-wrapper{
+.child-edit-mode .button{
   .hidden;
 }
 
@@ -541,17 +549,8 @@ iframe {
   margin-right:@standardBrickPadding;
 }
 
-.course .add-lesson-container,
-.course .add-note-container{
-  text-align: center;
-  margin:@verticalpadding auto 0;
-  width:@lessonNoteButtonWidth;
-}
-
 
 .course #add-week-container:hover,
-.course .add-lesson-container:hover,
-.course .add-note-container:hover,
 .course #add-update-container:hover{
   background-color:@buttonBGColorHover;
   color:@inverseButtonTextColor;
@@ -565,13 +564,7 @@ iframe {
   font-weight: bold;
   text-align: center;
   color:@buttonBGColor;
-  margin:0 auto;
-}
-
-.course .add-lesson-note-container{
-  position:absolute;
-  bottom:@standardBrickPadding;
-  width:100%;
+  margin:60px auto 0;
 }
 
 textarea,
@@ -646,18 +639,8 @@ textarea.week-title{
   margin:@buttonMargin;
 }
 
-
-.course .add-lesson-note-wrapper{
-  .glowing-box;
-}
-
-.course .add-lesson-note-wrapper:hover{
-  .glowing-box-inset;
-  background-color:@standardBrickHoverBG;
-}
-
 .lesson:hover,
-.note:hover{
+.add-lesson:hover{
   cursor:pointer;
   .glowing-box-inset;
   background-color:@standardBrickHoverBG;
@@ -707,6 +690,16 @@ textarea.week-title{
   background-color:@editModeBGColor;
 }
 
+.lesson .text-wrapper{
+  max-height: @lessonTextWrapperMaxHeight;
+  overflow:hidden;
+}
+
+.lesson .icon-wrapper{
+  max-height: 50px;
+  overflow: hidden;
+}
+
 .lesson-open{
   position: relative;
   min-height:@weekStandardHeight;
@@ -726,6 +719,11 @@ textarea.week-title{
 
 .lesson-open .lesson-title{
   max-width: 70%;
+  margin-bottom:@verticalpadding;
+}
+
+.lesson-open .lesson-description{
+  margin-bottom:@verticalpadding;
 }
 
 #lesson-tabs{
@@ -735,6 +733,10 @@ textarea.week-title{
 #lesson-attachment{
   margin-top:@attachmentMarginTop;
   .float-left;
+}
+
+.state-first-edit-lesson #lesson-attachment{
+  .hidden;
 }
 
 

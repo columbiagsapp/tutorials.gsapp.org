@@ -23,7 +23,7 @@
 
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
-      <h2 id="schedule-button" class="heading float-left heading-button">Schedule</h2>
+      <h2 id="schedule-button" class="heading float-left heading-button editable">Schedule</h2>
       <?php if($editable){ ?>
         <div id="add-week-container" class="button">+</div>
       <?php } ?>
@@ -53,19 +53,24 @@
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
     <div class="inner">
-      <% if ( typeof(title) != "undefined" ) { %>
-        <h2 class="title">
-          <textarea readonly class="editable lesson-title"><%= title %></textarea>
-        </h2>
-      <% } %>
-      <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
-      <% } %>
-      <% if (typeof(field_video_embed) != "undefined" ) {
-            if(field_video_embed != null) { %>
-        <div class="editable collapsible lesson-video-icon"></div>
-      <% } }%>
-      
+      <div class="text-wrapper">
+        <% if ( typeof(title) != "undefined" ) { %>
+          <h2 class="title">
+            <div class="editable lesson-title"><%= title %></div>
+          </h2>
+        <% } %>
+        <% if (typeof(field_description) != "undefined" ) { %>
+          <div class="editable collapsible lesson-description">
+            <%= field_description_summary %>
+          </div>
+        <% } %>
+      </div><!-- /.text-wrapper -->
+      <div class="icon-wrapper">
+        <% if (typeof(field_video_embed) != "undefined" ) {
+              if(field_video_embed != null) { %>
+          <div class="editable collapsible lesson-video-icon"></div>
+        <% } }%>
+      </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
   </div>
 </script>
@@ -75,16 +80,20 @@
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">
-          <textarea readonly class="editable lesson-title"><%= title %></textarea>
+          <div class="editable lesson-title editable-title"><%= title %></div>
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable collapsible lesson-description"><%= field_description %></textarea>
+        <div class="editable collapsible lesson-description editable-description"><%= field_description %></div>
       <% } %>
       <% if (typeof(field_video_embed) != "undefined" ) { %>
-        <div class="editable collapsible lesson-video"><%= field_video_embed %></div>
+        <div class="collapsible lesson-video"><%= field_video_embed %></div>
       <% } %>
-      <div class="editable collapsible lesson-video-edit-container"></div>
+      <div class="editable collapsible lesson-video-edit-container editable-embed hidden">
+        <% if (typeof(field_video_embed) != "undefined" ) { %>
+        <%= field_video_embed %>
+      <% } %>
+      </div>
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons collapsible">
@@ -140,12 +149,8 @@
       <div class="lesson brick standard preloader"></div>
       
       <?php if($editable){ ?>
-        <div class="add-lesson-note-wrapper brick standard collapsible">
+        <div class="add-lesson brick standard collapsible glowing-box">
           <div class="add-lesson-note-plus">+</div>
-          <div class="add-lesson-note-container">
-            <div class="add-lesson-container button">Lesson</div>
-            <div class="add-note-container button">Note</div>
-          </div>
         </div>
       <?php } ?>
 

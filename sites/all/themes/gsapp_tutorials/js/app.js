@@ -9,13 +9,29 @@ var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
 var FIRST_EDIT_UPDATE = 'first-edit-update';
 
+var lessonEditHallo = {};
+
+lessonEditHallo.placeholder = {};
+
+lessonEditHallo.placeholder.field_description = 'Add description here';
+lessonEditHallo.placeholder.title = 'Add title here';
+lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
 
+      function strip(html)
+      {
+         var tmp = document.createElement("DIV");
+         tmp.innerHTML = html;
+         return tmp.textContent||tmp.innerText;
+      }
+
+
       function extractBodyProperty(property){
         var bodyClasses = $('body').attr('class');
-        var idxStart = bodyClasses.indexOf(property);
+        var idxStart = bodyClasses.indexOf(property) + property.length;
         var idxEnd = bodyClasses.indexOf(' ', idxStart);
         if(idxEnd >= 0){
           var returnVal = bodyClasses.substring(idxStart, idxEnd);
@@ -305,8 +321,12 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
           Create an empty question for new question to be asked
         */
         $('#questionsubmit').bind('click',function(){
-          //var uid = extractBodyProperty('user-uid-');
-          console.log('uid: ');
+          var userUID = extractBodyProperty('user-uid-');
+          console.log('uid: '+userUID);
+
+          var user = Drupal.Backbone.Models.User({ "uid": userUID });
+
+          user.fetch();
 
           var q = new Question({
             "title": $('#submitquestiontitle').val(),
@@ -493,7 +513,7 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
 
               openLessonView.render(); 
 
-              attachQuestionAndAnswer(NID)
+              attachQuestionAndAnswer(NID);
 
               return true;
             }else{
@@ -522,26 +542,60 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
             }
             
             if($('.edit', this_selector).text() == "Edit"){//user clicked button to go into edit mode
-              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
+              //$('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
 
-              var videoEmbedTextareaArray = [];
-              videoEmbedTextareaArray.push('<textarea id="video-embed-textarea" class="editable lesson-video-edit">');
-              var videoEmbedText = thisModel.get('field_video_embed');
-              if( (videoEmbedText != null) && (videoEmbedText != '') ){//if the field is empty, backbone returns null
-                videoEmbedTextareaArray.push( videoEmbedText );
-              }else{
-                videoEmbedTextareaArray.push( 'Paste embed text here from Youtube or Vimeo' );
+              //launch Hallo.js
+              $('.lesson-open .lesson-title').hallo({
+                plugins: {
+                  'halloreundo': {}
+                },
+                editable: true,
+                toolbar: 'halloToolbarFixed',
+                placeholder: lessonEditHallo.placeholder.title
+              });
+
+              $('.lesson-open .lesson-description').hallo({
+                plugins: {
+                  'halloformat': {},
+                  'halloheadings': {},
+                  'halloimage': {},
+                  'halloblock': {},
+                  'hallojustify': {},
+                  'hallolists': {},
+                  'hallolink': {},
+                  'halloreundo': {}
+                },
+                editable: true,
+                toolbar: 'halloToolbarFixed',
+                placeholder: lessonEditHallo.placeholder.field_description
+              });
+
+              var video_html = $('.lesson-open .lesson-video').html();
+              if(video_html.length > 0){
+                lessonEditHallo.placeholder.field_video_embed = '';
+                console.log('lessonEditHallo.placeholder.field_video_embed: '+lessonEditHallo.placeholder.field_video_embed);
+                $('.lesson-open .lesson-video-edit-container').text( video_html );
               }
-              videoEmbedTextareaArray.push( '</textarea>' );
-              var videoEmbedTextarea = videoEmbedTextareaArray.join(''); 
-              $('.lesson-video-edit-container', this_selector).append( videoEmbedTextarea );
+
+              $('.lesson-open .lesson-video-edit-container').hallo({
+                plugins: {
+                  'halloreundo': {}
+                },
+                editable: true,
+                toolbar: 'halloToolbarFixed',
+                placeholder: lessonEditHallo.placeholder.field_video_embed
+              });
+
+              $('.lesson-open .lesson-video-edit-container').removeClass('hidden');
+              $('.lesson-open .lesson-video').addClass('hidden');
 
             }else{//user clicked button to save changes
+              
               clearState(FIRST_EDIT_LESSON);
 
-              var video_embed_code = $(this_selector + ' .lesson-video-edit').val();
+              var video_embed_code = $(this_selector + ' .lesson-video-edit-container').html();
               var heightIdxStart = video_embed_code.indexOf('height=');
               var widthIdxStart = video_embed_code.indexOf('width=');
 
@@ -566,16 +620,44 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
                 video_embed_code = temp + temp2;
               }
 
+
+              //disable Hallo.js editors
+              $('.lesson-open .lesson-title').hallo({
+                editable: false
+              });
+
+              $('.lesson-open .lesson-description').hallo({
+                editable: false
+              });
+
+              $('.lesson-open .lesson-video-edit-container').hallo({
+                editable: false
+              });
+
+              $('.lesson-open .lesson-video-edit-container').addClass('hidden');
+              $('.lesson-open .lesson-video').removeClass('hidden');
+
+              //strip html from description for the schedule/week lesson description summary
+
+              var description = $(this_selector + ' .lesson-description').html();
+              var description_summary = strip(description);
+
+              console.log('description: '+ description);
+              console.log('description_summary: '+description_summary);
+
               this.model.set({
-                "title": $(this_selector + ' .lesson-title').val(),
-                "field_description": $(this_selector + ' .lesson-description').val(),
-                "field_video_embed": video_embed_code
+                "title": $(this_selector + ' .lesson-title').html(),
+                "field_description": description,
+                "field_description_summary": description_summary,
+                "field_video_embed": $(this_selector + ' .lesson-video-edit-container').text()
               });
 
               this.model.save();
               openLessonModel = null;
               openLessonModel = this.model.clone();
               this.cancelEdit();
+
+              
             }
           },
 
@@ -634,7 +716,7 @@ var FIRST_EDIT_UPDATE = 'first-edit-update';
 
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
-            "click .add-lesson-container" :  "addLesson",
+            "click .add-lesson" :  "addLesson",
             "click .edit-week-buttons .edit" : "editWeek",
             "click .edit-week-buttons .delete": "deleteWeek",
             "click .edit-week-buttons .cancel": "cancelEdit"

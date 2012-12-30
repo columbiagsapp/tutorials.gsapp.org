@@ -45,7 +45,7 @@
       // ### Drupal.Backbone.Models.User
       //
       // Model for users.
-      Drupal.Backbone.Models.User = Drupal.Backbone.Models.Base.extend({
+      Drupal.Backbone.Models.User = Drupal.Backbone.Models.Entity.extend({
         urlRoot: "user",
         idAttribute: "uid",
         initialize: function(opts) {
