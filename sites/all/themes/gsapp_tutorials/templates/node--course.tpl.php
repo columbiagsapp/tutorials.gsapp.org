@@ -76,7 +76,7 @@
 </script>
 
 <script type="text/template" id="bb_lesson_open_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson-open brick roman">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>open-node-<%= nid %><% }else{ %>open-node-temp<% } %>" class="lesson-open brick roman">
     <div id="lesson-open-anchor" class="inner">
       <div class="content">
         <h2 class="title"><div class="editable lesson-title editable-title">
@@ -174,8 +174,8 @@
 </script>
 
 <script type="text/template" id="bb_embed_template">
-  <div id="node-<% if (typeof(nid) != "undefined" ){ %><%= nid %><% } %>" class="collapsible lesson-embed-wrapper">
-    <div class="lesson-embed-element">
+  <div class="collapsible lesson-embed-wrapper">
+    <div id="node-<% if (typeof(nid) != "undefined" ){ %><%= nid %><% } %>" class="lesson-embed-element <% if (typeof(field_embed_type) != "undefined" ){ %><%= field_embed_type %><% } %>">
       <div class="field-embed-edit-wrapper">
         <div class="field-embed-edit-top">
           <label class="field-embed-edit-label">

@@ -202,7 +202,8 @@
 }
 
 #update-preloader,
-.lesson.preloader{
+.lesson.preloader,
+.embed.preloader{
   height:300px;
 }
 
@@ -772,12 +773,13 @@ textarea[readonly]{
   width:100%;
 }
 
-.lesson-open .lesson-video{
+.lesson-embed-element.Video iframe,
+.lesson-embed-element.Video object,
+.lesson-embed-element.Scribd iframe,
+.lesson-embed-element.Scribd object,
+.lesson-embed-element.Slideshare iframe,
+.lesson-embed-element.Slideshare object{
   min-height:@weekStandardHeight;
-}
-
-.lesson-open .lesson-video iframe{
-  height:400px;
 }
 
 .lesson-open .lesson-title{

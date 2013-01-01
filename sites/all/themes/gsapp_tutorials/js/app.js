@@ -2,8 +2,9 @@
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
-var openLessonModel = null;
 var openLessonView = null;
+var EmbedsCollection = [];
+var EmbedsCollectionView = [];
 
 var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
@@ -17,6 +18,11 @@ lessonEditHallo.placeholder.field_description = 'Add description here';
 lessonEditHallo.placeholder.title = 'Add title here';
 lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
 lessonEditHallo.placeholder.number = "##";
+
+
+var LessonPointer;
+var tempPointer; 
+var LC;
 
 (function ($){
   Drupal.behaviors.app = {
@@ -101,8 +107,10 @@ lessonEditHallo.placeholder.number = "##";
           //remove the temporary lesson model and view
           openLessonView.remove();
           openLessonView = null;
-          openLessonModel.clear();
-          openLessonModel = null;
+
+          EmbedsCollection.reset();
+          EmbedsCollection = null;
+          EmbedsCollectionView = null;
 
           $('.theOpenLesson').removeClass('theOpenLesson');
           $('.selected').removeClass('selected');
@@ -509,14 +517,106 @@ lessonEditHallo.placeholder.number = "##";
           //the Underscore formated template in node--tutorial.tpl.php stored in a 
           //<script> tag and identified by its id
           templateSelector: '#bb_lesson_template',
+         
+          //_openLessonView: null,
 
-          _embedsCollection: [],
+          //bind vote up and down events to the buttons and tie these to local functions
+          events: {
+            "click .lesson": "openLesson"
+          },
 
-          _embedsCollectionView: [],
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            this.model.bind('change', this.render, this);//this calls the fetch
+            //this._openLessonView = [];
+          },
 
+          openLesson: function(){
+            var NID = this.model.get('nid');
+            var this_selector = '#node-' + NID;
+
+            //don't click through if in edit mode
+            if(!$(this_selector).closest('.week').hasClass('edit-mode')){
+              var different_week = true;
+              var contentSectionHTML = 
+              '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+
+              //if a lesson is already open, make sure to close it and 
+              //return it to the schedule
+              if($('.lesson-open').length > 0){
+                $('.selected').removeClass('selected');
+                $('.theOpenLesson').removeClass('theOpenLesson');
+
+                contentSectionHTML = '';
+
+                openLessonView.remove();
+                openLessonView = null;
+                //openLessonView = null;
+
+                //need to replace the el, the view.remove() clears it
+                $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
+              }else{
+                $('#schedule').removeClass('span9').addClass('span3 collapsed');
+                updates_detached = $('#updates').detach();
+                $('#main').prepend(contentSectionHTML);
+              }
+              
+              $(this_selector).closest('.week').addClass('selected');
+              $(this_selector).addClass('theOpenLesson');
+
+              //create new child LessonOpenView to this LessonView
+              openLessonView = new LessonOpenView({
+                model: this.model
+              });
+
+              openLessonView.render(); 
+
+              openLessonView.initEmbedsCollectionAndView(NID);
+
+              openLessonView.initHalloEditorLesson(false);
+
+              //attach any embeds
+              openLessonView.attachEmbed();
+
+              //TODO TCT2003 need to attach any uploads
+
+              //attach Q&A
+              //TODO TCT2003 perhaps make this a fcn of LessonOpenView?
+              attachQuestionAndAnswer(NID);
+
+              //point the global openLessonView to the new LessonOpenView
+              //openLessonView = this._openLessonView;
+
+              return true;
+            }else{
+              return false;
+            }
+
+          },
+
+          firstEditLesson: function(){
+            setState(FIRST_EDIT_LESSON);
+
+            //can't call edit lesson until finished with openLesson
+            if( this.openLesson() ){
+              this._openLessonView.initHalloEditorLesson(true);
+              this._openLessonView.editLesson();
+            }
+          }
+
+        });//end LessonView
+
+
+        var LessonOpenView = Drupal.Backbone.Views.Base.extend({
+          //the Underscore formated template in node--tutorial.tpl.php stored in a 
+          //<script> tag and identified by its id
+          templateSelector: '#bb_lesson_open_template',
+          el: '#lesson-content-el',
+          
           placeholder: {
             title: "Add a title new",
-            field_description: "Add body text new"
+            field_description: "Add body text new",
+            field_embed_code: "Paste embed code here"
           },
 
           //bind vote up and down events to the buttons and tie these to local functions
@@ -524,15 +624,44 @@ lessonEditHallo.placeholder.number = "##";
             "click .edit" : "editLesson",
             "click .delete": "deleteLesson",
             "click .cancel": "cancelEdit",
-            "click .lesson": "openLesson",
-            "click .button-embed-video": "addVideoLesson"
+            "click .button-embed-video": "addVideoEmbed",
+            "click .button-embed-slideshare": "addSlideshareEmbed",
+            "click .button-embed-scribd": "addScribdEmbed",
+            "click .button-embed-soundcloud": "addSoundcloudEmbed"
+          },
+
+          initEmbedsCollectionAndView: function(lessonID){
+            //empty container arrays if they already have embed collection
+            //and collection view
+            console.log('initEmbedsCollectionAndView()');
+
+            EmbedsCollection = new EmbedCollectionPrototype();
+            EmbedsCollection.reset();
+            //put the embeds collection at the front of the container array
+            //this.embedsCollection.unshift(EmbedsCollection);
+
+            var theEL = '#open-node-' + lessonID + ' .embeds-list-el';
+
+            console.log('initing embedsCollectionView');
+
+            EmbedsCollectionView = new EmbedCollectionViewPrototype({
+              collection: EmbedsCollection,
+              templateSelector: '#embed-list',
+              renderer: 'underscore',
+              el: theEL,
+              ItemView: EmbedView,
+              itemParent: '.embed-list-container'
+            });
+
+            EmbedsCollectionView.render();
+            //put the embeds collection view at the front of the container array
+            //this.embedsCollectionView.unshift(EmbedsCollectionView);
           },
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
             this.model.bind('change', this.render, this);//this calls the fetch
-            //this._embedsCollection = [];
-            //this._embedsCollectionView = [];
+            console.log('LessonOpenView initialize()');
           },
 
           /*
@@ -545,6 +674,12 @@ lessonEditHallo.placeholder.number = "##";
 
             $('.lesson-open .lesson-description').hallo({
               editable: true
+            });
+
+            $('.lesson-open .lesson-embed-element').each(function(){
+              $('.field-embed-edit-code', this).hallo({
+                editable: true
+              });
             });
           },
 
@@ -559,6 +694,12 @@ lessonEditHallo.placeholder.number = "##";
             $('.lesson-open .lesson-description').hallo({
               editable: false
             });
+
+            $('.lesson-open .lesson-embed-element').each(function(){
+              $('.field-embed-edit-code', this).hallo({
+                editable: false
+              });
+            });
             
           },
 
@@ -567,6 +708,8 @@ lessonEditHallo.placeholder.number = "##";
             for the first opening of a lesson
           */
           initHalloEditorLesson: function(editmode){
+
+            console.log('initHalloEditorLesson() this.model.get("nid"): '+this.model.get("nid"));
             //launch Hallo.js
             $('.lesson-open .lesson-title').hallo({
               plugins: {
@@ -593,83 +736,62 @@ lessonEditHallo.placeholder.number = "##";
               editable: editmode,
               toolbar: 'halloToolbarFixed',
               placeholder: this.placeholder.field_description
-            });            
-          },
-
-          initEmbedsCollectionAndView: function(lessonID){
-            //empty container arrays if they already have embed collection
-            //and collection view
-            if(this._embedsCollection.length > 0){
-              this._embedsCollection.length = 0;
-              this._embedsCollectionView.length = 0;
-            }
-
-            EmbedsCollection = new EmbedCollectionPrototype();
-            EmbedsCollection.reset();
-            //put the embeds collection at the front of the container array
-            this._embedsCollection.unshift(EmbedsCollection);
-
-            var theEL = '#node-' + lessonID + ' .embeds-list-el';
-
-            console.log('initing _embedsCollectionView');
-
-            var EmbedsCollectionView = new EmbedCollectionViewPrototype({
-              collection: this._embedsCollection[0],
-              templateSelector: '#embed-list',
-              renderer: 'underscore',
-              el: theEL,
-              ItemView: EmbedView,
-              itemParent: '.embed-list-container'
-            });
-
-            EmbedsCollectionView.render();
-
-            //put the embeds collection view at the front of the container array
-            this._embedsCollectionView.unshift(EmbedsCollectionView);
+            });      
           },
 
           saveEmbeds: function(){
-            console.log('this.saveEmbeds()');
+            console.log('saveEmbeds()');
 
-            if(this._embedsCollection[0].length > 0){
-              console.log('this._embedsCollection[0]:');
-              console.dir(this._embedsCollection[0]);
+            var lessonID = this.model.get('nid');
+            var embedsArray = [];
 
-              this._embedsCollection[0].each(function(embed, index){
-                console.log('embedsCollection.each()');
-                console.log('embed id: '+ embed.get('nid'));
-
+            if(EmbedsCollection.length > 0){
+              EmbedsCollection.each(function(embed, index){
                 var embedID = embed.get('nid');
                 var embed_selector = '#node-' + embedID;
+                var embed_type = $('.field-embed-edit-label .type-code', embed_selector).text();
 
-                embed.set({
-                  "field_embed_type": $('.field-embed-edit-label .type-code', embed_selector).text(),
-                  "field_embed_code": $('.field-embed-edit-code', embed_selector).text()
-                });
+                embedsArray.push( embed_type );
+                
 
-                embed.save();
+                //only update if isModified
+                if($('.field-embed-edit-code', embed_selector).hasClass('isModified')){
+                  embed.set({
+                    "field_embed_type": embed_type,
+                    "field_embed_code": $('.field-embed-edit-code', embed_selector).text()
+                  });
 
-
+                  embed.save();
+                }
               });
             }
+
+            this.model.set({
+              "field_embeds": embedsArray
+            });
+
+            this.model.save();
+
           },
 
           attachEmbed: function(){
 
-            var lessonID = this.model.get('nid');
+            var lessonID = this.model.get("nid");
 
-            this.initEmbedsCollectionAndView(lessonID);
+            //this.initEmbedsCollectionAndView(lessonID);
 
             //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
-            this._embedsCollection[0].fetchQuery({
+            EmbedsCollection.fetchQuery({
               "field_parent_lesson_nid":lessonID,
               "type":"embed"
             }, {
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.embed.preloader', '#node-'+lessonID).remove();
+                $('.embed.preloader', '#open-node-'+lessonID).remove();
 
-                $('.lesson-embed-element', '#node-'+lessonID).each(function(){
+                console.log('embed fetch success');
+
+                $('.lesson-embed-element', '#open-node-'+lessonID).each(function(){
                   $('.field-embed-edit-code', this).text( $('.field-embed-content-wrapper', this).html() );
 
                   $('.field-embed-edit-code', this).hallo({
@@ -684,103 +806,22 @@ lessonEditHallo.placeholder.number = "##";
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.embed.preloader', '#node-'+lessonID).remove();
+                $('.embed.preloader', '#open-node-'+lessonID).remove();
+
+                console.log('embed fetch error');
               }
 
             });
           },
 
-          openLesson: function(){
-            var NID = this.model.get('nid');
-            var this_selector = '#node-' + NID;
-
-            //don't click through if in edit mode
-            if(!$(this_selector).closest('.week').hasClass('edit-mode')){
-              var different_week = true;
-              var contentSectionHTML = 
-              '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
-
-              //if a lesson is already open, make sure to close it and return it to the schedule
-              if(openLessonModel != null){
-                if( !$(this_selector).closest('.week').hasClass('selected') ){
-                  //if it's the same week, do nothing, otherwise clear the selected
-                  $('.selected').removeClass('selected');
-                  different_week = true;
-                }else{
-                  different_week = false;
-                }
-                $('.theOpenLesson').removeClass('theOpenLesson');
-
-                contentSectionHTML = '';
-                openLessonView.remove();
-                openLessonModel.clear();
-                openLessonView = null;
-                openLessonModel = null;
-
-                //need to replace the el, the view.remove() clear s it
-                $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
-              }
-              
-              if(different_week){
-                //only add class if not the same week
-                $(this_selector).closest('.week').addClass('selected');
-              }
-
-              $(this_selector).addClass('theOpenLesson');
-
-              if(contentSectionHTML.length > 0){
-                //else it already exists
-                $('#schedule').removeClass('span9').addClass('span3 collapsed');
-                updates_detached = $('#updates').detach();
-                $('#main').prepend(contentSectionHTML);
-              }
-
-              openLessonModel = this.model.clone();
-
-              openLessonView = new LessonView({
-                model: this.model,
-                el: '#lesson-content-el',
-                templateSelector: '#bb_lesson_open_template'
-              });
-
-              openLessonView.render(); 
-
-              this.initHalloEditorLesson(false);
-
-              this.attachEmbed(NID);
-
-              attachQuestionAndAnswer(NID);
-
-              return true;
-            }else{
-              return false;
-            }
-
-          },
-
-          firstEditLesson: function(){
-            setState(FIRST_EDIT_LESSON);
-
-            //can't call edit lesson until finished with openLesson
-            if(this.openLesson()){
-              this.initHalloEditorLesson(true);
-              this.editLesson();
-            }
-          },
-
           editLesson: function(){
-            //select either this model or it's clone for open-lesson
-            if(openLessonModel != null ){
-              var this_selector = '#node-' + openLessonModel.get('nid');
-              var thisModel = openLessonModel;//pointer to the valid model
-            }else{
-              var this_selector = '#node-' + this.model.get('nid');
-              var thisModel = this.model;//pointer to the valid model
-            }
+            var this_selector = '#open-node-' + this.model.get('nid');
+
+            console.log('editLesson() this_selector: '+this_selector);
             
-            if($('.edit', this_selector).text() == "Edit"){//user clicked button to go into edit mode
-              //$('input[type="text"], textarea', this_selector).removeAttr('readonly');
-              $('.edit', this_selector).text('Save');
+            //user clicked button to go into edit mode
+            if($('.edit', this_selector).text() == "Edit"){
+              $('.edit', this_selector).text('Save');//switch button text to Save
               $(this_selector).addClass('edit-mode');
 
               //populate embed-edit-code fields for each embed element with html as plain text
@@ -793,15 +834,10 @@ lessonEditHallo.placeholder.number = "##";
                 }
               });
 
-              
-
               this.enableHalloEditorsLesson();
-
-              $('.lesson-open .lesson-video-wrapper .lesson-embed-video-edit-container, .lesson-open .lesson-video-wrapper .label').removeClass('hidden');
-              $('.lesson-open .lesson-video').addClass('hidden');
-
-            }else{//user clicked button to save changes
-              
+            }
+            //user clicked button to save changes
+            else{
               clearState(FIRST_EDIT_LESSON);
 
               //strip html from description for the schedule/week lesson description summary
@@ -814,8 +850,6 @@ lessonEditHallo.placeholder.number = "##";
               if( $(this_selector + ' .lesson-description').hasClass('isModified') ) {
                 var description = $(this_selector + ' .lesson-description').html();
                 var description_summary = strip(description);
-                console.log('description: '+description);
-                console.log('description_summary: '+description_summary);
 
                 this.model.set({
                   "field_description": description,
@@ -823,33 +857,26 @@ lessonEditHallo.placeholder.number = "##";
                 });
               }
 
-              
-
               //Iterate through all models in the EmbedsCollection and 
               //save out the values
-              console.log('----------');
               this.saveEmbeds();
 
-
-
+              //TODO TCT2003 add this.saveUploads();
 
               this.model.save();
-              openLessonModel = null;
-              openLessonModel = this.model.clone();
               this.cancelEdit();
-
-              
-            }
+            }//end of save mode
           },
 
           deleteLesson: function(){
             //delete the actual model from the database and its view
-            var weekID = $('.open').closest('.week').attr('id');
-            weekID = weekID.substr(5);
-            LessonsCollectionView[weekID].remove(this.model);
+            //var weekID = $('.open').closest('.week').attr('id');
+            //weekID = weekID.substr(5);
+            //LessonsCollectionView[weekID].remove(this.model);
             this.model.destroy();
             this.remove();
 
+            //TODO TCT2003 do I need the .open remove?
             if( getState(FIRST_EDIT_LESSON) ){
               $('.open').remove();
             }
@@ -859,46 +886,36 @@ lessonEditHallo.placeholder.number = "##";
           },
 
           cancelEdit: function(){
-            var this_selector = '#node-' + this.model.get('nid');
+            var this_selector = '#open-node-' + this.model.get('nid');
             //disable Hallo.js editors
             this.disableHalloEditorsLesson();
 
-            $('.lesson-open .lesson-video-wrapper .lesson-embed-video-edit-container, .lesson-open .lesson-video-wrapper .label').addClass('hidden');
-            $('.lesson-open .lesson-video').removeClass('hidden');
-
             if( getState(FIRST_EDIT_LESSON) ){
+              //TODO TCT2003 do I need to save the model first?
               this.model.save();
               this.deleteLesson();
             }else{
               $('.edit', this_selector).text('Edit');
-              $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
               $(this_selector).removeClass('edit-mode');
               
+              //TODO SOON TCT2003 
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
-              $('textarea.lesson-title', this_selector).val( this.model.get('title') );
-              $('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
-
-              $('.lesson-video', this_selector).val( this.model.get('field_video_embed') );
-              $('.lesson-video-edit', this_selector).remove();
+              //$('textarea.lesson-title', this_selector).val( this.model.get('title') );
+              //$('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
 
               //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
+              /*
               $('.selected .lesson').each(function(){
                 if($(this).attr('id') == this_selector){
                   $(this).addClass('theOpenLesson');
                 }
-              });
+              });*/
             }
 
             clearState(FIRST_EDIT_LESSON);
-            //$('#main').removeClass('first-edit');
           },
 
-          /*
-            Triggered when the user clicks the Youtube/Vimeo button from the 
-            Embed dropdown menu in edit-mode
-          */
-          addVideoLesson: function(){
-            
+          addEmbed: function(embedType){
             var courseID = $('.course').attr('id');
             courseID = courseID.substring(5);
 
@@ -909,7 +926,7 @@ lessonEditHallo.placeholder.number = "##";
 
             var e = new Embed({
               "title": embed_title,
-              "field_embed_type": "Video",
+              "field_embed_type": embedType,
               "type": "embed",
               "field_parent_lesson_nid":lessonID,
               "field_parent_course_nid":courseID
@@ -936,23 +953,44 @@ lessonEditHallo.placeholder.number = "##";
                 });
                 e.save();
 
-                if(this._embedsCollection.length <= 0){
-                  this.initEmbedsCollectionAndView(lessonID);
-                }
+                //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
                 
-                var newEmbedView = this._embedsCollectionView[0].addOne(e);
+                console.log('*****adding new embed to EmbedsCollection');
+                var newEmbedView = EmbedsCollectionView.addOne(e);
 
                 newEmbedView.firstEditEmbed();
               }
             });
+          },//end addEmbed()
 
+          /*
+            Triggered when the user clicks the Youtube/Vimeo button from the 
+            Embed dropdown menu in edit-mode
+          */
+          addVideoEmbed: function(){
+            this.addEmbed('Video');
+          },
+
+          addSoundcloudEmbed: function(){
+            this.addEmbed('Soundcloud');
+          },
+          addSlideshareEmbed: function(){
+            this.addEmbed('Slideshare');
+          },
+          addScribdEmbed: function(){
+            this.addEmbed('Scribd');
           }
 
+        });//end LessonOpenView
 
-        });
+
 
         var EmbedView = Drupal.Backbone.Views.Base.extend({
           templateSelector: '#bb_embed_template',
+
+          placeholder: {
+            field_embed_code: "Paste embed code here"
+          },
 
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
@@ -965,19 +1003,25 @@ lessonEditHallo.placeholder.number = "##";
           },
 
           firstEditEmbed: function(){
-
             console.log('firstEditEmbed()');
+            var embedID = this.model.get('nid');
+            var this_selector = '#node-' + embedID;
+
+            $('.field-embed-edit-code', this_selector).hallo({
+              plugins: {
+                'halloreundo': {}
+              },
+              editable: true,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.field_embed_code
+            });
+
           },
 
           deleteEmbed: function(){
-
-            console.log('delete this embed');
-
             //delete the actual model from the database and its view
-            
             this.model.destroy();
             this.remove();
-
           }
 
         });
@@ -1433,6 +1477,8 @@ lessonEditHallo.placeholder.number = "##";
                 if(weekID != "week-preloader"){
                   weekID = weekID.substr(5);
 
+
+
                   LessonsCollection[weekID] = new LessonCollectionPrototype();
                   LessonsCollection[weekID].reset();
 
@@ -1449,6 +1495,10 @@ lessonEditHallo.placeholder.number = "##";
                   });
 
                   LessonsCollectionView[weekID].render();
+
+//TODO GET RID TCT2003
+LC = LessonsCollectionView;
+
                   //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
                   LessonsCollection[weekID].fetchQuery({
                     "field_parent_week_nid":weekID,
