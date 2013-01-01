@@ -66,6 +66,7 @@
 @innerPadding: 10px;
 
 @weekStandardHeight: 420px;
+@lessonStandardHeight: 200px;
 
 
 @phoneBrickPadding: 10px;
@@ -89,6 +90,9 @@
 @lessonIconHeight = 16px;
 @lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @lessonIconHeight - @innerPadding );
 
+
+/* EDITABLES */
+@editableMinHeight: 30px;
 
 
 
@@ -131,7 +135,7 @@
   display:none;
 }
 
-.open{
+.theOpenLesson{
   display:none !important;
 }
 
@@ -193,6 +197,10 @@
   height: @weekStandardHeight;
 }
 
+#lesson-content-preloader{
+  height: @lessonStandardHeight;
+}
+
 #update-preloader,
 .lesson.preloader{
   height:300px;
@@ -240,6 +248,28 @@
 .glowing-box.disabledHover{
   cursor: default !important;
   .glowing-box;
+}
+
+
+.edit-mode .editable-description{
+  min-height:150px !important;
+}
+
+
+
+
+/* EMBEDS */
+
+.edit-mode .field-embed-content{
+  .hidden
+}
+
+.field-embed-edit{
+  .hidden;
+}
+
+.edit-mode .field-embed-edit{
+  display:block !important;
 }
 
 
@@ -378,13 +408,22 @@ body{
 }
 
 .week .week-header-top{
-  width:70%;
+  width:80%;
   margin-bottom:@verticalpadding;
+}
+
+.collapsed .week .week-header-top{
+  width:100%;
 }
 
 .week .week-header-top div{
   display:inline-block;
   margin-left:@innerPadding;
+}
+
+.collapsed .week .week-header-top div{
+  display:block;
+  margin-left:0;
 }
 
 
@@ -526,6 +565,18 @@ iframe {
   color:@inverseButtonTextColor;
 }
 
+.secondaryButton{
+  border-bottom:1px solid;
+  color:@textColor;
+  font:@smallFont;
+  text-transform: uppercase;
+}
+
+.secondaryButton:hover{
+  border:none;
+  color:@darkBGColor;
+}
+
 .delete,
 .cancel{
   .hidden;
@@ -607,10 +658,6 @@ textarea[readonly]{
   max-width:40px;
 }
 
-.week-title{
-  width:50%;
-}
-
 .course .lesson textarea,
 .course .update textarea{
   width:100%;
@@ -663,6 +710,12 @@ textarea[readonly]{
   .glowing-box.disabledHover;
 }
 
+.edit-mode .editable{
+  margin-bottom:@verticalpadding;
+  background-color:@lightBGColor;
+  color:@textColor;
+  min-height:@editableMinHeight;
+}
 
 
 .week.selected{
@@ -677,6 +730,7 @@ textarea[readonly]{
 .lesson .text-wrapper{
   max-height: @lessonTextWrapperMaxHeight;
   overflow:hidden;
+  word-break: break-all;
 }
 
 .lesson .lesson-title{
@@ -711,7 +765,7 @@ textarea[readonly]{
 
 .lesson-open{
   position: relative;
-  min-height:@weekStandardHeight;
+  min-height:@lessonStandardHeight;
 }
 
 .lesson-open textarea{
@@ -735,6 +789,21 @@ textarea[readonly]{
   margin-bottom:@verticalpadding;
 }
 
+.content-edit{
+  .hidden;
+  float:left;
+  margin-bottom:@brickPadding;
+}
+
+.content{
+  float:left;
+  width:100%;
+}
+
+.edit-mode .content-edit{
+  display:block !important;
+}
+
 #lesson-tabs{
   float:left;
 }
@@ -748,6 +817,47 @@ textarea[readonly]{
   .hidden;
 }
 
+.field-embed-edit-wrapper{
+  .hidden;
+}
+
+.edit-mode .field-embed-edit-wrapper{
+  display: block;
+}
+
+
+
+/* LESSON EDIT MODE */
+
+.lesson-embed-wrapper{
+  margin-bottom:@verticalpadding;
+}
+
+
+.field-embed-edit-top{
+  width:100%;
+  float:left;
+  min-height: 20px;
+}
+
+.field-embed-edit-label{
+  max-width:70%;
+  float:left;
+}
+.field-embed-edit-buttons{
+  max-width:30%;
+  float:right;
+}
+.field-embed-edit-buttons div{
+  float:right;
+  margin-left:@innerPadding;
+  .secondaryButton;
+}
+
+.field-embed-edit-code{
+  float:left;
+  width:100%;
+}
 
 /* UPDATES */
 .collapsed .edit-update-buttons{

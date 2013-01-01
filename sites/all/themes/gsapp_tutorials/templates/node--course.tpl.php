@@ -66,8 +66,8 @@
         <% } %>
       </div><!-- /.text-wrapper -->
       <div class="icon-wrapper">
-        <% if (typeof(field_video_embed) != "undefined" ) {
-              if(field_video_embed != null) { %>
+        <% if( typeof(field_video_embed) != "undefined" ) {
+              if( (field_video_embed != null) && (field_video_embed.length > 0) ){ %>
           <i class="icon-play"></i>
         <% } }%>
       </div><!-- /.icon-wrapper -->
@@ -77,23 +77,61 @@
 
 <script type="text/template" id="bb_lesson_open_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson-open brick roman">
-    <div class="inner">
-      <% if ( typeof(title) != "undefined" ) { %>
-        <h2 class="title">
-          <div class="editable lesson-title editable-title"><%= title %></div>
-        </h2>
-      <% } %>
-      <% if (typeof(field_description) != "undefined" ) { %>
-        <div class="editable collapsible lesson-description editable-description"><%= field_description %></div>
-      <% } %>
-      <% if (typeof(field_video_embed) != "undefined" ) { %>
-        <div class="collapsible lesson-video"><%= field_video_embed %></div>
-      <% } %>
-      <div class="editable collapsible lesson-video-edit-container editable-embed hidden">
-        <% if (typeof(field_video_embed) != "undefined" ) { %>
-        <%= field_video_embed %>
-      <% } %>
-      </div>
+    <div id="lesson-open-anchor" class="inner">
+      <div class="content">
+        <h2 class="title"><div class="editable lesson-title editable-title">
+          <% if ( typeof(title) != "undefined" ) { %><%= title %><% } %>
+        </div></h2><!-- /.title -->
+
+        <div class="editable collapsible lesson-description editable-description">
+          <% if (typeof(field_description) != "undefined" ) { %><%= field_description %><% } %>
+        </div><!-- /.lesson-description -->
+
+        <div class="embeds-list-el"></div>
+        <div class="embed brick roman preloader"></div>
+        
+
+      </div><!-- /.content -->
+
+      <div class="content-edit">
+        <div class="btn-group dropup button-group-text float-left">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-reorder"></i>&nbsp;&nbsp;Text
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a tabindex="-1" href="#lesson-open-anchor" class="button-text-text"><i class="icon-reorder"></i> Text</a></li>
+            <li><a tabindex="-1" href="#lesson-open-anchor" class="button-text-link"><i class="icon-link"></i> Link</a></li>
+            <li><a tabindex="-1" href="#lesson-open-anchor" class="button-text-bibliography"><i class="icon-book"></i> Bibliography</a></li>
+          </ul>
+        </div>
+
+        <div class="btn-group dropup button-group-embed float-left">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-globe"></i>&nbsp;&nbsp;Embed
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a tabindex="-1" href="#lesson-embed-video-anchor" class="button-embed-video"><i class="icon-play"></i> Youtube/Vimeo</a></li>
+            <li class="divider"></li>
+            <li><a tabindex="-1" href="#" class="button-embed-slideshare"><i class="icon-th"></i> Slideshare</a></li>
+            <li><a tabindex="-1" href="#" class="button-embed-scribd"><i class="icon-file"></i> Scribd</a></li>
+            <li class="divider"></li>
+            <li><a tabindex="-1" href="#" class="button-embed-soundcloud"><i class="icon-music"></i> Soundcloud</a></li>
+          </ul>
+        </div>
+
+        <div class="btn-group dropup button-group-upload float-left">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-upload-alt"></i>&nbsp;&nbsp;Upload
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a tabindex="-1" href="#" class="button-upload-pdf"><i class="icon-file"></i> PDF</a></li>
+            <li><a tabindex="-1" href="#" class="button-upload-file"><i class="icon-upload-alt"></i> File</a></li>
+          </ul>
+        </div>
+      </div><!-- /.lesson-embed-upload -->
       
       <?php if($editable){ ?>
         <div class="edit-lesson-buttons collapsible">
@@ -103,6 +141,8 @@
         </div>
       <?php } ?>
     </div><!-- /.inner -->
+
+
   </div>
 
   <div id="lesson-attachment" class="roman">
@@ -133,6 +173,32 @@
 
 </script>
 
+<script type="text/template" id="bb_embed_template">
+  <div id="node-<% if (typeof(nid) != "undefined" ){ %><%= nid %><% } %>" class="collapsible lesson-embed-wrapper">
+    <div class="lesson-embed-element">
+      <div class="field-embed-edit-wrapper">
+        <div class="field-embed-edit-top">
+          <label class="field-embed-edit-label">
+            <% if (typeof(field_embed_type) != "undefined" ){ %>
+              <span class="type-code"><%= field_embed_type %></span> embed code
+            <% } %>
+          </label>
+          <div class="field-embed-edit-buttons">
+            <div class="remove">Remove</div>
+          </div>
+        </div><!-- /.field-embed-edit-top -->
+        <div class="field-embed-edit-code editable">
+        </div><!-- /.field-embed-edit-code -->
+      </div><!-- /.field-embed-edit-wrapper -->
+      <div class="field-embed-content-wrapper">
+        <% if (typeof(field_embed_code) != "undefined" ){ %>
+          <%= field_embed_code %>
+        <% } %>
+      </div><!-- /.field-embed-content-wrapper -->
+    </div><!-- /#lesson-embed-element-index -->
+  </div><!-- /.lesson-embed-wrapper -->
+</script>
+
 <script type="text/template" id="bb_week_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman outer">
     <div class="inner">
@@ -140,7 +206,7 @@
         <div class="week-header-top">
           <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
             <h2 class="title">
-              Week<div class="editable week-field week-number"><%= field_week_number %></div>: <div class="editable week-field week-title"><%= title %></div>
+              <div class="float-left">Week <span class="editable week-field week-number"><%= field_week_number %></span>:</div><div class="editable week-field week-title"><%= title %></div>
             </h2>
           <% } %>
         </div><!-- /.week-header-top -->
@@ -195,6 +261,12 @@
 <script type="text/template" id="lesson-list">
   <div>
     <div class="lesson-list-container"></div>
+  </div>
+</script>
+
+<script type="text/template" id="embed-list">
+  <div>
+    <div class="embed-list-container"></div>
   </div>
 </script>
 

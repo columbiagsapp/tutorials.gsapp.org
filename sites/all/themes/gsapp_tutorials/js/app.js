@@ -29,6 +29,55 @@ lessonEditHallo.placeholder.number = "##";
          return tmp.textContent||tmp.innerText;
       }
 
+      function appendEmbedElement(this_selector, type, nth){
+        var html_array = [];
+        html_array.push('<div id="lesson-embed-element-'+nth+'" class="lesson-embed-element">');
+          html_array.push('<div class="field-embed-edit-wrapper">');
+            html_array.push('<div class="field-embed-edit-top">');
+              html_array.push('<label class="field-embed-edit-label">'+ type +' embed code</label>');
+              html_array.push('<div class="field-embed-edit-buttons">');
+                html_array.push('<div class="remove">Remove</div>');
+              html_array.push('</div>');
+            html_array.push('</div><!-- /.field-embed-edit-top -->');
+            html_array.push('<div class="field-embed-edit-code editable"></div><!-- /.field-embed-edit-code -->');
+          html_array.push('</div><!-- /.field-embed-edit-wrapper -->');
+          html_array.push('<div class="field-embed-content-wrapper"></div><!-- /.field-embed-content-wrapper -->');
+        html_array.push('</div><!-- /#lesson-embed-element-index -->');
+
+        var html_string = html_array.join('');
+
+        $('.lesson-embed-wrapper', this_selector).append( $(html_string) );
+      }
+
+      function stripHeightWidthTagsFromIframe(){
+        /*
+        var video_embed_code = $(this_selector + ' .lesson-video-wrapper .lesson-embed-video-edit-container').html();
+        var heightIdxStart = video_embed_code.indexOf('height=');
+        var widthIdxStart = video_embed_code.indexOf('width=');
+
+        //remove any given height in the embed code
+        if(heightIdxStart >= 0){
+          var heightIdxEnd = video_embed_code.indexOf('"', heightIdxStart+8);
+          var temp = video_embed_code.substring(0, heightIdxStart);
+          var temp2 = video_embed_code.substring(heightIdxEnd+1);
+          if(temp2.substr(0,1) == ' '){
+            temp2 = temp2.substring(1);
+          }
+          video_embed_code = temp + temp2;
+        }
+        //remove any given width in the embed code
+        if(widthIdxStart >= 0){
+          var widthIdxEnd = video_embed_code.indexOf('"', widthIdxStart+7);
+          var temp = video_embed_code.substring(0, widthIdxStart);
+          var temp2 = video_embed_code.substring(widthIdxEnd+1);
+          if(temp2.substr(0,1) == ' '){
+            temp2 = temp2.substring(1);
+          }
+          video_embed_code = temp + temp2;
+        }
+        */
+      }
+
 
       function extractBodyProperty(property){
         var bodyClasses = $('body').attr('class');
@@ -55,7 +104,7 @@ lessonEditHallo.placeholder.number = "##";
           openLessonModel.clear();
           openLessonModel = null;
 
-          $('.open').removeClass('open');
+          $('.theOpenLesson').removeClass('theOpenLesson');
           $('.selected').removeClass('selected');
 
           $('#lesson-content').remove();
@@ -176,6 +225,7 @@ lessonEditHallo.placeholder.number = "##";
             break;
         }
       }//end of getState()
+
 
       function attachQuestionAndAnswer(lessonNid){
         /*
@@ -313,7 +363,8 @@ lessonEditHallo.placeholder.number = "##";
           Fetch the collection of Question nodes by sending the nid of the tutorial
         */
         QuestionsCollection.fetchQuery({
-          "field_parent_tutorial_nid":lessonNid
+          "field_parent_tutorial_nid":lessonNid,
+          "type":"question"
         });
 
 
@@ -334,7 +385,6 @@ lessonEditHallo.placeholder.number = "##";
             "field_question_votes":"0",
             "field_description": $('#submit-question-question').val(),
             "type": "question"
-
           });
 
           //need to set this explicitly for a node create
@@ -417,6 +467,21 @@ lessonEditHallo.placeholder.number = "##";
             this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
           }
         });
+
+        var Embed = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+            //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+            //needed to take out a bunch when using REST WS - last_view seems to be the culprit
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
+          },
+          testFunction: function(){
+            console.log('testFunction()');
+            console.log('this model nid: '+this.model.get("nid") );
+          }
+        });
+
+
         
         var Week = Drupal.Backbone.Models.Node.extend({
           initialize: function(opts){
@@ -445,21 +510,187 @@ lessonEditHallo.placeholder.number = "##";
           //<script> tag and identified by its id
           templateSelector: '#bb_lesson_template',
 
+          _embedsCollection: [],
+
+          _embedsCollectionView: [],
+
+          placeholder: {
+            title: "Add a title new",
+            field_description: "Add body text new"
+          },
+
           //bind vote up and down events to the buttons and tie these to local functions
           events: {
             "click .edit" : "editLesson",
             "click .delete": "deleteLesson",
             "click .cancel": "cancelEdit",
-            "click .lesson":"openLesson"
+            "click .lesson": "openLesson",
+            "click .button-embed-video": "addVideoLesson"
           },
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            this.model.bind('change', this.render, this);//this calls the fetch 
+            this.model.bind('change', this.render, this);//this calls the fetch
+            //this._embedsCollection = [];
+            //this._embedsCollectionView = [];
+          },
+
+          /*
+            Enables Hallo.js editor for title and body
+          */
+          enableHalloEditorsLesson: function(){
+            $('.lesson-open .lesson-title').hallo({
+              editable: true
+            });
+
+            $('.lesson-open .lesson-description').hallo({
+              editable: true
+            });
+          },
+
+          /*
+            Disables Hallo.js editor for title and body
+          */
+          disableHalloEditorsLesson: function(){
+            $('.lesson-open .lesson-title').hallo({
+              editable: false
+            });
+
+            $('.lesson-open .lesson-description').hallo({
+              editable: false
+            });
+            
+          },
+
+          /*
+            Initializes Hallo.js editor for title and body with placeholders
+            for the first opening of a lesson
+          */
+          initHalloEditorLesson: function(editmode){
+            //launch Hallo.js
+            $('.lesson-open .lesson-title').hallo({
+              plugins: {
+                'halloreundo': {}
+              },
+              editable: editmode,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.title
+            });
+
+            $('.lesson-open .lesson-description').hallo({
+              plugins: {
+                'halloformat': {},
+                'halloimage': {},
+                'halloblock': {},
+                'hallojustify': {},
+                'hallolists': {},
+                'hallolink': {},
+                'halloreundo': {},
+                'halloblacklist': {
+                  tags: ['br']
+                }
+              },
+              editable: editmode,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.field_description
+            });            
+          },
+
+          initEmbedsCollectionAndView: function(lessonID){
+            //empty container arrays if they already have embed collection
+            //and collection view
+            if(this._embedsCollection.length > 0){
+              this._embedsCollection.length = 0;
+              this._embedsCollectionView.length = 0;
+            }
+
+            EmbedsCollection = new EmbedCollectionPrototype();
+            EmbedsCollection.reset();
+            //put the embeds collection at the front of the container array
+            this._embedsCollection.unshift(EmbedsCollection);
+
+            var theEL = '#node-' + lessonID + ' .embeds-list-el';
+
+            console.log('initing _embedsCollectionView');
+
+            var EmbedsCollectionView = new EmbedCollectionViewPrototype({
+              collection: this._embedsCollection[0],
+              templateSelector: '#embed-list',
+              renderer: 'underscore',
+              el: theEL,
+              ItemView: EmbedView,
+              itemParent: '.embed-list-container'
+            });
+
+            EmbedsCollectionView.render();
+
+            //put the embeds collection view at the front of the container array
+            this._embedsCollectionView.unshift(EmbedsCollectionView);
+          },
+
+          saveEmbeds: function(){
+            console.log('this.saveEmbeds()');
+
+            if(this._embedsCollection[0].length > 0){
+              console.log('this._embedsCollection[0]:');
+              console.dir(this._embedsCollection[0]);
+
+              this._embedsCollection[0].each(function(embed, index){
+                console.log('embedsCollection.each()');
+                console.log('embed id: '+ embed.get('nid'));
+
+                var embedID = embed.get('nid');
+                var embed_selector = '#node-' + embedID;
+
+                embed.set({
+                  "field_embed_type": $('.field-embed-edit-label .type-code', embed_selector).text(),
+                  "field_embed_code": $('.field-embed-edit-code', embed_selector).text()
+                });
+
+                embed.save();
+
+
+              });
+            }
+          },
+
+          attachEmbed: function(){
+
+            var lessonID = this.model.get('nid');
+
+            this.initEmbedsCollectionAndView(lessonID);
+
+            //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
+            this._embedsCollection[0].fetchQuery({
+              "field_parent_lesson_nid":lessonID,
+              "type":"embed"
+            }, {
+              success: function(model, response, options){
+                //remove preloader for lesson for this particular week based on weekID
+                $('.embed.preloader', '#node-'+lessonID).remove();
+
+                $('.lesson-embed-element', '#node-'+lessonID).each(function(){
+                  $('.field-embed-edit-code', this).text( $('.field-embed-content-wrapper', this).html() );
+
+                  $('.field-embed-edit-code', this).hallo({
+                    plugins: {
+                      'halloreundo': {}
+                    },
+                    editable: true,
+                    toolbar: 'halloToolbarFixed',
+                    placeholder: 'Paste code asaaaa'
+                  });
+                });
+              },
+              error: function(model, xhr, options){
+                //remove preloader for lesson for this particular week based on weekID
+                $('.embed.preloader', '#node-'+lessonID).remove();
+              }
+
+            });
           },
 
           openLesson: function(){
-
             var NID = this.model.get('nid');
             var this_selector = '#node-' + NID;
 
@@ -478,7 +709,7 @@ lessonEditHallo.placeholder.number = "##";
                 }else{
                   different_week = false;
                 }
-                $('.open').removeClass('open');
+                $('.theOpenLesson').removeClass('theOpenLesson');
 
                 contentSectionHTML = '';
                 openLessonView.remove();
@@ -495,7 +726,7 @@ lessonEditHallo.placeholder.number = "##";
                 $(this_selector).closest('.week').addClass('selected');
               }
 
-              $(this_selector).addClass('open');
+              $(this_selector).addClass('theOpenLesson');
 
               if(contentSectionHTML.length > 0){
                 //else it already exists
@@ -514,6 +745,10 @@ lessonEditHallo.placeholder.number = "##";
 
               openLessonView.render(); 
 
+              this.initHalloEditorLesson(false);
+
+              this.attachEmbed(NID);
+
               attachQuestionAndAnswer(NID);
 
               return true;
@@ -528,6 +763,7 @@ lessonEditHallo.placeholder.number = "##";
 
             //can't call edit lesson until finished with openLesson
             if(this.openLesson()){
+              this.initHalloEditorLesson(true);
               this.editLesson();
             }
           },
@@ -547,94 +783,55 @@ lessonEditHallo.placeholder.number = "##";
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
 
-              //launch Hallo.js
-              $('.lesson-open .lesson-title').hallo({
-                plugins: {
-                  'halloreundo': {}
-                },
-                editable: true,
-                toolbar: 'halloToolbarFixed',
-                placeholder: lessonEditHallo.placeholder.title
+              //populate embed-edit-code fields for each embed element with html as plain text
+              $('.lesson-embed-element', this_selector).each(function(){
+                var embed_html = $('.field-embed-content-wrapper', this).html();
+                if(embed_html != undefined){
+                  if(embed_html.length > 0){
+                    $('.field-embed-edit-code', this).text( embed_html );
+                  }
+                }
               });
 
-              $('.lesson-open .lesson-description').hallo({
-                plugins: {
-                  'halloformat': {},
-                  'halloheadings': {},
-                  'halloimage': {},
-                  'halloblock': {},
-                  'hallojustify': {},
-                  'hallolists': {},
-                  'hallolink': {},
-                  'halloreundo': {}
-                },
-                editable: true,
-                toolbar: 'halloToolbarFixed',
-                placeholder: lessonEditHallo.placeholder.field_description
-              });
+              
 
-              var video_html = $('.lesson-open .lesson-video').html();
-              if(video_html.length > 0){
-                lessonEditHallo.placeholder.field_video_embed = '';
-                console.log('lessonEditHallo.placeholder.field_video_embed: '+lessonEditHallo.placeholder.field_video_embed);
-                $('.lesson-open .lesson-video-edit-container').text( video_html );
-              }
+              this.enableHalloEditorsLesson();
 
-              $('.lesson-open .lesson-video-edit-container').hallo({
-                plugins: {
-                  'halloreundo': {}
-                },
-                editable: true,
-                toolbar: 'halloToolbarFixed',
-                placeholder: lessonEditHallo.placeholder.field_video_embed
-              });
-
-              $('.lesson-open .lesson-video-edit-container').removeClass('hidden');
+              $('.lesson-open .lesson-video-wrapper .lesson-embed-video-edit-container, .lesson-open .lesson-video-wrapper .label').removeClass('hidden');
               $('.lesson-open .lesson-video').addClass('hidden');
 
             }else{//user clicked button to save changes
               
               clearState(FIRST_EDIT_LESSON);
 
-              var video_embed_code = $(this_selector + ' .lesson-video-edit-container').html();
-              var heightIdxStart = video_embed_code.indexOf('height=');
-              var widthIdxStart = video_embed_code.indexOf('width=');
-
-              //remove any given height in the embed code
-              if(heightIdxStart >= 0){
-                var heightIdxEnd = video_embed_code.indexOf('"', heightIdxStart+8);
-                var temp = video_embed_code.substring(0, heightIdxStart);
-                var temp2 = video_embed_code.substring(heightIdxEnd+1);
-                if(temp2.substr(0,1) == ' '){
-                  temp2 = temp2.substring(1);
-                }
-                video_embed_code = temp + temp2;
-              }
-              //remove any given width in the embed code
-              if(widthIdxStart >= 0){
-                var widthIdxEnd = video_embed_code.indexOf('"', widthIdxStart+7);
-                var temp = video_embed_code.substring(0, widthIdxStart);
-                var temp2 = video_embed_code.substring(widthIdxEnd+1);
-                if(temp2.substr(0,1) == ' '){
-                  temp2 = temp2.substring(1);
-                }
-                video_embed_code = temp + temp2;
-              }
-
               //strip html from description for the schedule/week lesson description summary
+              if( $(this_selector + ' .lesson-title').hasClass('isModified') ) {
+                this.model.set({
+                  "title": $(this_selector + ' .lesson-title').html()
+                });
+              }
 
-              var description = $(this_selector + ' .lesson-description').html();
-              var description_summary = strip(description);
+              if( $(this_selector + ' .lesson-description').hasClass('isModified') ) {
+                var description = $(this_selector + ' .lesson-description').html();
+                var description_summary = strip(description);
+                console.log('description: '+description);
+                console.log('description_summary: '+description_summary);
 
-              console.log('description: '+ description);
-              console.log('description_summary: '+description_summary);
+                this.model.set({
+                  "field_description": description,
+                  "field_description_summary": description_summary
+                });
+              }
 
-              this.model.set({
-                "title": $(this_selector + ' .lesson-title').html(),
-                "field_description": description,
-                "field_description_summary": description_summary,
-                "field_video_embed": $(this_selector + ' .lesson-video-edit-container').text()
-              });
+              
+
+              //Iterate through all models in the EmbedsCollection and 
+              //save out the values
+              console.log('----------');
+              this.saveEmbeds();
+
+
+
 
               this.model.save();
               openLessonModel = null;
@@ -664,21 +861,11 @@ lessonEditHallo.placeholder.number = "##";
           cancelEdit: function(){
             var this_selector = '#node-' + this.model.get('nid');
             //disable Hallo.js editors
-            $('.lesson-open .lesson-title').hallo({
-              editable: false
-            });
+            this.disableHalloEditorsLesson();
 
-            $('.lesson-open .lesson-description').hallo({
-              editable: false
-            });
-
-            $('.lesson-open .lesson-video-edit-container').hallo({
-              editable: false
-            });
-
-            $('.lesson-open .lesson-video-edit-container').addClass('hidden');
+            $('.lesson-open .lesson-video-wrapper .lesson-embed-video-edit-container, .lesson-open .lesson-video-wrapper .label').addClass('hidden');
             $('.lesson-open .lesson-video').removeClass('hidden');
-              
+
             if( getState(FIRST_EDIT_LESSON) ){
               this.model.save();
               this.deleteLesson();
@@ -697,13 +884,100 @@ lessonEditHallo.placeholder.number = "##";
               //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
               $('.selected .lesson').each(function(){
                 if($(this).attr('id') == this_selector){
-                  $(this).addClass('open');
+                  $(this).addClass('theOpenLesson');
                 }
               });
             }
 
             clearState(FIRST_EDIT_LESSON);
             //$('#main').removeClass('first-edit');
+          },
+
+          /*
+            Triggered when the user clicks the Youtube/Vimeo button from the 
+            Embed dropdown menu in edit-mode
+          */
+          addVideoLesson: function(){
+            
+            var courseID = $('.course').attr('id');
+            courseID = courseID.substring(5);
+
+            console.log('Course: '+courseID);
+
+            var lessonID = this.model.get('nid');
+            var embed_title = "embeddedTo"+lessonID;
+
+            var e = new Embed({
+              "title": embed_title,
+              "field_embed_type": "Video",
+              "type": "embed",
+              "field_parent_lesson_nid":lessonID,
+              "field_parent_course_nid":courseID
+            });
+
+            //need to set this explicitly for a node create
+            //because the Drupal Backbone module doesn't know
+            //when the node is new... must be a better way!
+            e.url = "/node";
+
+            var resp = e.save({}, {
+              success: function(model, response, options){
+                //not sure why the BB drupal module can't handle this
+                //need to set the model's id explicitly, otherwise it
+                //triggers the isNew() function in backbone.js and it
+                //tries to create a new one in the db, and because I 
+                //over rode the url because it was originally new,
+                //I need to re-instate the url
+                //TOOD: I should fix this in the Drupal BB module
+                e.id = response.id;
+                e.url = "/node/" + response.id + ".json";
+                e.set({
+                  "nid":response.id
+                });
+                e.save();
+
+                if(this._embedsCollection.length <= 0){
+                  this.initEmbedsCollectionAndView(lessonID);
+                }
+                
+                var newEmbedView = this._embedsCollectionView[0].addOne(e);
+
+                newEmbedView.firstEditEmbed();
+              }
+            });
+
+          }
+
+
+        });
+
+        var EmbedView = Drupal.Backbone.Views.Base.extend({
+          templateSelector: '#bb_embed_template',
+
+          //bind vote up and down events to the buttons and tie these to local functions
+          events: {
+            "click .remove" :  "deleteEmbed"
+          },
+
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            this.model.bind('change', this.render, this);//this calls the fetch
+          },
+
+          firstEditEmbed: function(){
+
+            console.log('firstEditEmbed()');
+          },
+
+          deleteEmbed: function(){
+
+            console.log('delete this embed');
+
+            //delete the actual model from the database and its view
+            
+            this.model.destroy();
+            this.remove();
+
           }
 
         });
@@ -737,8 +1011,9 @@ lessonEditHallo.placeholder.number = "##";
             var weekID = this.model.get('nid');
 
             var l = new Lesson({
-              "title": "Lesson title",
-              "field_description": "Optional description",
+              "title": "",
+              "field_description": "",
+              "field_description_summary": "",
               "type": "lesson"
             });
 
@@ -781,7 +1056,6 @@ lessonEditHallo.placeholder.number = "##";
                     renderer: 'underscore',
                     el: theEL,
                     ItemView: LessonView,
-                    //itemTag: 'li',
                     itemParent: '.lesson-list-container'
                   });
 
@@ -793,8 +1067,6 @@ lessonEditHallo.placeholder.number = "##";
                 newLessonView.firstEditLesson();
               }
             });
-            
-            
 
           },
 
@@ -1000,6 +1272,10 @@ lessonEditHallo.placeholder.number = "##";
           model: Lesson
         });
 
+        var EmbedCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: Embed
+        });
+
         var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Week,
           comparator: function(question) {
@@ -1034,6 +1310,11 @@ lessonEditHallo.placeholder.number = "##";
         */
 
         var LessonCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
+          resort: function(opts){
+          }
+        });
+
+        var EmbedCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
           }
         });
@@ -1133,6 +1414,10 @@ lessonEditHallo.placeholder.number = "##";
         var LessonsCollection = [];
         var LessonsCollectionView = [];
 
+        //console.log('instantiating EmbedsCollection');
+        //var EmbedsCollection;
+        //var EmbedsCollectionView;
+
         /* 
           STEP 7
           Fetch the collection of Question nodes by sending the nid of the tutorial
@@ -1172,12 +1457,12 @@ lessonEditHallo.placeholder.number = "##";
                     success: function(model, response, options){
                       //remove preloader for lesson for this particular week based on weekID
                       $('.lesson.preloader', '#node-'+weekID).remove();
-                      $('.open', '#node-'+weekID).removeClass('open');
+                      $('.open', '#node-'+weekID).removeClass('theOpenLesson');
                     },
                     error: function(model, xhr, options){
                       //remove preloader for lesson for this particular week based on weekID
                       $('.lesson.preloader', '#node-'+weekID).remove();
-                      $('.lesson.open', '#node-'+weekID).removeClass('open');
+                      $('.lesson.open', '#node-'+weekID).removeClass('theOpenLesson');
                     }
 
                   });
