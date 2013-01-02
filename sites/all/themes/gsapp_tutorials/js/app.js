@@ -595,12 +595,13 @@ var LC;
           },
 
           firstEditLesson: function(){
+            console.log('firstEditLesson()');
             setState(FIRST_EDIT_LESSON);
 
             //can't call edit lesson until finished with openLesson
             if( this.openLesson() ){
-              this._openLessonView.initHalloEditorLesson(true);
-              this._openLessonView.editLesson();
+              openLessonView.enableHalloEditorsLesson();
+              openLessonView.editLesson();
             }
           }
 
@@ -641,8 +642,6 @@ var LC;
             //this.embedsCollection.unshift(EmbedsCollection);
 
             var theEL = '#open-node-' + lessonID + ' .embeds-list-el';
-
-            console.log('initing embedsCollectionView');
 
             EmbedsCollectionView = new EmbedCollectionViewPrototype({
               collection: EmbedsCollection,
@@ -746,19 +745,28 @@ var LC;
             var embedsArray = [];
 
             if(EmbedsCollection.length > 0){
+              console.log('EmbedsCollection.length > 0');
+
               EmbedsCollection.each(function(embed, index){
                 var embedID = embed.get('nid');
                 var embed_selector = '#node-' + embedID;
                 var embed_type = $('.field-embed-edit-label .type-code', embed_selector).text();
+                var embed_code = $('.field-embed-edit-code', embed_selector).text();
 
                 embedsArray.push( embed_type );
+
+                console.log('embedID: '+ embedID);
                 
 
                 //only update if isModified
                 if($('.field-embed-edit-code', embed_selector).hasClass('isModified')){
+
+                  console.log('saving embed with ID: '+embedID);
+
                   embed.set({
                     "field_embed_type": embed_type,
-                    "field_embed_code": $('.field-embed-edit-code', embed_selector).text()
+                    "field_embed_code": embed_code,
+                    "type": "embed"
                   });
 
                   embed.save();
@@ -766,17 +774,14 @@ var LC;
               });
             }
 
-            this.model.set({
-              "field_embeds": embedsArray
-            });
-
-            this.model.save();
-
+            return embedsArray.join(',');
           },
 
           attachEmbed: function(){
 
             var lessonID = this.model.get("nid");
+
+            console.log('attachEmbed() for lesson: '+lessonID);
 
             //this.initEmbedsCollectionAndView(lessonID);
 
@@ -816,8 +821,6 @@ var LC;
 
           editLesson: function(){
             var this_selector = '#open-node-' + this.model.get('nid');
-
-            console.log('editLesson() this_selector: '+this_selector);
             
             //user clicked button to go into edit mode
             if($('.edit', this_selector).text() == "Edit"){
@@ -842,28 +845,37 @@ var LC;
 
               //strip html from description for the schedule/week lesson description summary
               if( $(this_selector + ' .lesson-title').hasClass('isModified') ) {
-                this.model.set({
-                  "title": $(this_selector + ' .lesson-title').html()
-                });
+                var theTitle = $(this_selector + ' .lesson-title').text();
+              }else{
+                var theTitle = this.model.get("title");
               }
 
-              if( $(this_selector + ' .lesson-description').hasClass('isModified') ) {
-                var description = $(this_selector + ' .lesson-description').html();
+
+              if( $('.lesson-description', this_selector).hasClass('isModified') ) {
+                var description = $('.lesson-description', this_selector).html();
                 var description_summary = strip(description);
-
-                this.model.set({
-                  "field_description": description,
-                  "field_description_summary": description_summary
-                });
+              }else{
+                var description = this.model.get("field_description");
+                var description_summary = this.model.get("field_description_summary");
               }
+
+              
 
               //Iterate through all models in the EmbedsCollection and 
               //save out the values
-              this.saveEmbeds();
+              var embeds = this.saveEmbeds();
 
               //TODO TCT2003 add this.saveUploads();
 
+              this.model.set({
+                "title": theTitle,
+                "field_description": description,
+                "field_description_summary": description_summary,
+                "field_embeds": embeds
+              });
+
               this.model.save();
+
               this.cancelEdit();
             }//end of save mode
           },
@@ -891,6 +903,7 @@ var LC;
             this.disableHalloEditorsLesson();
 
             if( getState(FIRST_EDIT_LESSON) ){
+              clearState(FIRST_EDIT_LESSON);
               //TODO TCT2003 do I need to save the model first?
               this.model.save();
               this.deleteLesson();
@@ -911,8 +924,6 @@ var LC;
                 }
               });*/
             }
-
-            clearState(FIRST_EDIT_LESSON);
           },
 
           addEmbed: function(embedType){
@@ -1054,10 +1065,16 @@ var LC;
           addLesson: function(){
             var weekID = this.model.get('nid');
 
+            console.log('addLesson() called by week : '+ weekID);
+
+            EmbedsCollection = null;
+            EmbedsCollectionView = null;
+
             var l = new Lesson({
               "title": "",
               "field_description": "",
               "field_description_summary": "",
+              "field_embeds": "",
               "type": "lesson"
             });
 
@@ -1083,12 +1100,7 @@ var LC;
                 });
                 l.save();
 
-                console.log('weeKNID: '+weekID);
-
                 if(LessonsCollectionView[weekID] == undefined){
-
-                  console.log('creating new LessonsCollectionView[]');
-
                   LessonsCollection[weekID] = new LessonCollectionPrototype();
                   LessonsCollection[weekID].reset();
 
@@ -1495,9 +1507,6 @@ var LC;
                   });
 
                   LessonsCollectionView[weekID].render();
-
-//TODO GET RID TCT2003
-LC = LessonsCollectionView;
 
                   //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
                   LessonsCollection[weekID].fetchQuery({

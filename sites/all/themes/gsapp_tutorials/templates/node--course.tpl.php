@@ -66,10 +66,12 @@
         <% } %>
       </div><!-- /.text-wrapper -->
       <div class="icon-wrapper">
-        <% if( typeof(field_video_embed) != "undefined" ) {
-              if( (field_video_embed != null) && (field_video_embed.length > 0) ){ %>
-          <i class="icon-play"></i>
-        <% } }%>
+        <% if( typeof(field_embeds) != "undefined" ) { %>
+            <% if(field_embeds.indexOf('Video') > -1 ){ %><i class="icon-play"></i><% } %>
+            <% if(field_embeds.indexOf('Soundcloud') > -1 ){ %><i class="icon-music"></i><% } %>
+            <% if(field_embeds.indexOf('Scribd') > -1){ %><i class="icon-file"></i><% } %>
+            <% if(field_embeds.indexOf('Slideshare') > -1){ %><i class="icon-th"></i><% } %>
+        <% } %>
       </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
   </div>
@@ -79,13 +81,9 @@
   <div id="<% if (typeof(nid) != 'undefined' ) { %>open-node-<%= nid %><% }else{ %>open-node-temp<% } %>" class="lesson-open brick roman">
     <div id="lesson-open-anchor" class="inner">
       <div class="content">
-        <h2 class="title"><div class="editable lesson-title editable-title">
-          <% if ( typeof(title) != "undefined" ) { %><%= title %><% } %>
-        </div></h2><!-- /.title -->
+        <h2 class="title"><div class="editable lesson-title editable-title"><% if ( typeof(title) != "undefined" ) { %><%= title %><% } %></div></h2><!-- /.title -->
 
-        <div class="editable collapsible lesson-description editable-description">
-          <% if (typeof(field_description) != "undefined" ) { %><%= field_description %><% } %>
-        </div><!-- /.lesson-description -->
+        <div class="editable collapsible lesson-description editable-description"><% if (typeof(field_description) != "undefined" ) { %><%= field_description %><% } %></div><!-- /.lesson-description -->
 
         <div class="embeds-list-el"></div>
         <div class="embed brick roman preloader"></div>
