@@ -13,6 +13,7 @@ var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
 var FIRST_EDIT_UPDATE = 'first-edit-update';
 var FIRST_EDIT_EMBED = 'first-edit-embed';
+var MODIFIED = 'state-modified';
 
 var lessonEditHallo = {};
 
@@ -172,6 +173,10 @@ var LC;
             console.log('setting state FIRST_EDIT_EMBED');
             $('#main').addClass('state-first-edit-embed');
             break;
+          case MODIFIED:
+            console.log('setting state MODIFIED');
+            $('#main').addClass('state-modified');
+            break;
           default:
             break;
         }
@@ -194,6 +199,10 @@ var LC;
           case FIRST_EDIT_EMBED:
             console.log('clearing state FIRST_EDIT_EMBED');
             $('#main').removeClass('state-first-edit-embed');
+            break;
+          case MODIFIED:
+            console.log('clearing state MODIFIED');
+            $('#main').removeClass('state-modified');
             break;
           default:
             break;
@@ -229,6 +238,13 @@ var LC;
             break;
           case FIRST_EDIT_EMBED:
             if($('#main').hasClass('state-first-edit-embed')){
+              return true;
+            }else{
+              return false;
+            }
+            break;
+          case MODIFIED:
+            if($('#main').hasClass('state-modified')){
               return true;
             }else{
               return false;
@@ -799,9 +815,9 @@ var LC;
                 console.log('embed saving');
 
                 //only fire for the last 
-                if( (i == (ECV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_EMBED)) ){
+                if( (i == (ECV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_EMBED) || getState(MODIFIED) ) ){
 
-                  clearState(FIRST_EDIT_EMBED);
+                  
 
                   embedView.model.save({},{
                     
@@ -839,6 +855,9 @@ var LC;
                   
               }//end for
             }
+
+            clearState(FIRST_EDIT_EMBED);
+            clearState(MODIFIED);
 
             return embedsArray.join(',');
           },
@@ -911,6 +930,7 @@ var LC;
 
               //strip html from description for the schedule/week lesson description summary
               if( $(this_selector + ' .lesson-title').hasClass('isModified') ) {
+                setState(MODIFIED);
                 var theTitle = $(this_selector + ' .lesson-title').text();
               }else{
                 var theTitle = this.model.get("title");
@@ -918,6 +938,7 @@ var LC;
 
 
               if( $('.lesson-description', this_selector).hasClass('isModified') ) {
+                setState(MODIFIED);
                 var description = $('.lesson-description', this_selector).html();
                 var description_summary = strip(description);
               }else{
@@ -1111,6 +1132,8 @@ var LC;
             //delete the actual model from the database and its view
             this.model.destroy();
             this.remove();
+
+            setState(MODIFIED);
           }
 
         });
