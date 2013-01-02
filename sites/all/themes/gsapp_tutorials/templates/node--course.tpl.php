@@ -66,12 +66,12 @@
         <% } %>
       </div><!-- /.text-wrapper -->
       <div class="icon-wrapper">
-        <% if( typeof(field_embeds) != "undefined" ) { %>
+        <% if( typeof(field_embeds) != "undefined" ) { if(field_embeds != null){%>
             <% if(field_embeds.indexOf('Video') > -1 ){ %><i class="icon-play"></i><% } %>
             <% if(field_embeds.indexOf('Soundcloud') > -1 ){ %><i class="icon-music"></i><% } %>
             <% if(field_embeds.indexOf('Scribd') > -1){ %><i class="icon-file"></i><% } %>
             <% if(field_embeds.indexOf('Slideshare') > -1){ %><i class="icon-th"></i><% } %>
-        <% } %>
+        <% } } %>
       </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
   </div>
