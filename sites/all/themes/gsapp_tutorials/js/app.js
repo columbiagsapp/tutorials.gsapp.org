@@ -1279,7 +1279,6 @@ var LC;
             var this_selector = '#node-' + this.model.get('nid');
 
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
-              $('input[type="text"].week-field, textarea.week-field', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
 
@@ -1365,13 +1364,12 @@ var LC;
               this.deleteWeek();
             }else{
               $('.edit', this_selector).text('Edit');
-              $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
               $(this_selector).removeClass('edit-mode');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
-              $('textarea.week-title', this_selector).val( this.model.get('title') );
-              $('textarea.week-number', this_selector).val( this.model.get('field_week_number') );
-              $('textarea.week-description', this_selector).val( this.model.get('field_description') );
+              $('.week-title', this_selector).text( this.model.get('title') );
+              $('.week-number', this_selector).text( this.model.get('field_week_number') );
+              $('.week-description', this_selector).html( this.model.get('field_description') );
             }
           }
 
@@ -1386,6 +1384,11 @@ var LC;
             "click .update": "transitionUpdate"
           },
 
+          placeholder:{
+            title: "Add title",
+            field_description: "Add text"
+          },
+
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
             this.model.bind('change', this.render, this);//this calls the fetch 
@@ -1393,6 +1396,51 @@ var LC;
 
           transitionUpdate: function(){
             transitionUpdates();
+          },
+
+          /*
+            Initializes Hallo.js editor for title and body with placeholders
+            for the first opening of a lesson
+          */
+          initHalloEditorsUpdate: function(editmode){
+            //launch Hallo.js
+            $('.edit-mode .update-title').hallo({
+              plugins: {
+                'halloreundo': {}
+              },
+              editable: editmode,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.title
+            });
+
+            $('.edit-mode .update-description').hallo({
+              plugins: {
+                'halloformat': {},
+                'halloimage': {},
+                'halloblock': {},
+                'hallojustify': {},
+                'hallolists': {},
+                'hallolink': {},
+                'halloreundo': {},
+                'halloblacklist': {
+                  tags: ['br']
+                }
+              },
+              editable: editmode,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.field_description
+            });    
+          },
+
+          disableHalloEditorsUpdate: function(){
+            $('.edit-mode .update-title').hallo({
+              editable: false
+            });
+
+            $('.edit-mode .update-description').hallo({
+              editable: false
+            }); 
+
           },
 
           firstEditUpdate: function(){
@@ -1410,17 +1458,17 @@ var LC;
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
               console.log('clicked edit');
-
-              $('input[type="text"], textarea', this_selector).removeAttr('readonly');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
+              this.initHalloEditorsUpdate(true);
             }else{
               console.log('clicked save');
               clearState(FIRST_EDIT_UPDATE);
+              this.disableHalloEditorsUpdate();
               //$('#main').removeClass('first-edit');
               this.model.set({
-                "title": $(this_selector + ' .update-title').val(),
-                "field_description": $(this_selector + ' .update-description').val()
+                "title": $(this_selector + ' .update-title').text(),
+                "field_description": $(this_selector + ' .update-description').html()
               });
 
               this.model.save();
@@ -1447,12 +1495,11 @@ var LC;
               this.deleteUpdate();
             }else{
               $('.edit', this_selector).text('Edit');
-              $('input[type="text"], textarea', this_selector).attr('readonly','readonly');
               $('.edit-mode').removeClass('edit-mode');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
-              $('textarea.update-title', this_selector).val( this.model.get('title') );
-              $('textarea.update-description', this_selector).val( this.model.get('field_description') );
+              $('.update-title', this_selector).text( this.model.get('title') );
+              $('.update-description', this_selector).html( this.model.get('field_description') );
             }
           }
 

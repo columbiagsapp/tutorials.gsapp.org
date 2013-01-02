@@ -238,11 +238,11 @@
     <div class="inner">
       <% if ( typeof(title) != "undefined" ) { %>
         <h2 class="title">
-          <textarea readonly class="editable update-title"><%= title %></textarea>
+          <div class="editable update-title"><%= title %></div>
         </h2>
       <% } %>
       <% if (typeof(field_description) != "undefined" ) { %>
-        <textarea readonly class="editable update-description"><%= field_description %></textarea>
+        <div class="editable update-description"><%= field_description %></div>
       <% } %>
       
       <?php if($editable){ ?>
