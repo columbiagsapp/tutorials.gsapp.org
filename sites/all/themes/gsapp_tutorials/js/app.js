@@ -748,8 +748,6 @@ var LC;
             for the first opening of a lesson
           */
           initHalloEditorLesson: function(editmode){
-
-            console.log('initHalloEditorLesson() this.model.get("nid"): '+this.model.get("nid"));
             //launch Hallo.js
             $('.lesson-open .lesson-title').hallo({
               plugins: {
@@ -782,13 +780,13 @@ var LC;
           saveEmbeds: function(){
             console.log('saveEmbeds()');
 
+            var thisLessonOpenView = this;
+
             var lessonID = this.model.get('nid');
             var embedsArray = [];
 
             if(EmbedsCollectionView._itemViews.length > 0){
               console.log('EmbedsCollection.length > 0');
-
-              var thisLessonOpenView = this;
 
               var ECV_iVLength = EmbedsCollectionView._itemViews.length;
 
@@ -801,10 +799,6 @@ var LC;
                 var embed_code = $('.field-embed-edit-code', embed_selector).text();
 
                 embedsArray.push( embed_type );
-
-                console.log('embedID: '+ embedID);
-                
-                console.log('saving embed with ID: '+embedID);
                 
                 embedView.model.set({
                   "field_embed_type": embed_type,
@@ -812,13 +806,8 @@ var LC;
                   "type": "embed"
                 });
 
-                console.log('embed saving');
-
                 //only fire for the last 
                 if( (i == (ECV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_EMBED) || getState(MODIFIED) ) ){
-
-                  
-
                   embedView.model.save({},{
                     
                     success: function(model, response, options){
@@ -826,11 +815,9 @@ var LC;
                       //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('embed save success');
+                      console.log('re-initializing Embeds collection stuff');
+
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
-
-                      thisLessonOpenView.initHalloEditorLesson(false);
-
-                      //attach any embeds
                       thisLessonOpenView.attachEmbed();
                     },
                     error: function(model, xhr, options){
@@ -838,12 +825,9 @@ var LC;
                       //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('embed save error');
+                      console.log('re-initializing Embeds collection stuff');
 
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
-
-                      thisLessonOpenView.initHalloEditorLesson(false);
-
-                      //attach any embeds
                       thisLessonOpenView.attachEmbed();
                     }
                   });
@@ -854,6 +838,10 @@ var LC;
 
                   
               }//end for
+            }else{
+              console.log('re-initializing Embeds collection stuff');
+              thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
+              thisLessonOpenView.attachEmbed();
             }
 
             clearState(FIRST_EDIT_EMBED);
@@ -926,8 +914,6 @@ var LC;
             }
             //user clicked button to save changes
             else{
-              
-
               //strip html from description for the schedule/week lesson description summary
               if( $(this_selector + ' .lesson-title').hasClass('isModified') ) {
                 setState(MODIFIED);
@@ -935,7 +921,6 @@ var LC;
               }else{
                 var theTitle = this.model.get("title");
               }
-
 
               if( $('.lesson-description', this_selector).hasClass('isModified') ) {
                 setState(MODIFIED);
@@ -945,8 +930,6 @@ var LC;
                 var description = this.model.get("field_description");
                 var description_summary = this.model.get("field_description_summary");
               }
-
-              
 
               //Iterate through all models in the EmbedsCollection and 
               //save out the values
@@ -1006,12 +989,12 @@ var LC;
               //$('textarea.lesson-description', this_selector).val( this.model.get('field_description') );
 
               //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
-              /*
+              
               $('.selected .lesson').each(function(){
                 if($(this).attr('id') == this_selector){
                   $(this).addClass('theOpenLesson');
                 }
-              });*/
+              });
             }
 
             //TODO SOON TCT2003 this is a HACK !!!
@@ -1024,6 +1007,7 @@ var LC;
           },
 
           addEmbed: function(embedType){
+            var thisLessonOpenView = this;
             var courseID = $('.course').attr('id');
             courseID = courseID.substring(5);
 
@@ -1064,11 +1048,17 @@ var LC;
                 //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
                 
                 console.log('*****adding new embed to EmbedsCollection');
-                var newEmbedView = EmbedsCollectionView.addOne(e);
 
                 setState(FIRST_EDIT_EMBED);
 
-                newEmbedView.firstEditEmbed();
+                //if EmbedsCollection is empty, need to re-initialize
+                if(EmbedsCollection.length == 0){
+                  thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
+                  thisLessonOpenView.attachEmbed();
+                }else{
+                  var newEmbedView = EmbedsCollectionView.addOne(e);
+                  newEmbedView.firstEditEmbed();
+                }
               }
             });
           },//end addEmbed()
