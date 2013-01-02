@@ -457,7 +457,7 @@
           newModel.bind('remove', myItemView.unrender);
 
           //TCT2003: addOne should also add the model to this.collection
-          this.collection.add(newModel, {silent: true});
+          //this.collection.add(newModel);
 
           //TCT2003 added this return
           return myItemView;

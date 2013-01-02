@@ -3,12 +3,16 @@ var app = app || {};
 var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
 var openLessonView = null;
+
+var parentLessonView = null;
+
 var EmbedsCollection = [];
 var EmbedsCollectionView = [];
 
 var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
 var FIRST_EDIT_UPDATE = 'first-edit-update';
+var FIRST_EDIT_EMBED = 'first-edit-embed';
 
 var lessonEditHallo = {};
 
@@ -164,6 +168,10 @@ var LC;
             console.log('setting state FIRST_EDIT_UPDATE');
             $('#main').addClass('state-first-edit-update');
             break;
+          case FIRST_EDIT_EMBED:
+            console.log('setting state FIRST_EDIT_EMBED');
+            $('#main').addClass('state-first-edit-embed');
+            break;
           default:
             break;
         }
@@ -182,6 +190,10 @@ var LC;
           case FIRST_EDIT_UPDATE:
             console.log('clearing state FIRST_EDIT_UPDATE');
             $('#main').removeClass('state-first-edit-update');
+            break;
+          case FIRST_EDIT_EMBED:
+            console.log('clearing state FIRST_EDIT_EMBED');
+            $('#main').removeClass('state-first-edit-embed');
             break;
           default:
             break;
@@ -210,6 +222,13 @@ var LC;
             break;
           case FIRST_EDIT_UPDATE:
             if($('#main').hasClass('state-first-edit-update')){
+              return true;
+            }else{
+              return false;
+            }
+            break;
+          case FIRST_EDIT_EMBED:
+            if($('#main').hasClass('state-first-edit-embed')){
               return true;
             }else{
               return false;
@@ -532,6 +551,9 @@ var LC;
           },
 
           openLesson: function(){
+
+            parentLessonView = this;
+
             var NID = this.model.get('nid');
             var this_selector = '#node-' + NID;
 
@@ -635,6 +657,9 @@ var LC;
             //empty container arrays if they already have embed collection
             //and collection view
             console.log('initEmbedsCollectionAndView()');
+
+            EmbedsCollection = null;
+            EmbedsCollectionView = null;
 
             EmbedsCollection = new EmbedCollectionPrototype();
             EmbedsCollection.reset();
@@ -744,11 +769,17 @@ var LC;
             var lessonID = this.model.get('nid');
             var embedsArray = [];
 
-            if(EmbedsCollection.length > 0){
+            if(EmbedsCollectionView._itemViews.length > 0){
               console.log('EmbedsCollection.length > 0');
 
-              EmbedsCollection.each(function(embed, index){
-                var embedID = embed.get('nid');
+              var thisLessonOpenView = this;
+
+              var ECV_iVLength = EmbedsCollectionView._itemViews.length;
+
+              for(var i = 0; i < ECV_iVLength; i++){
+                var embedView = EmbedsCollectionView._itemViews[i];
+
+                var embedID = embedView.model.get('nid');
                 var embed_selector = '#node-' + embedID;
                 var embed_type = $('.field-embed-edit-label .type-code', embed_selector).text();
                 var embed_code = $('.field-embed-edit-code', embed_selector).text();
@@ -757,21 +788,56 @@ var LC;
 
                 console.log('embedID: '+ embedID);
                 
+                console.log('saving embed with ID: '+embedID);
+                
+                embedView.model.set({
+                  "field_embed_type": embed_type,
+                  "field_embed_code": embed_code,
+                  "type": "embed"
+                });
 
-                //only update if isModified
-                if($('.field-embed-edit-code', embed_selector).hasClass('isModified')){
+                console.log('embed saving');
 
-                  console.log('saving embed with ID: '+embedID);
+                //only fire for the last 
+                if( (i == (ECV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_EMBED)) ){
 
-                  embed.set({
-                    "field_embed_type": embed_type,
-                    "field_embed_code": embed_code,
-                    "type": "embed"
+                  clearState(FIRST_EDIT_EMBED);
+
+                  embedView.model.save({},{
+                    
+                    success: function(model, response, options){
+                      //remove preloader for lesson for this particular week based on weekID
+                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
+
+                      console.log('embed save success');
+                      thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
+
+                      thisLessonOpenView.initHalloEditorLesson(false);
+
+                      //attach any embeds
+                      thisLessonOpenView.attachEmbed();
+                    },
+                    error: function(model, xhr, options){
+                      //remove preloader for lesson for this particular week based on weekID
+                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
+
+                      console.log('embed save error');
+
+                      thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
+
+                      thisLessonOpenView.initHalloEditorLesson(false);
+
+                      //attach any embeds
+                      thisLessonOpenView.attachEmbed();
+                    }
                   });
 
-                  embed.save();
+                }else{
+                  embedView.model.save();
                 }
-              });
+
+                  
+              }//end for
             }
 
             return embedsArray.join(',');
@@ -841,7 +907,7 @@ var LC;
             }
             //user clicked button to save changes
             else{
-              clearState(FIRST_EDIT_LESSON);
+              
 
               //strip html from description for the schedule/week lesson description summary
               if( $(this_selector + ' .lesson-title').hasClass('isModified') ) {
@@ -876,6 +942,7 @@ var LC;
 
               this.model.save();
 
+              clearState(FIRST_EDIT_LESSON);
               this.cancelEdit();
             }//end of save mode
           },
@@ -910,6 +977,7 @@ var LC;
             }else{
               $('.edit', this_selector).text('Edit');
               $(this_selector).removeClass('edit-mode');
+
               
               //TODO SOON TCT2003 
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
@@ -924,6 +992,14 @@ var LC;
                 }
               });*/
             }
+
+            //TODO SOON TCT2003 this is a HACK !!!
+            //parentLessonView.openLesson();
+
+
+            
+
+
           },
 
           addEmbed: function(embedType){
@@ -968,6 +1044,8 @@ var LC;
                 
                 console.log('*****adding new embed to EmbedsCollection');
                 var newEmbedView = EmbedsCollectionView.addOne(e);
+
+                setState(FIRST_EDIT_EMBED);
 
                 newEmbedView.firstEditEmbed();
               }
@@ -1066,9 +1144,6 @@ var LC;
             var weekID = this.model.get('nid');
 
             console.log('addLesson() called by week : '+ weekID);
-
-            EmbedsCollection = null;
-            EmbedsCollectionView = null;
 
             var l = new Lesson({
               "title": "",
