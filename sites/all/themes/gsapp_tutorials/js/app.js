@@ -775,10 +775,7 @@ var LC;
                 'hallojustify': {},
                 'hallolists': {},
                 'hallolink': {},
-                'halloreundo': {},
-                'halloblacklist': {
-                  tags: ['br']
-                }
+                'halloreundo': {}
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
@@ -814,10 +811,7 @@ var LC;
                 'hallojustify': {},
                 'hallolists': {},
                 'hallolink': {},
-                'halloreundo': {},
-                'halloblacklist': {
-                  tags: ['br']
-                }
+                'halloreundo': {}
               },
               editable: true,
               toolbar: 'halloToolbarFixed',
@@ -1421,10 +1415,7 @@ var LC;
                 'hallojustify': {},
                 'hallolists': {},
                 'hallolink': {},
-                'halloreundo': {},
-                'halloblacklist': {
-                  tags: ['br']
-                }
+                'halloreundo': {}
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
