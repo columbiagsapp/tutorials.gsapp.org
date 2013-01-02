@@ -11,7 +11,7 @@
   <header class="jumbotron subhead span12">
     <div class="container header-left">
       <div class="clearfix"><?php print render($content['field_code']); ?> <?php print render($content['field_semester']); ?> <?php print render($content['field_year']); ?></div>
-      <h1 class="clearfix"><?php print $title; ?></h1>
+      <h1 class="clearfix"><a href="/course/<?php print $node->nid; ?>" target="_self"><?php print $title; ?></a></h1>
       <div class="clearfix"><?php print render($content['field_instructors']); ?>
       </div>
     </div><!-- /.header-left -->
@@ -150,18 +150,18 @@
       <li class="inline inactive"><h2 class="inline">Transcript</h2></li>
     </ul>
 
-    <div id="lesson-content">
+    <div id="lesson-attachment-content">
       <div id="questions-list-el"></div>
         <div class="add-question brick roman edit-mode">
           <div class="inner">
             <h4 class="float-left">Ask a question</h4>
             <div class="submit-question-buttons float-right">
-              <div id="questionsubmit" class="button save">Save</div>
+              <div id="question-submit" class="button save">Save</div>
               <div id="question-submit-cancel" class="button cancel">Cancel</div>
             </div>
             <div class="roman float-left submit-question-content-container">
-              <h2><textarea id="submitquestiontitle">Add title here</textarea></h2>
-              <textarea id="submit-question-question" name="submit-question-question">Add your question text here</textarea>
+              <h2><div id="submit-question-title" class="editable"></div></h2>
+              <div id="submit-question-question" class="editable"></div>
             </div>
           </div><!-- /.inner -->
         </div><!-- /.add-question -->

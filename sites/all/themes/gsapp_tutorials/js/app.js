@@ -415,18 +415,20 @@ var LC;
           STEP 8
           Create an empty question for new question to be asked
         */
-        $('#questionsubmit').bind('click',function(){
+        $('#question-submit').bind('click',function(){
+          console.log('clicked #question-submit');
+
           var userUID = extractBodyProperty('user-uid-');
           console.log('uid: '+userUID);
 
-          var user = Drupal.Backbone.Models.User({ "uid": userUID });
+          //var user = Drupal.Backbone.Models.User({ "uid": userUID });
 
-          user.fetch();
+          //user.fetch();
 
           var q = new Question({
-            "title": $('#submitquestiontitle').val(),
+            "title": $('#submit-question-title').text(),
             "field_question_votes":"0",
-            "field_description": $('#submit-question-question').val(),
+            "field_description": $('#submit-question-question').html(),
             "type": "question"
           });
 
@@ -451,6 +453,8 @@ var LC;
               });
 
               q.save();
+
+              openLessonView.initQuestionSubmitHalloEditorsLesson();
             }
           });
           //this can be asyncronous with the server save, meaning that
@@ -568,6 +572,8 @@ var LC;
 
           openLesson: function(){
 
+            console.log('** openLesson()');
+
             parentLessonView = this;
 
             var NID = this.model.get('nid');
@@ -612,6 +618,7 @@ var LC;
               openLessonView.initEmbedsCollectionAndView(NID);
 
               openLessonView.initHalloEditorLesson(false);
+              openLessonView.initQuestionSubmitHalloEditorsLesson();
 
               //attach any embeds
               openLessonView.attachEmbed();
@@ -655,7 +662,8 @@ var LC;
           placeholder: {
             title: "Add a title new",
             field_description: "Add body text new",
-            field_embed_code: "Paste embed code here"
+            field_embed_code: "Paste embed code here",
+            field_question_submit: "Write your question here"
           },
 
           //bind vote up and down events to the buttons and tie these to local functions
@@ -721,6 +729,7 @@ var LC;
                 editable: true
               });
             });
+
           },
 
           /*
@@ -740,7 +749,7 @@ var LC;
                 editable: false
               });
             });
-            
+
           },
 
           /*
@@ -774,7 +783,46 @@ var LC;
               editable: editmode,
               toolbar: 'halloToolbarFixed',
               placeholder: this.placeholder.field_description
-            });      
+            });    
+          },
+
+          initQuestionSubmitHalloEditorsLesson: function(){
+            console.log('----initQuestionSubmitHalloEditorsLesson()');
+
+            if($('#submit-question-title').text().length > 0){
+              $('#submit-question-title').text('');
+            }
+
+            if($('#submit-question-question').html().length > 0){
+              $('#submit-question-question').html('');
+            }
+
+            $('#submit-question-title').hallo({
+              plugins: {
+                'halloreundo': {}
+              },
+              editable: true,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.title
+            });
+
+            $('#submit-question-question').hallo({
+              plugins: {
+                'halloformat': {},
+                'halloimage': {},
+                'halloblock': {},
+                'hallojustify': {},
+                'hallolists': {},
+                'hallolink': {},
+                'halloreundo': {},
+                'halloblacklist': {
+                  tags: ['br']
+                }
+              },
+              editable: true,
+              toolbar: 'halloToolbarFixed',
+              placeholder: this.placeholder.field_question_submit
+            }); 
           },
 
           saveEmbeds: function(){
@@ -946,7 +994,11 @@ var LC;
 
               this.model.save();
 
-              clearState(FIRST_EDIT_LESSON);
+              if(getState(FIRST_EDIT_LESSON)){
+                clearState(FIRST_EDIT_LESSON);
+                this.initQuestionSubmitHalloEditorsLesson();
+              }
+
               this.cancelEdit();
             }//end of save mode
           },
