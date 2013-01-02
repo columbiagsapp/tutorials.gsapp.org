@@ -2,6 +2,7 @@
 @lightBGColor: #efefef;
 @darkBGColor: #aaa;
 @standardBrickHoverBG: #dfdfdf;
+@selectedBGColor: #ccc;
 
 @baseFontSize: 14px;
 @baseLineHeight: 20px;
@@ -136,7 +137,7 @@
 }
 
 .theOpenLesson{
-  display:none !important;
+  background-color:@selectedBGColor !important;
 }
 
 .float-left{
@@ -202,9 +203,13 @@
 }
 
 #update-preloader,
-.lesson.preloader,
-.embed.preloader{
+.lesson.preloader
+{
   height:300px;
+}
+
+.embed.preloader{
+  height:150px;
 }
 
 .collapsed .collapsible{
