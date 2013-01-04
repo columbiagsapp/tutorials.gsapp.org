@@ -26,6 +26,8 @@ scripts[] = js/backbone.js
 scripts[] = js/drupalbackbone.js
 scripts[] = js/drupalbackbone-restws.js
 
+scripts[] = js/jquery.fileupload-gsapp.js
+
 scripts[] = hallo/deps/rangy-core-1.2.3.js
 scripts[] = hallo/examples/hallo.js
 
