@@ -31,10 +31,10 @@ var LC;
 
 searchresult = [];
 
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
-
       function strip(html)
       {
          var tmp = document.createElement("DIV");
@@ -604,7 +604,7 @@ searchresult = [];
               }else{
                 $('#schedule').removeClass('span9').addClass('span3 collapsed');
                 updates_detached = $('#updates').detach();
-                $('#main').prepend(contentSectionHTML);
+                $('#main').append(contentSectionHTML);
               }
               
               $(this_selector).closest('.week').addClass('selected');
@@ -779,7 +779,8 @@ searchresult = [];
                 'hallojustify': {},
                 'hallolists': {},
                 'hallolink': {},
-                'halloreundo': {}
+                'halloreundo': {},
+                'halloimage': {}
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
