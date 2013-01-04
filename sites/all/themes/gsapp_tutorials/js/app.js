@@ -29,6 +29,8 @@ var LessonPointer;
 var tempPointer; 
 var LC;
 
+searchresult = [];
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
@@ -767,10 +769,12 @@ var LC;
               placeholder: this.placeholder.title
             });
 
+
+       
+
             $('.lesson-open .lesson-description').hallo({
               plugins: {
                 'halloformat': {},
-                'halloimage': {},
                 'halloblock': {},
                 'hallojustify': {},
                 'hallolists': {},
@@ -781,6 +785,8 @@ var LC;
               toolbar: 'halloToolbarFixed',
               placeholder: this.placeholder.field_description
             });    
+
+            //$('body #main').append('<div class="field-type-file field-name-field-assignment-attachment field-widget-file-generic form-wrapper" id="edit-field-assignment-attachment"><div id="edit-field-assignment-attachment-und-0-ajax-wrapper"><div class="form-item form-type-managed-file form-item-field-assignment-attachment-und-0"><label for="edit-field-assignment-attachment-und-0">Assignment Attachment </label><div class="file-widget form-managed-file clearfix"><input type="file" id="edit-field-assignment-attachment-und-0-upload" name="files[field_assignment_attachment_und_0]" size="22" class="form-file" /><input type="submit" id="edit-field-assignment-attachment-und-0-upload-button" name="field_assignment_attachment_und_0_upload_button" value="Upload" class="form-submit" /><input type="hidden" name="field_assignment_attachment[und][0][fid]" value="0" /><input type="hidden" name="field_assignment_attachment[und][0][display]" value="1" /></div><div class="description">A PDF of the assignment<br />Files must be less than <strong>5 MB</strong>.<br />Allowed file types: <strong>txt pdf doc</strong>.</div></div></div>');
           },
 
           initQuestionSubmitHalloEditorsLesson: function(){
