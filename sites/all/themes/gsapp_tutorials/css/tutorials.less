@@ -95,6 +95,13 @@
 /* EDITABLES */
 @editableMinHeight: 30px;
 
+/* MODALS */
+@modalWidth: 700px;
+@modalMarginLeft = (-1 * @modalWidth / 2);
+@mobileModalWidth: 380px;
+@mobileModalMarginLeft = (-1 * @mobileModalWidth / 2);
+
+
 
 h1 a{
   border:none !important;
@@ -273,6 +280,13 @@ h1 a:hover{
 
 
 
+
+/* FILE UPLOADS */
+#block-jquery-file-upload-jquery-file-uploader{
+
+}
+
+
 /* EMBEDS */
 
 .edit-mode .field-embed-content{
@@ -334,6 +348,10 @@ h1 a:hover{
     height:auto;
     margin: 0 0 5px;
   }
+  .modal{
+    width: @mobileModalWidth;
+    margin-left: @mobileModalMarginLeft;
+  }
 }
 
 /* tablet but not phone */
@@ -356,7 +374,12 @@ h1 a:hover{
   }
 }
 
-
+@media (min-width: 481px) {
+  .modal{
+    width: @modalWidth;
+    margin-left: @modalMarginLeft;
+  }
+}
 
 
 
