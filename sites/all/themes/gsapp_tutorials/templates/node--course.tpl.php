@@ -119,16 +119,8 @@
           </ul>
         </div>
 
-        <div class="btn-group dropup button-group-upload float-left">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-upload-alt"></i>&nbsp;&nbsp;Upload
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a tabindex="-1" href="#" class="button-upload-pdf"><i class="icon-file"></i> PDF</a></li>
-            <li><a tabindex="-1" href="#" class="button-upload-file"><i class="icon-upload-alt"></i> File</a></li>
-          </ul>
-        </div>
+        <a tabindex="-1" href="#" class="btn float-left button-upload-file"><i class="icon-upload-alt"></i>&nbsp;&nbsp;Upload</a>
+
       </div><!-- /.lesson-embed-upload -->
       
       <?php if($editable){ ?>
