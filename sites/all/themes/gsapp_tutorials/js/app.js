@@ -676,7 +676,8 @@ searchresult = [];
             "click .button-embed-video": "addVideoEmbed",
             "click .button-embed-slideshare": "addSlideshareEmbed",
             "click .button-embed-scribd": "addScribdEmbed",
-            "click .button-embed-soundcloud": "addSoundcloudEmbed"
+            "click .button-embed-soundcloud": "addSoundcloudEmbed",
+            "click .button-upload-file": "uploadFile"
           },
 
           initEmbedsCollectionAndView: function(lessonID){
@@ -1132,6 +1133,15 @@ searchresult = [];
           },
           addScribdEmbed: function(){
             this.addEmbed('Scribd');
+          },
+
+          uploadFile: function(){
+            console.log('*****   called uploadFile()');
+
+            init_fileuploader();
+            $('#fileupload-modal').modal('show');
+            return false;
+
           }
 
         });//end LessonOpenView
