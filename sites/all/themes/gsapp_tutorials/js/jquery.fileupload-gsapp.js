@@ -33,6 +33,7 @@ function config_fileuploader(variables){
   vars = variables;
 }
 
+/*
 function init_fileuploader(){
   console.log('*******init_fileuploader(), with vars:');
   console.log(vars);
@@ -111,11 +112,11 @@ function init_fileuploader(){
       }
     });
   });*/
-  
+  /*
 }
 function hsize(b){
     if(b >= 1048576) return (Math.round((b / 1048576) * 100) / 100) + " mb";
     else if(b >= 1024) return (Math.round((b / 1024) * 100) / 100) + " kb";
     else return b + " b";
 }
-
+*/

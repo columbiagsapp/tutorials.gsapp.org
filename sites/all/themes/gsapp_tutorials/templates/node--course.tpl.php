@@ -52,7 +52,7 @@
 
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
-    <div class="inner float-left">
+    <div class="inner">
       <div class="text-wrapper">
         <% if ( typeof(title) != "undefined" ) { %>
           <h2 class="title">
@@ -69,8 +69,13 @@
         <% if( typeof(field_embeds) != "undefined" ) { if(field_embeds != null){%>
             <% if(field_embeds.indexOf('Video') > -1 ){ %><i class="icon-play"></i><% } %>
             <% if(field_embeds.indexOf('Soundcloud') > -1 ){ %><i class="icon-music"></i><% } %>
-            <% if(field_embeds.indexOf('Scribd') > -1){ %><i class="icon-file"></i><% } %>
+            <% if(field_embeds.indexOf('Scribd') > -1){ %><i class="icon-file-alt"></i><% } %>
             <% if(field_embeds.indexOf('Slideshare') > -1){ %><i class="icon-th"></i><% } %>
+        <% } } %>
+
+        <% if( typeof(field_uploads) != "undefined" ) { if(field_uploads != null){%>
+            <% if(field_uploads.indexOf('image') > -1 ){ %><i class="icon-picture"></i><% } %>
+            <% if(field_uploads.indexOf('pdf') > -1 ){ %><i class="icon-file-alt"></i><% } %>
         <% } } %>
       </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
@@ -87,6 +92,9 @@
 
         <div class="embeds-list-el"></div>
         <div class="embed brick roman preloader"></div>
+
+        <div class="uploads-list-el"></div>
+        <div class="upload brick roman preloader"></div>
         
 
       </div><!-- /.content -->
@@ -189,6 +197,25 @@
   </div><!-- /.lesson-embed-wrapper -->
 </script>
 
+<script type="text/template" id="bb_upload_template">
+  <div class="collapsible lesson-upload-wrapper">
+    <div id="node-<% if (typeof(nid) != "undefined" ){ %><%= nid %><% } %>" class="lesson-upload-element <% if (typeof(field_upload_type) != "undefined" ){ %><%= field_upload_type %><% } %>">
+      
+      <div class="field-upload-edit-wrapper">
+        <div class="field-upload-edit-buttons">
+          <div class="remove">Remove</div>
+        </div>
+      </div><!-- /.field-upload-edit-wrapper -->
+        
+      <div class="field-upload-content-wrapper">
+        <% if (typeof(field_upload_filename) != "undefined" ){ %>
+          <%= field_upload_filename %>
+        <% } %>
+      </div><!-- /.field-upload-content-wrapper -->
+    </div><!-- /#node-index.lesson-upload-element -->
+  </div><!-- /.lesson-upload-wrapper -->
+</script>
+
 <script type="text/template" id="bb_week_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman outer">
     <div class="inner">
@@ -257,6 +284,12 @@
 <script type="text/template" id="embed-list">
   <div>
     <div class="embed-list-container"></div>
+  </div>
+</script>
+
+<script type="text/template" id="upload-list">
+  <div>
+    <div class="upload-list-container"></div>
   </div>
 </script>
 

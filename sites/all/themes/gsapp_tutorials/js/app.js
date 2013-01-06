@@ -9,10 +9,14 @@ var parentLessonView = null;
 var EmbedsCollection = [];
 var EmbedsCollectionView = [];
 
+var UploadsCollection = [];
+var UploadsCollectionView = [];
+
 var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
 var FIRST_EDIT_UPDATE = 'first-edit-update';
 var FIRST_EDIT_EMBED = 'first-edit-embed';
+var FIRST_EDIT_UPLOAD = 'first-edit-upload';
 var MODIFIED = 'state-modified';
 
 var lessonEditHallo = {};
@@ -40,6 +44,100 @@ searchresult = [];
          var tmp = document.createElement("DIV");
          tmp.innerHTML = html;
          return tmp.textContent||tmp.innerText;
+      }
+
+      function hsize(b){
+          if(b >= 1048576) return (Math.round((b / 1048576) * 100) / 100) + " mb";
+          else if(b >= 1024) return (Math.round((b / 1024) * 100) / 100) + " kb";
+          else return b + " b";
+      }
+
+      function init_fileuploader(){
+        console.log('*******init_fileuploader(), with vars:');
+        console.log(vars);
+        space_allowed = vars.space_remaining;
+        
+        var types = vars.filetypes;
+        var pattern = new RegExp("(\.|\/)("+types+")$");
+
+        var total_bytes_cal = 0;
+        var added_files = new Array();
+        //alert(types);
+        jQuery('#jquery-file-upload-form').fileupload({//gif|jpe?g|png|tiff|asf|avi|mpe?g|wmv|vob|mov|mp4|flv
+          sequentialUploads: true,
+          acceptFileTypes: pattern,
+          previewMaxWidth: 120,
+          maxFileSize: vars.max_file_size,
+          change: function (e, data) {
+            
+            var total_bytes = 0;
+            jQuery.each(data.files, function (index, file) {
+              //alert(file.name);
+              added_files.push(index);
+              total_bytes = total_bytes + file.size;   
+            });
+            if(total_bytes > space_allowed){
+              total_bytes_cal = total_bytes;
+              var msg = "You have selected to upload a total of " + hsize(total_bytes) + ".\n";
+              msg += "However, you only have " + hsize(space_allowed) + " of remaining space.\n";
+              alert(msg);
+              total_bytes = 0;
+            }else{
+              total_bytes_cal = 0;
+            }
+          },
+          start: function(e, data){
+            //alert(total_bytes_cal);
+            if(total_bytes_cal > space_allowed){
+              jQuery('button.cancel').trigger('click');
+              jQuery('.progress-success').hide();
+            }
+          },
+          added: function(e, data){
+            
+            if(total_bytes_cal > space_allowed){
+              jQuery('button.cancel').trigger('click');
+              jQuery('.progress-success').hide();
+              //jQuery('.table-striped').hide();
+            }
+            //total_bytes_cal = 0;
+          },
+          completed: 
+            function(e, data){
+
+              console.log('first return, data.result: ');
+              console.dir(data.result);
+
+              //TODO TCT2003 add logic for deciding the image type
+              var upload_file_type = 'image';
+              openLessonView.addUpload(data.result, upload_file_type);
+
+              //openLessonView.saveUploads(data.result, upload_file_type);
+            
+              jQuery.ajax({
+                type: "POST",
+                url: vars.base_path+'jquery_file_upload/get_remaining_space', // github.com/troyth added vars.
+                success: function(data) {
+                  space_allowed = data;
+                }
+              });
+          }
+        });
+        
+        // Load existing files:
+        /*
+        jQuery('#jquery-file-upload-form').each(function () {
+          var that = this;
+          jQuery.getJSON(this.action, function (result) {
+            if (result && result.length) {
+              $(that).fileupload('option', 'done')
+              .call(that, null, {
+                result: result
+              });
+            }
+          });
+        });*/
+        
       }
 
       function appendEmbedElement(this_selector, type, nth){
@@ -175,6 +273,10 @@ searchresult = [];
             console.log('setting state FIRST_EDIT_EMBED');
             $('#main').addClass('state-first-edit-embed');
             break;
+          case FIRST_EDIT_UPLOAD:
+            console.log('setting state FIRST_EDIT_UPLOAD');
+            $('#main').addClass('state-first-edit-upload');
+            break;
           case MODIFIED:
             console.log('setting state MODIFIED');
             $('#main').addClass('state-modified');
@@ -201,6 +303,10 @@ searchresult = [];
           case FIRST_EDIT_EMBED:
             console.log('clearing state FIRST_EDIT_EMBED');
             $('#main').removeClass('state-first-edit-embed');
+            break;
+          case FIRST_EDIT_UPLOAD:
+            console.log('clearing state FIRST_EDIT_UPLOAD');
+            $('#main').removeClass('state-first-edit-upload');
             break;
           case MODIFIED:
             console.log('clearing state MODIFIED');
@@ -240,6 +346,13 @@ searchresult = [];
             break;
           case FIRST_EDIT_EMBED:
             if($('#main').hasClass('state-first-edit-embed')){
+              return true;
+            }else{
+              return false;
+            }
+            break;
+          case FIRST_EDIT_UPLOAD:
+            if($('#main').hasClass('state-first-edit-upload')){
               return true;
             }else{
               return false;
@@ -530,7 +643,14 @@ searchresult = [];
           }
         });
 
-
+        var Upload = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+            //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+            //needed to take out a bunch when using REST WS - last_view seems to be the culprit
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
+          }
+        });
         
         var Week = Drupal.Backbone.Models.Node.extend({
           initialize: function(opts){
@@ -618,12 +738,14 @@ searchresult = [];
               openLessonView.render(); 
 
               openLessonView.initEmbedsCollectionAndView(NID);
+              openLessonView.initUploadsCollectionAndView(NID);
 
               openLessonView.initHalloEditorLesson(false);
               openLessonView.initQuestionSubmitHalloEditorsLesson();
 
               //attach any embeds
               openLessonView.attachEmbed();
+              openLessonView.attachUpload();
 
               //TODO TCT2003 need to attach any uploads
 
@@ -680,11 +802,36 @@ searchresult = [];
             "click .button-upload-file": "uploadFile"
           },
 
+          initUploadsCollectionAndView: function(lessonID){
+            //empty container arrays if they already have embed collection
+            //and collection view
+            UploadsCollection = null;
+            UploadsCollectionView = null;
+
+            UploadsCollection = new UploadCollectionPrototype();
+            UploadsCollection.reset();
+            //put the embeds collection at the front of the container array
+            //this.embedsCollection.unshift(EmbedsCollection);
+
+            var theEL = '#open-node-' + lessonID + ' .uploads-list-el';
+
+            UploadsCollectionView = new UploadCollectionViewPrototype({
+              collection: UploadsCollection,
+              templateSelector: '#upload-list',
+              renderer: 'underscore',
+              el: theEL,
+              ItemView: UploadView,
+              itemParent: '.upload-list-container'
+            });
+
+            UploadsCollectionView.render();
+            //put the embeds collection view at the front of the container array
+            //this.embedsCollectionView.unshift(EmbedsCollectionView);
+          },
+
           initEmbedsCollectionAndView: function(lessonID){
             //empty container arrays if they already have embed collection
             //and collection view
-            console.log('initEmbedsCollectionAndView()');
-
             EmbedsCollection = null;
             EmbedsCollectionView = null;
 
@@ -827,6 +974,86 @@ searchresult = [];
             }); 
           },
 
+          saveUploads: function(data, data_upload_type){
+
+
+            console.log('saveUploads() with result: ');
+            console.dir(data);
+
+            var thisLessonOpenView = this;
+
+            var lessonID = this.model.get('nid');
+            var uploadsArray = [];//returned to Lesson to be stored in field_uploads[]
+
+            //if the open lesson already has uploads, and therefore an UploadsCollectionView
+            if(UploadsCollectionView._itemViews.length > 0){
+              console.log('UploadsCollection.length > 0');
+
+              var UCV_iVLength = UploadsCollectionView._itemViews.length;
+
+              for(var i = 0; i < UCV_iVLength; i++){
+                var uploadView = UploadsCollectionView._itemViews[i];
+
+                var uploadID = uploadView.model.get('nid');
+                var upload_selector = '#node-' + uploadID;
+
+                uploadsArray.push( data_upload_type );
+                
+                uploadView.model.set({
+                  "field_upload_type": data_upload_type,
+                  "field_upload_url": data.url,
+                  "field_delete_url": data.delete_url,
+                  "field_delete_http_method": data.delete_type,
+                  "field_upload_filename": data.name,
+                  "title": 'upload-'+data.name,
+                  "field_upload_filesize": data.size,
+                  "type": "upload"
+                });
+
+                //only fire the success callbacks to re-init UploadsCollection and UploadsCollectionView for the last one
+                if( (i == (UCV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_UPLOAD) ) ){
+                  uploadView.model.save({},{
+                    
+                    success: function(model, response, options){
+                      //remove preloader for lesson for this particular week based on weekID
+                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
+
+                      console.log('upload save success');
+                      console.log('re-initializing Uploads collection stuff');
+
+                      thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                      thisLessonOpenView.attachUpload();
+
+                    },
+                    error: function(model, xhr, options){
+                      //remove preloader for lesson for this particular week based on weekID
+                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
+
+                      console.log('upload save error');
+                      console.log('re-initializing Uploads collection stuff');
+
+                      thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                      thisLessonOpenView.attachUpload();
+                    }
+                  });
+
+                }else{
+                  uploadView.model.save();
+                }
+
+                  
+              }//end for
+            }else{
+              console.log('re-initializing Uploads collection stuff');
+              thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+              thisLessonOpenView.attachUpload();
+            }
+
+            clearState(FIRST_EDIT_UPLOAD);
+
+            return uploadsArray.join(',');
+          },
+
           saveEmbeds: function(){
             console.log('saveEmbeds()');
 
@@ -869,6 +1096,7 @@ searchresult = [];
 
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
                       thisLessonOpenView.attachEmbed();
+
                     },
                     error: function(model, xhr, options){
                       //remove preloader for lesson for this particular week based on weekID
@@ -898,6 +1126,37 @@ searchresult = [];
             clearState(MODIFIED);
 
             return embedsArray.join(',');
+          },
+
+          attachUpload: function(){
+
+            var lessonID = this.model.get("nid");
+
+            console.log('attachUpload() for lesson: '+lessonID);
+
+            //this.initEmbedsCollectionAndView(lessonID);
+
+            //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
+            UploadsCollection.fetchQuery({
+              "field_parent_lesson_nid":lessonID,
+              "type":"upload"
+            }, {
+              success: function(model, response, options){
+                //remove preloader for lesson for this particular week based on weekID
+                $('.upload.preloader', '#open-node-'+lessonID).remove();
+
+                console.log('upload fetch success');
+
+                //TODO TCT2003 add "remove" button
+              },
+              error: function(model, xhr, options){
+                //remove preloader for lesson for this particular week based on weekID
+                $('.upload.preloader', '#open-node-'+lessonID).remove();
+
+                console.log('upload fetch error');
+              }
+
+            });
           },
 
           attachEmbed: function(){
@@ -984,6 +1243,20 @@ searchresult = [];
               //Iterate through all models in the EmbedsCollection and 
               //save out the values
               var embeds = this.saveEmbeds();
+              //var uploads = this.saveUploads();//only call on init_fileuploader:completed()
+
+              var uploads = [];
+              //loop through each upload in UploadsCollection and push it's type into uploads[]
+              _.each(UploadsCollection.models, function(element, index, list){
+
+                console.log('element #'+index+ ' '+element);
+                console.dir(element);
+                uploads.push( element.get('field_upload_type') );
+              });
+
+              uploads = uploads.join(',');
+
+              console.log('uploads: '+uploads);
 
               //TODO TCT2003 add this.saveUploads();
 
@@ -991,11 +1264,14 @@ searchresult = [];
                 description_summary = description_summary.substr(0,190) + '...';
               }
 
+              console.log("saving description_summary: "+description_summary);
+
               this.model.set({
                 "title": theTitle,
                 "field_description": description,
                 "field_description_summary": description_summary,
-                "field_embeds": embeds
+                "field_embeds": embeds,
+                "field_uploads": uploads
               });
 
               this.model.save();
@@ -1063,6 +1339,72 @@ searchresult = [];
 
 
           },
+
+          addUpload: function(result, uploadType){
+            var thisLessonOpenView = this;
+            var courseID = $('.course').attr('id');
+            courseID = courseID.substring(5);
+
+            console.log('Course: '+courseID);
+
+            var lessonID = this.model.get('nid');
+            var upload_title = "upload-"+result.name;
+
+            var f = new Upload({
+              "title": upload_title,
+              "field_upload_type": uploadType,
+              "type": "upload",
+              "field_parent_lesson_nid":lessonID,
+              "field_parent_course_nid":courseID
+            });
+
+            //need to set this explicitly for a node create
+            //because the Drupal Backbone module doesn't know
+            //when the node is new... must be a better way!
+            f.url = "/node";
+
+            console.log('***result passed to addUpload():');
+            console.dir(result);
+
+            var resp = f.save({}, {
+              success: function(model, response, options){
+                //not sure why the BB drupal module can't handle this
+                //need to set the model's id explicitly, otherwise it
+                //triggers the isNew() function in backbone.js and it
+                //tries to create a new one in the db, and because I 
+                //over rode the url because it was originally new,
+                //I need to re-instate the url
+                //TOOD: I should fix this in the Drupal BB module
+                f.id = response.id;
+                f.url = "/node/" + response.id + ".json";
+                f.set({
+                  "nid":response.id
+                });
+                f.save();
+
+                //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
+                
+                console.log('*****adding new upload to UploadsCollection');
+
+                setState(FIRST_EDIT_UPLOAD);
+
+                //if EmbedsCollection is empty, need to re-initialize
+                if(UploadsCollection.length == 0){
+                  thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                  thisLessonOpenView.attachUpload();
+                }else{
+                  var newUploadView = UploadsCollectionView.addOne(f);
+                  //TODO TCT2003 don't think i need this
+                  //newUploadView.firstEditUpload();
+                }
+
+                console.log('***result passed to saveUploads() from addUpload() with type: '+uploadType);
+                console.dir(result);
+
+                thisLessonOpenView.saveUploads(result, uploadType);
+              }
+            });
+          },//end addUpload()
 
           addEmbed: function(embedType){
             var thisLessonOpenView = this;
@@ -1142,6 +1484,8 @@ searchresult = [];
           uploadFile: function(){
             console.log('*****   called uploadFile()');
 
+            //setState(FIRST_EDIT_UPLOAD);//put it in addUpload()
+
             init_fileuploader();
             $('#fileupload-modal').modal('show');
             return false;
@@ -1194,6 +1538,33 @@ searchresult = [];
           }
 
         });
+
+  
+        var UploadView = Drupal.Backbone.Views.Base.extend({
+          templateSelector: '#bb_upload_template',
+
+          //bind vote up and down events to the buttons and tie these to local functions
+          events: {
+            "click .remove" :  "deleteUpload"
+          },
+
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            this.model.bind('change', this.render, this);//this calls the fetch
+          },
+
+          deleteUpload: function(){
+            console.log('delete upload');
+            //delete the actual model from the database and its view
+            this.model.destroy();
+            this.remove();
+
+            //TODO TCT2003 do I need this?
+            setState(MODIFIED);
+          }
+
+        });
+
 
 
         var WeekView = Drupal.Backbone.Views.Base.extend({
@@ -1531,6 +1902,10 @@ searchresult = [];
           model: Embed
         });
 
+        var UploadCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: Upload
+        });
+
         var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Week,
           comparator: function(question) {
@@ -1570,6 +1945,11 @@ searchresult = [];
         });
 
         var EmbedCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
+          resort: function(opts){
+          }
+        });
+
+        var UploadCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
           }
         });
