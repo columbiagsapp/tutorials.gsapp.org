@@ -974,7 +974,18 @@ searchresult = [];
             }); 
           },
 
-          saveUploads: function(data, data_upload_type){
+          saveUploads: function(newModel){
+
+
+            //if EmbedsCollection is empty, need to re-initialize
+            if(UploadsCollection.length == 0){
+              thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+              thisLessonOpenView.attachUpload();
+            }else{
+              var newUploadView = UploadsCollectionView.addOne(newModel);
+              //TODO TCT2003 don't think i need this
+              //newUploadView.firstEditUpload();
+            }
 
 
             console.log('saveUploads() with result: ');
@@ -1245,23 +1256,10 @@ searchresult = [];
               var embeds = this.saveEmbeds();
               //var uploads = this.saveUploads();//only call on init_fileuploader:completed()
 
-              var uploads = [];
-              //loop through each upload in UploadsCollection and push it's type into uploads[]
-              _.each(UploadsCollection.models, function(element, index, list){
-
-                console.log('element #'+index+ ' '+element);
-                console.dir(element);
-                uploads.push( element.get('field_upload_type') );
-              });
-
-              uploads = uploads.join(',');
-
-              console.log('uploads: '+uploads);
-
               //TODO TCT2003 add this.saveUploads();
 
-              if(description_summary.length > 190){
-                description_summary = description_summary.substr(0,190) + '...';
+              if(description_summary.length > 180){
+                description_summary = description_summary.substr(0,180) + '...';
               }
 
               console.log("saving description_summary: "+description_summary);
@@ -1270,8 +1268,7 @@ searchresult = [];
                 "title": theTitle,
                 "field_description": description,
                 "field_description_summary": description_summary,
-                "field_embeds": embeds,
-                "field_uploads": uploads
+                "field_embeds": embeds
               });
 
               this.model.save();
@@ -1355,8 +1352,15 @@ searchresult = [];
               "field_upload_type": uploadType,
               "type": "upload",
               "field_parent_lesson_nid":lessonID,
-              "field_parent_course_nid":courseID
+              "field_parent_course_nid":courseID,
+              "field_upload_url": result.url,
+              "field_delete_url": result.delete_url,
+              "field_delete_http_method": result.delete_type,
+              "field_upload_filename": result.name,
+              "field_upload_filesize": result.size,
+              "type": "upload"
             });
+
 
             //need to set this explicitly for a node create
             //because the Drupal Backbone module doesn't know
@@ -1384,24 +1388,40 @@ searchresult = [];
 
                 //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
                 
-                console.log('*****adding new upload to UploadsCollection');
+                console.log('*****adding new upload to UploadsCollectionView');
 
                 setState(FIRST_EDIT_UPLOAD);
 
-                //if EmbedsCollection is empty, need to re-initialize
-                if(UploadsCollection.length == 0){
-                  thisLessonOpenView.initUploadsCollectionAndView(lessonID);
-                  thisLessonOpenView.attachUpload();
-                }else{
-                  var newUploadView = UploadsCollectionView.addOne(f);
-                  //TODO TCT2003 don't think i need this
-                  //newUploadView.firstEditUpload();
-                }
 
-                console.log('***result passed to saveUploads() from addUpload() with type: '+uploadType);
-                console.dir(result);
+                //thisLessonOpenView.saveUploads(f);
 
-                thisLessonOpenView.saveUploads(result, uploadType);
+
+                var newUploadView = UploadsCollectionView.addOne(f);
+
+                var uploads = [];
+
+                //loop through each upload in UploadsCollection and push it's type into uploads[]
+                _.each(UploadsCollection.models, function(element, index, list){
+                  console.dir(element);
+                  uploads.push( element.get('field_upload_type') );
+                });
+
+                uploads = uploads.join(',');
+
+                thisLessonOpenView.model.set({
+                  "field_uploads": uploads
+                });
+
+                thisLessonOpenView.model.save({}, {
+                  success: function(){
+                    console.log('saved file type into lesson');
+                    $('#fileupload-modal').modal('hide');
+                  }
+                });
+                  
+                //thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+        //        thisLessonOpenView.attachUpload();
+                     
               }
             });
           },//end addUpload()
