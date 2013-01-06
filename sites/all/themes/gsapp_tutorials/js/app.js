@@ -987,6 +987,10 @@ searchresult = [];
 
               //TODO TCT2003 add this.saveUploads();
 
+              if(description_summary.length > 190){
+                description_summary = description_summary.substr(0,190) + '...';
+              }
+
               this.model.set({
                 "title": theTitle,
                 "field_description": description,
