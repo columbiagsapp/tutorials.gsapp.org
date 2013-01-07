@@ -1276,8 +1276,8 @@ searchresult = [];
 
               this.model.save({},{
                 success: function(){//TODO TCT2003 why do I have to refetch these?
-                  thisLessonOpenView.attachEmbed();
-                  thisLessonOpenView.attachUpload();
+                  //thisLessonOpenView.attachEmbed();
+                  //thisLessonOpenView.attachUpload();
                 }
               });
 
