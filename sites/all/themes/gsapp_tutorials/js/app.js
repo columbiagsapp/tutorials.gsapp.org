@@ -1155,6 +1155,7 @@ searchresult = [];
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.upload.preloader', '#open-node-'+lessonID).remove();
+                $('.attachments-header').removeClass('hidden');
 
                 console.log('upload fetch success');
 
@@ -1271,7 +1272,14 @@ searchresult = [];
                 "field_embeds": embeds
               });
 
-              this.model.save();
+              var thisLessonOpenView = this;
+
+              this.model.save({},{
+                success: function(){//TODO TCT2003 why do I have to refetch these?
+                  thisLessonOpenView.attachEmbed();
+                  thisLessonOpenView.attachUpload();
+                }
+              });
 
               if(getState(FIRST_EDIT_LESSON)){
                 clearState(FIRST_EDIT_LESSON);
@@ -1327,14 +1335,6 @@ searchresult = [];
                 }
               });
             }
-
-            //TODO SOON TCT2003 this is a HACK !!!
-            //parentLessonView.openLesson();
-
-
-            
-
-
           },
 
           addUpload: function(result, uploadType){
@@ -1415,7 +1415,9 @@ searchresult = [];
                 thisLessonOpenView.model.save({}, {
                   success: function(){
                     console.log('saved file type into lesson');
+                    $('.attachments-header').removeClass('hidden');
                     $('#fileupload-modal').modal('hide');
+
                   }
                 });
                   

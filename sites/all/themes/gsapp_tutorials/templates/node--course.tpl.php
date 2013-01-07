@@ -84,7 +84,7 @@
 
 <script type="text/template" id="bb_lesson_open_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>open-node-<%= nid %><% }else{ %>open-node-temp<% } %>" class="lesson-open brick roman">
-    <div id="lesson-open-anchor" class="inner">
+    <div id="lesson-open-anchor" class="inner float-left">
       <div class="content">
         <h2 class="title"><div class="editable lesson-title editable-title"><% if ( typeof(title) != "undefined" ) { %><%= title %><% } %></div></h2><!-- /.title -->
 
@@ -200,18 +200,19 @@
 <script type="text/template" id="bb_upload_template">
   <div class="collapsible lesson-upload-wrapper">
     <div id="node-<% if (typeof(nid) != "undefined" ){ %><%= nid %><% } %>" class="lesson-upload-element <% if (typeof(field_upload_type) != "undefined" ){ %><%= field_upload_type %><% } %>">
-      
+        
+      <div class="field-upload-content-wrapper">
+        <% if ( (typeof(field_upload_filename) != "undefined") && ( typeof(field_upload_url) != "undefined" ) ){ %>
+          <i class="icon-picture"></i>&nbsp;<a href="<%= field_upload_url %>" target="_blank"><%= field_upload_filename %></a>
+        <% } %>
+      </div><!-- /.field-upload-content-wrapper -->
+
       <div class="field-upload-edit-wrapper">
         <div class="field-upload-edit-buttons">
           <div class="remove">Remove</div>
         </div>
       </div><!-- /.field-upload-edit-wrapper -->
-        
-      <div class="field-upload-content-wrapper">
-        <% if (typeof(field_upload_filename) != "undefined" ){ %>
-          <%= field_upload_filename %>
-        <% } %>
-      </div><!-- /.field-upload-content-wrapper -->
+
     </div><!-- /#node-index.lesson-upload-element -->
   </div><!-- /.lesson-upload-wrapper -->
 </script>
@@ -289,6 +290,7 @@
 
 <script type="text/template" id="upload-list">
   <div>
+    <h5 class="hidden attachments-header">Attachments</h5>
     <div class="upload-list-container"></div>
   </div>
 </script>

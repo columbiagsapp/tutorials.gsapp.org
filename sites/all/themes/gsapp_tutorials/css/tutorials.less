@@ -11,7 +11,6 @@
 
 @mobileScale: 0.6;
 
-
 @smallFontSize: 1em;
 @smallLineHeight: 1em;
 @mediumFontSize: 1.5714em;/*22px*/
@@ -609,15 +608,14 @@ iframe {
 }
 
 .secondaryButton{
-  border-bottom:1px solid;
   color:@textColor;
-  font:@smallFont;
+  font:bold 0.75em/2em @baseFontFamily;
   text-transform: uppercase;
 }
 
-.secondaryButton:hover{
-  border:none;
-  color:@darkBGColor;
+.secondaryButtonHover{
+  color:@lightBGColor;
+  cursor: pointer;
 }
 
 .delete,
@@ -846,7 +844,7 @@ textarea[readonly]{
 .content-edit{
   .hidden;
   float:left;
-  margin-bottom:@brickPadding;
+  margin-top:@brickPadding;
 }
 
 .content{
@@ -871,13 +869,16 @@ textarea[readonly]{
   .hidden;
 }
 
-.field-embed-edit-wrapper{
+.field-embed-edit-wrapper,
+.field-upload-edit-wrapper{
   .hidden;
 }
 
-.edit-mode .field-embed-edit-wrapper{
+.edit-mode .field-embed-edit-wrapper,
+.edit-mode .field-upload-edit-wrapper{
   display: block;
 }
+
 
 
 
@@ -908,9 +909,27 @@ textarea[readonly]{
   .secondaryButton;
 }
 
+.field-upload-edit-buttons .remove{
+  .secondaryButton;
+}
+
+.field-embed-edit-buttons .remove:hover,
+.field-upload-edit-buttons .remove:hover{
+  .secondaryButtonHover;
+}
+
 .field-embed-edit-code{
   float:left;
   width:100%;
+}
+
+.field-upload-content-wrapper{
+  float:left;
+}
+
+.field-upload-edit-wrapper{
+  float:left;
+  margin-left:@innerPadding;
 }
 
 /* UPDATES */
