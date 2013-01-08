@@ -8,14 +8,17 @@
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix course"<?php print $attributes; ?>>
 
 
-  <header class="jumbotron subhead span12">
-    <div class="container header-left">
+  <header class="jumbotron subhead row-fluid">
+    <div class="container header-left span9">
       <div class="clearfix"><?php print render($content['field_code']); ?> <?php print render($content['field_semester']); ?> <?php print render($content['field_year']); ?></div>
       <h1 class="clearfix"><a href="/course/<?php print $node->nid; ?>" target="_self"><?php print $title; ?></a></h1>
       <div class="clearfix"><?php print render($content['field_instructors']); ?>
       </div>
     </div><!-- /.header-left -->
-    <div class="container header-right">
+    <div class="container header-right span3">
+      <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
+      <div><a id="link-schedule" href="#schedule">Schedule</a></div>
+      <div><a id="link-updates" href="#updates">Updates</a></div>
       <div><?php print render($content['field_links']); ?></div>
     </div><!-- /.header-right -->
   </header>
@@ -203,7 +206,7 @@
         
       <div class="field-upload-content-wrapper">
         <% if ( (typeof(field_upload_filename) != "undefined") && ( typeof(field_upload_url) != "undefined" ) ){ %>
-          <i class="icon-picture"></i>&nbsp;<a href="<%= field_upload_url %>" target="_blank"><%= field_upload_filename %></a>
+          <i class="icon-picture"></i><a href="<%= field_upload_url %>" target="_blank"><%= field_upload_filename %></a>
         <% } %>
       </div><!-- /.field-upload-content-wrapper -->
 

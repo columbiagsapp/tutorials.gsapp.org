@@ -112,6 +112,10 @@ h1 a:hover{
   color:@darkBGColor !important;
 }
 
+.clearfix{
+  clear:both;
+}
+
 .box-shadow(@style, @c) when (iscolor(@c)) {
   box-shadow:         @style @c;
   -webkit-box-shadow: @style @c;
@@ -529,6 +533,18 @@ iframe {
   border:none !important;
 }
 
+/* COURSE-INDEX */
+.course-index .views-field-field-code,
+.course-index .views-field-field-semester,
+.course-index .views-field-field-year,
+.course-index .views-field-field-instructors{
+  float:left;
+  margin-right:5px;
+}
+
+.course-index .views-field-title{
+}
+
 
 /* COURSE */
 .course .jumbotron .header-left .field{
@@ -543,17 +559,6 @@ iframe {
 .course .header-left .field-name-field-instructors .field-items .field-item{
   float:left;
   margin-right:1em;
-}
-
-.course .header-left{
-  float:left;
-  width:90%;
-  margin:0;
-}
-.course .header-right{
-  float:right;
-  width:10%;
-  margin:0;
 }
 
 .course .week,
@@ -888,6 +893,15 @@ textarea[readonly]{
   margin-bottom:@verticalpadding;
 }
 
+.lesson-upload-wrapper{
+  float:left;
+  width:100%;
+  margin-bottom:@innerPadding;
+}
+
+.lesson-upload-wrapper i{
+  margin-right:@innerPadding;
+}
 
 .field-embed-edit-top{
   width:100%;

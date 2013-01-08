@@ -4,6 +4,9 @@ var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
 var openLessonView = null;
 
+var course,
+    courseNid;
+
 var parentLessonView = null;
 
 var EmbedsCollection = [];
@@ -203,6 +206,38 @@ searchresult = [];
         }
         return returnVal;
       }
+
+      function transitionSyllabus(){
+        var contentSectionHTML = 
+              '<section id="syllabus" class="span9 outer" role="complementary"><h2 class="heading float-left">Syllabus</h2><div id="syllabus-content" class="brick roman"><div class="inner">';
+
+        contentSectionHTML = contentSectionHTML + course.get('field_course_syllabus').value + '</div></div></section><!-- /.span3 -->';
+
+        if( $('#lesson-content').length){
+          //remove the temporary lesson model and view
+          openLessonView.remove();
+          openLessonView = null;
+
+          EmbedsCollection.reset();
+          EmbedsCollection = null;
+          EmbedsCollectionView = null;
+
+          $('.theOpenLesson').removeClass('theOpenLesson');
+          $('.selected').removeClass('selected');
+
+          $('#lesson-content').remove();
+
+          //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
+          $('#main').append(updates_detached);
+        }else{
+          console.log('detaching updates');
+          $('#schedule').removeClass('span9').addClass('span3 collapsed');
+          updates_detached = $('#updates').detach();
+        }
+        $('#main').append(contentSectionHTML);
+
+        return false;
+      }
       /*
         This function transitions from any state to the main state
         with Schedule in focus and Updates in the sidebar
@@ -224,6 +259,9 @@ searchresult = [];
 
           //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
           $('#schedule').removeClass('span3 collapsed').addClass('span9');
+          $('#main').append(updates_detached);
+        }else if( $('#syllabus').length > 0 ){
+          $('#syllabus').remove();
           $('#main').append(updates_detached);
         }
         $('#updates').removeClass('span9').addClass('span3 collapsed');
@@ -248,8 +286,9 @@ searchresult = [];
         return false;
       }
 
-      $('#schedule-button').bind('click', transitionSchedule);
-      $('#updates-button').bind('click', transitionUpdates);
+      $('#schedule-button, #link-schedule').bind('click', transitionSchedule);
+      $('#updates-button, #link-updates').bind('click', transitionUpdates);
+      $('#link-syllabus').bind('click', transitionSyllabus);
 
 
       /*
@@ -611,8 +650,10 @@ searchresult = [];
           are related (through node refs), the related assignments, etc - ie. all the things
           we want to load dynamically through Backbone so that the user can dynamically update them
         */
-        var courseNid = pathArray[2];//nid from URL
-        var course = new Drupal.Backbone.Models.Node({ nid: courseNid });//get this from the url eventually
+        courseNid = pathArray[2];//nid from URL
+        course = new Drupal.Backbone.Models.Node({ nid: courseNid });//get this from the url eventually
+
+        course.fetch();
 
 
         /*
