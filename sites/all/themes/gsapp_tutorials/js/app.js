@@ -1783,7 +1783,7 @@ searchresult = [];
               });
 
             }else{//cancel clicked
-              $('.lesson-list-container', this_selector).sortable('refreshPositions');
+              $('.lesson-list-container', this_selector).sortable('cancel');
             }
             $('.lesson-list-container', this_selector).sortable('disable');
             $('.lesson-list-container, .lesson-list-container li', this_selector).enableSelection();
