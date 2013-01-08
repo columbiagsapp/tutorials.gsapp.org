@@ -19,9 +19,14 @@
       <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
       <div><a id="link-schedule" href="#schedule">Schedule</a></div>
       <div><a id="link-updates" href="#updates">Updates</a></div>
-      <div><?php print render($content['field_links']); ?></div>
-      
-      <div><?php print render( field_view_field('node', $node, 'field_links') );?></div>
+      <?php 
+        //print out links in the links field with external link icon
+        $items = field_get_items('node', $node, 'field_links', $node->language); 
+        foreach($items as $item){
+          print '<div><a href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i></div>';
+        }
+  
+      ?>
     </div><!-- /.header-right -->
   </header>
 
