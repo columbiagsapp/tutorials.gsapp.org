@@ -216,6 +216,8 @@
       //      if it exists as part of this.render()
       Drupal.Backbone.Views.Base = Backbone.View.extend({
 
+        tagName: 'li',
+
         // #### initialize
         //
         // Initialize our view by preparing the template for later rendering.
@@ -402,7 +404,6 @@
       // Can specify a view for each collection item, a container el as well as location for insert
       // Q: should the container el for each item be on the individual view, or here? I think here, to enable re-use of model views which may not be in li, etc.
       Drupal.Backbone.Views.CollectionView = Drupal.Backbone.Views.Base.extend({
-
         // Intiialize function takes a configuration object as argument.
         // Expected properties must include:
         //
