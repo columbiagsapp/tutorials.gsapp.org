@@ -288,34 +288,40 @@
 
 <script type="text/template" id="lesson-list">
   <div>
-    <div class="lesson-list-container"></div>
+    <ul class="lesson-list-container list-container"></ul>
   </div>
 </script>
 
 <script type="text/template" id="embed-list">
   <div>
-    <div class="embed-list-container"></div>
+    <ul class="embed-list-container list-container"></ul>
   </div>
 </script>
 
 <script type="text/template" id="upload-list">
   <div>
     <h5 class="hidden attachments-header">Attachments</h5>
-    <div class="upload-list-container"></div>
+    <ul class="upload-list-container list-container"></ul>
   </div>
 </script>
 
 
 <script type="text/template" id="week-list">
   <div>
-    <div class="week-list-container">
-    </div>
+    <ul class="week-list-container list-container">
+    </ul>
   </div>
 </script>
 
 <script type="text/template" id="update-list">
   <div>
-    <div class="update-list-container"></div>
+    <ul class="update-list-container list-container"></ul>
+  </div>
+</script>
+
+<script type="text/template" id="collection-list">
+  <div>
+    <ul class="collection-list-parent list-container"></ul>
   </div>
 </script>
 
@@ -371,12 +377,7 @@
   </div>
 </script>
 
-<script type="text/template" id="collection-list">
-  <div>
-    <div class="collection-list-parent"></div>
-  </div>
-  
-</script>
+
 
 
 
