@@ -795,7 +795,7 @@ textarea[readonly]{
 
 .lesson .icon-wrapper{
   height: @lessonIconHeight;
-  width:100%;
+  width:(@standardBrickWidth - 2*(@standardBrickPadding));
   overflow: hidden;
   position:absolute;
   bottom:@verticalpadding;
@@ -803,6 +803,7 @@ textarea[readonly]{
 
 .lesson .icon-wrapper i{
   margin-right:@innerPadding;
+  float:left;
 }
 
 .collapsed .lesson .text-wrapper,
@@ -1012,4 +1013,39 @@ textarea[readonly]{
 
 
 
+/* SORTABLE JQUERY UI */
+#sortable { 
+  list-style-type: none; 
+  margin: 0; 
+  padding: 0; 
+  width: 60%;
+}
+#sortable li { 
+  margin: 0 5px 5px 5px; 
+  padding: 5px; 
+  font-size: 1.2em; 
+  height: 1.5em;
+}
+html>body #sortable li { height: 1.5em; line-height: 1.2em; }
+.ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+
+
+
+
 /* OVERRIDES - THESE MUST STAY AT THE BOTTOM OF THIS FILE */
+
+.list-container{
+  list-style:none !important;
+}
+.list-container > li{
+  list-style-type: none !important; 
+  margin: 0; 
+  padding: 0; 
+  line-height: inherit;
+}
+
+
+
+
+
+
