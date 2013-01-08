@@ -217,6 +217,7 @@
       Drupal.Backbone.Views.Base = Backbone.View.extend({
 
         tagName: 'li',
+        className: 'ui-state-default',
 
         // #### initialize
         //

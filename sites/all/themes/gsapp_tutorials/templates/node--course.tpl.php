@@ -35,7 +35,8 @@
     <section id="schedule" class="span9"> 
       <h2 id="schedule-button" class="heading float-left heading-button editable">Schedule</h2>
       <?php if($editable){ ?>
-        <div id="add-week-container" class="button">+</div>
+        <div id="resort-week-container" class="button">Resort</div>
+        <div id="add-week-container" class="button">+ Section</div>
       <?php } ?>
       <div class="weeks">
         <div id="weeks-list-el"></div>
@@ -259,6 +260,8 @@
           <div class="delete button">Delete</div>
         </div>
       <?php } ?>
+
+      <div class="resort-crosshair"><i class="icon-sort"></i></div>
     </div><!-- /.inner -->
   </div>
 </script>

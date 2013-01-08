@@ -4,6 +4,8 @@ var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
 var openLessonView = null;
 
+var WeeksCollection;
+
 var course,
     courseNid;
 
@@ -48,6 +50,45 @@ searchresult = [];
          tmp.innerHTML = html;
          return tmp.textContent||tmp.innerText;
       }
+
+
+      function resortWeekOrder(){
+        if($(this).text() == 'Resort'){
+          $('.week').addClass('resort-mode');
+
+          $('.week-list-container').sortable();
+          $('.week-list-container, .week-list-container li').disableSelection();
+
+          $('#add-week-container').hide();
+          $(this).text('Save Order');
+        }else{
+          $('.week').removeClass('resort-mode');
+          $('.week-list-container').sortable("disable");
+
+          $('.week-list-container, .week-list-container li').enableSelection();
+
+          //TODO TCT2003 save out new order
+
+          WeeksCollection
+
+          $('.week-list-container > li').each(function(i){
+            console.log('*******each .week-list-container li, number: '+ i);
+            var thisNID = $(this).find('.week').attr('id');
+            thisNID = thisNID.substr(5);
+            var model = WeeksCollection.get( thisNID );
+            model.set({
+              "field_order": i
+            });
+            model.save();
+          });
+
+          $('#add-week-container').show();
+          $(this).text('Resort');
+        }
+
+      }
+
+      $('#resort-week-container').bind('click', resortWeekOrder);
 
       function hsize(b){
           if(b >= 1048576) return (Math.round((b / 1048576) * 100) / 100) + " mb";
@@ -1972,11 +2013,11 @@ searchresult = [];
         var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
           model: Week,
           comparator: function(question) {
-            return question.get("field_week_number");//negative value to sort from greatest to least
+            return question.get("field_order");//add negative value to sort from greatest to least
           }
         });
 
-        var WeeksCollection = new WeekCollectionPrototype();
+        WeeksCollection = new WeekCollectionPrototype();
 
         //TODO: for some reason the collection is initializing with one model
         //that is undefined, so reset it immediately to clear it out

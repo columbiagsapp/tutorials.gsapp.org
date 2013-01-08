@@ -645,7 +645,8 @@ iframe {
 }
 
 .course #add-update-container,
-.course #add-week-container{
+.course #add-week-container,
+.course #resort-week-container{
   float:right;
   margin-right:@standardBrickPadding;
 }
@@ -1014,20 +1015,22 @@ textarea[readonly]{
 
 
 /* SORTABLE JQUERY UI */
-#sortable { 
-  list-style-type: none; 
-  margin: 0; 
-  padding: 0; 
-  width: 60%;
+.week .resort-crosshair{
+  display: none;
 }
-#sortable li { 
-  margin: 0 5px 5px 5px; 
-  padding: 5px; 
-  font-size: 1.2em; 
-  height: 1.5em;
+
+.resort-mode .resort-crosshair{
+  display:block !important;
+  text-align: center;
+  margin:0 auto;
+  font-size:@largeFontSize;
 }
-html>body #sortable li { height: 1.5em; line-height: 1.2em; }
-.ui-state-highlight { height: 1.5em; line-height: 1.2em; }
+
+.resort-mode .lessons-list-el,
+.resort-mode .add-lesson,
+.resort-mode .edit-week-buttons{
+  display: none;
+}
 
 
 
@@ -1036,15 +1039,30 @@ html>body #sortable li { height: 1.5em; line-height: 1.2em; }
 
 .list-container{
   list-style:none !important;
+  margin:0 !important;
+  padding:0 !important;
 }
 .list-container > li{
   list-style-type: none !important; 
   margin: 0; 
   padding: 0; 
   line-height: inherit;
+  height:auto;
+  width:auto;
+  float:left;
 }
 
+.week-list-container > li,
+.update-list-container > li{
+  width:100%;
+}
 
+.ui-state-default{
+  border: inherit !important;
+  background: inherit !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+}
 
 
 
