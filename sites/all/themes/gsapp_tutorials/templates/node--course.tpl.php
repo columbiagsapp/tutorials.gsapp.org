@@ -20,6 +20,8 @@
       <div><a id="link-schedule" href="#schedule">Schedule</a></div>
       <div><a id="link-updates" href="#updates">Updates</a></div>
       <div><?php print render($content['field_links']); ?></div>
+      
+      <div><?php print render( field_view_field('node', $node, 'field_links') );?></div>
     </div><!-- /.header-right -->
   </header>
 
