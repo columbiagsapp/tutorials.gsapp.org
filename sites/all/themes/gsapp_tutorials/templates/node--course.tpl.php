@@ -35,8 +35,10 @@
     <section id="schedule" class="span9"> 
       <h2 id="schedule-button" class="heading float-left heading-button editable">Schedule</h2>
       <?php if($editable){ ?>
-        <div id="resort-week-container" class="button">Resort</div>
-        <div id="add-week-container" class="button">+ Section</div>
+        <div class="schedule-button-container edit-button-container">
+          <div id="resort-week-container" class="button">Resort</div>
+          <div id="add-week-container" class="button">+ Section</div>
+        </div>
       <?php } ?>
       <div class="weeks">
         <div id="weeks-list-el"></div>
@@ -46,9 +48,11 @@
 
 
     <section id="updates" class="span3 collapsed outer" role="complementary">
-      <h2 id="updates-button" class="heading float-left heading-button">Updates</h2>
+      <h2 id="updates-button" class="heading float-left heading-button">Announcements</h2>
         <?php if($editable){ ?>
-          <div id="add-update-container" class="button">+</div>
+          <div class="edit-button-container">
+            <div id="add-update-container" class="button">+ Announcement</div>
+          </div>
         <?php } ?>
         <div id="updates-list-el" class="el"></div>
         <div id="update-preloader" class="update brick standard preloader"></div>
