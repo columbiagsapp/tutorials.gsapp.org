@@ -2205,8 +2205,8 @@ searchresult = [];
           "type":"week"
           }, {
             success: function(model, response, options){
+              $('#week-preloader').remove();
               $('.course .weeks .week').each(function(i){
-                $('#week-preloader').remove();
                 var weekID = $(this).attr('id');
                 if(weekID != "week-preloader"){
                   weekID = weekID.substr(5);
@@ -2252,6 +2252,9 @@ searchresult = [];
 
                 }
               });
+            },
+            error: function(){
+              $('#week-preloader').remove();
             }
         });
 
@@ -2261,7 +2264,10 @@ searchresult = [];
           }, {
             success: function(model, response, options){
               $('#update-preloader').remove();
-          }
+            }, 
+            error: function(){
+              $('#update-preloader').remove();
+            }
         });
 
         /*
