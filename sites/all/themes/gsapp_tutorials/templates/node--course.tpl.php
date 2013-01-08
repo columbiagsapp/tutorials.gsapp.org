@@ -90,6 +90,7 @@
         <% } } %>
       </div><!-- /.icon-wrapper -->
     </div><!-- /.inner -->
+    <div class="resort-icon"><i class="icon-move"></i></div>
   </div>
 </script>
 
@@ -261,7 +262,7 @@
         </div>
       <?php } ?>
 
-      <div class="resort-crosshair"><i class="icon-sort"></i></div>
+      <div class="resort-icon"><i class="icon-sort"></i></div>
     </div><!-- /.inner -->
   </div>
 </script>

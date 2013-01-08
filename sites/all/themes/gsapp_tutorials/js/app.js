@@ -6,6 +6,9 @@ var openLessonView = null;
 
 var WeeksCollection;
 
+var LessonsCollection,
+    LessonsCollectionView;
+
 var course,
     courseNid;
 
@@ -51,7 +54,6 @@ searchresult = [];
          return tmp.textContent||tmp.innerText;
       }
 
-
       function resortWeekOrder(){
         if($(this).text() == 'Resort'){
           $('.week').addClass('resort-mode');
@@ -67,10 +69,7 @@ searchresult = [];
 
           $('.week-list-container, .week-list-container li').enableSelection();
 
-          //TODO TCT2003 save out new order
-
-          WeeksCollection
-
+          //save out new order
           $('.week-list-container > li').each(function(i){
             console.log('*******each .week-list-container li, number: '+ i);
             var thisNID = $(this).find('.week').attr('id');
@@ -1756,6 +1755,40 @@ searchresult = [];
 
           },
 
+          resortWeekLessons: function(this_selector){
+            console.log('resortWeekLessons');
+            var weekNID = this.model.get('nid');
+            var this_selector = '#node-' + weekNID;
+
+            $('.lesson-list-container', this_selector).sortable('enable');
+            $('.lesson-list-container, .lesson-list-container li', this_selector).disableSelection();
+            
+          },
+
+          setWeekLessonsOrder: function(this_selector, save){
+            if(save){
+              //save out new order
+              $('.lesson-list-container > li', this_selector).each(function(i){
+                console.log('*******each .lesson-list-container li, number: '+ i);
+                var thisNID = $(this).find('.lesson').attr('id');
+                thisNID = thisNID.substr(5);
+                var weekID = this_selector.substr(6);
+                console.log('weekID: '+ weekID);
+                console.log('thisNID: '+ thisNID);
+                var model = LessonsCollection[weekID].get( thisNID );
+                model.set({
+                  "field_order": i
+                });
+                model.save();
+              });
+
+            }else{//cancel clicked
+              $('.lesson-list-container', this_selector).sortable('refreshPositions');
+            }
+            $('.lesson-list-container', this_selector).sortable('disable');
+            $('.lesson-list-container, .lesson-list-container li', this_selector).enableSelection();
+          },
+
           firstEditWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
             $('.lesson.preloader', this_selector).remove();
@@ -1766,6 +1799,7 @@ searchresult = [];
           },
 
           editWeek: function(){
+            console.log('editWeek()');
             var this_selector = '#node-' + this.model.get('nid');
 
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
@@ -1804,6 +1838,7 @@ searchresult = [];
                 placeholder: lessonEditHallo.placeholder.field_description
               });
 
+              this.resortWeekLessons(this_selector);
 
 
             }else{
@@ -1824,6 +1859,7 @@ searchresult = [];
               });//TODO TCT2003 should have {silent: true}, see TODO DEC 20 in initialize
 
               this.model.save();
+              this.setWeekLessonsOrder(this_selector, true);
               this.cancelEdit();
             }
           },
@@ -1860,6 +1896,7 @@ searchresult = [];
               $('.week-title', this_selector).text( this.model.get('title') );
               $('.week-number', this_selector).text( this.model.get('field_week_number') );
               $('.week-description', this_selector).html( this.model.get('field_description') );
+              this.setWeekLessonsOrder(this_selector, false);
             }
           }
 
@@ -1999,7 +2036,10 @@ searchresult = [];
         */
 
         var LessonCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-          model: Lesson
+          model: Lesson,
+          comparator: function(question) {
+            return question.get("field_order");//add negative value to sort from greatest to least
+          }
         });
 
         var EmbedCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
@@ -2149,8 +2189,8 @@ searchresult = [];
 
         UpdatesCollectionView.render();
 
-        var LessonsCollection = [];
-        var LessonsCollectionView = [];
+        LessonsCollection = [];
+        LessonsCollectionView = [];
 
         //console.log('instantiating EmbedsCollection');
         //var EmbedsCollection;
@@ -2199,6 +2239,8 @@ searchresult = [];
                       //remove preloader for lesson for this particular week based on weekID
                       $('.lesson.preloader', '#node-'+weekID).remove();
                       $('.open', '#node-'+weekID).removeClass('theOpenLesson');
+                      $('.lesson-list-container', '#node-'+weekID).sortable();
+                      $('.lesson-list-container', '#node-'+weekID).sortable('disable');
                     },
                     error: function(model, xhr, options){
                       //remove preloader for lesson for this particular week based on weekID

@@ -19,6 +19,7 @@
 @largeLineHeight: 1em;
 @xLargeFontSize: 3.5714em;/*50px*/
 @xLargeLineHeight: 1em;
+@hugeFontSize: 120px;
 
 @smallFontSizeTablet: (@smallFontSize * 1.2857);/*18px*/
 @mediumFontSizeTablet: @smallFontSizeTablet;
@@ -661,7 +662,7 @@ iframe {
 
 
 .course .add-lesson-note-plus{
-  font-size:120px;
+  font-size:@hugeFontSize;
   line-height: 1em;
   font-weight: bold;
   text-align: center;
@@ -1015,22 +1016,37 @@ textarea[readonly]{
 
 
 /* SORTABLE JQUERY UI */
-.week .resort-crosshair{
+.week .resort-icon,
+.lesson .resort-icon{
   display: none;
 }
 
-.resort-mode .resort-crosshair{
+.resort-mode .resort-icon{
   display:block !important;
   text-align: center;
   margin:0 auto;
   font-size:@largeFontSize;
 }
 
+.week.edit-mode .lesson .resort-icon{
+  position: absolute;
+  display:block !important;
+  text-align: center;
+  margin:0 auto;
+  bottom:(@standardBrickHeight / 2) - 2 * @verticalpadding;
+  color:@lightBGColor;
+  font-size:@largeFontSize;
+  width:100%;
+}
+
 .resort-mode .lessons-list-el,
 .resort-mode .add-lesson,
-.resort-mode .edit-week-buttons{
+.resort-mode .edit-week-buttons,
+.week.edit-mode .lesson .lesson-description{
   display: none;
 }
+
+
 
 
 
