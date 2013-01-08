@@ -2033,7 +2033,6 @@ searchresult = [];
           renderer: 'underscore',
           el: '#weeks-list-el',
           ItemView: WeekView,
-          //itemTag: 'li',
           itemParent: '.week-list-container'
         });
  
