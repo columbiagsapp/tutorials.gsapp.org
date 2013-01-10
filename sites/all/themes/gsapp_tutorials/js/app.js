@@ -1,6 +1,3 @@
-var testing = 'testing';
-
-
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
