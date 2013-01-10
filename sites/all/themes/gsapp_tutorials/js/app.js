@@ -1,4 +1,4 @@
-var testing;
+var testing = 'testing';
 
 
 var app = app || {};
