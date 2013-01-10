@@ -28,6 +28,7 @@
   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
   <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+  <script type="text/javascript" src="http://fast.fonts.com/jsapi/1d7837fd-801b-4873-8c02-3adb63c2f65f.js"></script>
 </head>
 <body class="<?php print $classes; print ' user-uid-'.$user->uid;
   foreach($user->roles as $key => $value){
