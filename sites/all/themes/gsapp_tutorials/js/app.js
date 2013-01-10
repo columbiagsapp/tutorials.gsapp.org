@@ -240,12 +240,19 @@ lessonEditHallo.placeholder.number = "##";
 
       function saveExternalLinkToCourse(){
         var links = course.get("field_links");
+        var url = $('#add-link-popup .new-link-url').text();
 
-        var html = $('<div class="course-link-item"><a class="float-left" href="' + $('#add-link-popup .new-link-url').text() + '" target="_blank">'+$('#add-link-popup .new-link-title').text()+'</a><a class="float-right remove">Remove</a></div>');
+        if( url.substr(4) != "http"){
+          var appendURL = "http://" + url;
+        }else{
+          var appendURL = url;
+        }
+
+        var html = $('<div id="course-link-item-' + links.length + '" class="course-link-item"><a class="float-left" href="' + appendURL + '" target="_blank">'+$('#add-link-popup .new-link-title').text()+'</a>&nbsp;&nbsp;<i class="icon-external-link"></i><a class="float-right remove">Remove</a></div>');
 
         var obj = {
           "title": $('#add-link-popup .new-link-title').text(),
-          "url": $('#add-link-popup .new-link-url').text()
+          "url": url
         };
 
         links.push(obj);
@@ -256,6 +263,7 @@ lessonEditHallo.placeholder.number = "##";
         course.save({}, {
           success: function(model, response, options){
             $('#course-links').append( html );
+            $('#course-links .remove').bind('click', removeExternalLinkToCourse);
           },
           error: function(){
             alert('Please re-submit your new link');
