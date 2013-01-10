@@ -1,3 +1,5 @@
+var testing;
+
 
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
