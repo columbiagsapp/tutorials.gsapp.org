@@ -225,6 +225,99 @@ lessonEditHallo.placeholder.number = "##";
         */
       }
 
+      function cancelExternalLinkToCourse(){
+        $('#add-link-popup').hide();
+        $('#add-link').show();
+
+        $('#add-link-popup .new-link-title').hallo({
+          editable: false
+        }); 
+
+        $('#add-link-popup .new-link-url').hallo({
+          editable: false
+        });
+      }
+
+      function saveExternalLinkToCourse(){
+        var links = course.get("field_links");
+
+        var html = $('<div class="course-link-item"><a class="float-left" href="' + $('#add-link-popup .new-link-url').text() + '" target="_blank">'+$('#add-link-popup .new-link-title').text()+'</a><a class="float-right remove">Remove</a></div>');
+
+        var obj = {
+          "title": $('#add-link-popup .new-link-title').text(),
+          "url": $('#add-link-popup .new-link-url').text()
+        };
+
+        links.push(obj);
+        course.set({
+            "field_links": links
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links').append( html );
+          },
+          error: function(){
+            alert('Please re-submit your new link');
+          }
+        });
+
+        cancelExternalLinkToCourse();
+
+      }
+
+      function removeExternalLinkToCourse(){
+        var links = course.get("field_links");
+        var id = $(this).closest('.course-link-item').attr('id');
+        id = id.substr(17);
+        id = parseInt(id);
+
+        console.log('links: ');
+        console.dir(links);
+
+        console.log('id: '+ id);
+
+        links.splice( id ,1);
+
+        console.log('links post splice ');
+        console.dir(links);
+
+        course.set({
+            "field_links": links
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links #course-link-item-'+ id ).remove();
+          },
+          error: function(){
+            alert('Please try to remove the link again');
+          }
+        });
+
+
+        $(this).closest('.course-link-item').remove();
+      }
+
+      function addExternalLinkToCourse(){
+        $('#add-link-popup').show();
+        $('#add-link').hide();
+
+        $('#add-link-popup .new-link-title').hallo({
+          editable: true,
+          placeholder: 'Add link title'
+        }); 
+
+        $('#add-link-popup .new-link-url').hallo({
+          editable: true,
+          placeholder: 'Add link url'
+        }); 
+      }
+
+      $('#add-link').bind('click', addExternalLinkToCourse);
+      $('#course-links .remove').bind('click', removeExternalLinkToCourse);
+      $('#add-link-popup .save').bind('click', saveExternalLinkToCourse);
+      $('#add-link-popup .cancel').bind('click', cancelExternalLinkToCourse);
 
       function extractBodyProperty(property){
         var bodyClasses = $('body').attr('class');

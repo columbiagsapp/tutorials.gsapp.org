@@ -535,8 +535,8 @@ iframe {
 
 .jumbotron {
   position: relative;
-  margin:20px 0 40px;/*height of fixed menu */
-  padding: 40px 20px;
+  margin:40px 0 60px;/*height of fixed menu */
+  padding: 0;
   text-align: left;
   float:left;
 }
@@ -1118,6 +1118,38 @@ textarea[readonly]{
   color: inherit !important;
 }
 
+/* additions after branched by Troy */
+#add-link{
+  float:left;
+  margin-top:@innerPadding;
+}
 
+#add-link-popup{
+  display:none;
+  margin-top:@innerPadding;
+  position:relative;
+  width:100%;
+  z-index:1000;
+}
 
+#add-link-popup .button{
+  float:right;
+  margin-left:@innerPadding;
+}
+
+#add-link-popup .edit-course-links-buttons{
+  width:100%;
+  float:left;
+}
+
+#add-link-popup .editable{
+  width:100%;
+  float:left;
+  background:@lightBGColor;
+  margin-bottom:@innerPadding;
+}
+
+.jumbotron .header-right{
+  position:relative;
+}
 

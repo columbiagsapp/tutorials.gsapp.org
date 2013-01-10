@@ -14,23 +14,42 @@
 
   <header class="jumbotron subhead row-fluid">
     <div class="container header-left span9">
-      <div class="clearfix"><?php print render($content['field_code']); ?> <?php print render($content['field_semester']); ?> <?php print render($content['field_year']); ?></div>
-      <h1 class="clearfix"><a href="/course/<?php print $node->nid; ?>" target="_self"><?php print $title; ?></a></h1>
-      <div class="clearfix"><?php print render($content['field_instructors']); ?>
-      </div>
+      <div class="inner">
+        <div class="clearfix"><?php print render($content['field_code']); ?> <?php print render($content['field_semester']); ?> <?php print render($content['field_year']); ?></div>
+        <h1 class="clearfix"><a href="/course/<?php print $node->nid; ?>" target="_self"><?php print $title; ?></a></h1>
+        <div class="clearfix"><?php print render($content['field_instructors']); ?>
+        </div>
+      </div><!-- /.inner -->
     </div><!-- /.header-left -->
     <div class="container header-right span3">
-      <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
-      <div><a id="link-schedule" href="#schedule">Schedule</a></div>
-      <div><a id="link-updates" href="#updates">Updates</a></div>
-      <?php 
-        //print out links in the links field with external link icon
-        $items = field_get_items('node', $node, 'field_links', $node->language); 
-        foreach($items as $item){
-          print '<div><a href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i></div>';
-        }
-  
-      ?>
+      <div class="inner">
+        <div id="course-links">
+          <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
+          <div><a id="link-schedule" href="#schedule">Schedule</a></div>
+          <div><a id="link-updates" href="#updates">Updates</a></div>
+          <?php 
+            //print out links in the links field with external link icon
+            $items = field_get_items('node', $node, 'field_links', $node->language); 
+            $i = 0;
+            foreach($items as $item){
+              print '<div id="course-link-item-'.$i.'" class="course-link-item"><a class="float-left" href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i><a class="float-right remove">Remove</a></div>';
+              $i++;
+            }
+      
+          ?>
+        </div><!-- /#course-links -->
+        <div id="add-link" class="button">+ Link</div>
+        <div id="add-link-popup" class="brick edit-mode">
+          <div class="inner float-left">
+            <div class="new-link-title editable"></div>
+            <div class="new-link-url editable"></div>
+            <div class="edit-course-links-buttons">
+              <div class="button save">Save</div>
+              <div class="button cancel">Cancel</div>
+            </div><!-- /.edit-course-links-buttons --> 
+          </div>
+        </div><!-- /#add-link-popup --> 
+      </div><!-- /.inner -->
     </div><!-- /.header-right -->
   </header>
 
