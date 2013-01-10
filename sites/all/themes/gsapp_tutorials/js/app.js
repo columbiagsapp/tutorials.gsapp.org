@@ -3,6 +3,8 @@ var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
 var openLessonView = null;
 
+var COURSE_SUMMARY_CHAR_LEN = 400;
+
 var WeeksCollection;
 
 var LessonsCollection,
@@ -34,14 +36,6 @@ lessonEditHallo.placeholder.field_description = 'Add description here';
 lessonEditHallo.placeholder.title = 'Add title here';
 lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
 lessonEditHallo.placeholder.number = "##";
-
-
-var LessonPointer;
-var tempPointer; 
-var LC;
-
-searchresult = [];
-
 
 (function ($){
   Drupal.behaviors.app = {
@@ -260,26 +254,24 @@ searchresult = [];
 
         }else{
 
+          if( $('#syllabus .syllabus-content').hasClass('isModified')){
+            var value = $('#syllabus .syllabus-content').html();
+            var summary = $('#syllabus .syllabus-content').text();
+            summary = summary.substr(0,COURSE_SUMMARY_CHAR_LEN);
+
+            course.set({
+              "field_syllabus": {
+                "value": value,
+                "summary": summary,
+                "format": "full_html"
+              }
+            });
+            course.save();
+          }
+
           $('#syllabus .syllabus-content').hallo({
             editable: false
           }); 
-
-          var ar = [];
-
-          ar[0] = {
-              "value": $('#syllabus .syllabus-content').html()
-            };
-/*
-          
-          course.set({
-            "body": {
-              "und": ar
-              
-            }
-          });*/
-          
-          course.save();
-
 
           $('#syllabus-content-wrapper').removeClass('edit-mode');
           $('#cancel-edit-syllabus-button').hide();
@@ -292,7 +284,7 @@ searchresult = [];
         var contentSectionHTML = 
               '<section id="syllabus" class="span9 outer" role="complementary"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
 
-        contentSectionHTML = contentSectionHTML + course.get('body').value + '</div></div></div></section><!-- /.span3 -->';
+        contentSectionHTML = contentSectionHTML + course.get('field_syllabus').value + '</div></div></div></section><!-- /.span3 -->';
 
         if( $('#lesson-content').length){
           //remove the temporary lesson model and view
@@ -753,7 +745,20 @@ searchresult = [];
           we want to load dynamically through Backbone so that the user can dynamically update them
         */
         courseNid = pathArray[2];//nid from URL
-        course = new Drupal.Backbone.Models.Node({ nid: courseNid });//get this from the url eventually
+        var Course = Drupal.Backbone.Models.Node.extend({ 
+          
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+
+            //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+            //needed to take out a bunch when using REST WS - last_view seems to be the culprit
+            this.addNoSaveAttributes(['body', 'field_answers_reference',
+             'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
+          }
+
+        });//get this from the url eventually
+
+        course = new Course({nid: courseNid });
 
         course.fetch();
 
