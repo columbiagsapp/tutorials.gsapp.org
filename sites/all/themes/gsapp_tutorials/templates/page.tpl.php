@@ -34,7 +34,7 @@
       		<?php endif; ?>
       	  
       		<?php if ($search): ?>
-      		  <?php if ($search): print render($search); endif; ?>
+      		  <?php //if ($search): print render($search); endif; ?>
       		<?php endif; ?>
       		
       		<?php if ($secondary_nav): ?>
@@ -52,7 +52,7 @@
     <section class="<?php print _twitter_bootstrap_content_span(1); ?>">  
       <?php print $messages; ?>
       <?php if ($tabs): ?>
-        <?php print render($tabs); ?>
+        <?php //print render($tabs); ?>
       <?php endif; ?>
       <?php if ($page['help']): ?> 
         <div class="brick"><?php print render($page['help']); ?></div>

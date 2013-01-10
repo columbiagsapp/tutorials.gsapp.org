@@ -7,6 +7,15 @@
   <title><?php print $head_title; ?></title>
   
   <?php print $styles; ?>
+  <script>
+    <?php 
+      if(isset($_SERVER['PHP_AUTH_USER'])){
+        print $_SERVER['PHP_AUTH_USER'];
+      }else{
+        print 'not set';
+      }
+    ?>
+  </script>
 
   <!-- HTML5 element support for IE6-8 -->
   <!--[if lt IE 9]>

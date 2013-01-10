@@ -162,10 +162,11 @@ function restws_handle_request($op, $format, $resource_name, $id = NULL, $payloa
       echo($resource_name);
       echo '  $id: ';
       echo($id);
-      echo '  $id: ';
-      echo($id);
+      echo '  $id: ' . $id;
       echo '  $payload: ';
-      echo($payload);
+      print_r($payload);
+      echo '  $resource: ';
+      print_r($resource);
 
       drupal_add_http_header('Status', '403 Forbidden');
       watchdog('access denied', check_plain($_GET['q']), NULL, WATCHDOG_WARNING);
@@ -274,6 +275,7 @@ function restws_menu_alter(&$items) {
 
 /**
  * Menu page callback.
+ * TCT2003: strips the $resource variable into its parts and sends them to restws_handle_request()
  */
 function restws_page_callback($resource, $page_callback = NULL) {
   $id_arg = arg(1);

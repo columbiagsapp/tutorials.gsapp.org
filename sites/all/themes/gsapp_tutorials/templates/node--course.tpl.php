@@ -3,7 +3,11 @@
   }else{
     $editable = false;
   }
+
+  dsm($node);
+  //echo '$_SERVER['PHP_AUTH_USER']: ' . $_SERVER['PHP_AUTH_USER'];
 ?>
+
 
 <div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix course"<?php print $attributes; ?>>
 

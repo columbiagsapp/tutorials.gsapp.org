@@ -11,9 +11,14 @@
  * Performs a user login from the credentials in the HTTP Authorization header.
  */
 function restws_basic_auth_init() {
+
+  //echo 'restws_basic_auth_init()';
   if (user_is_anonymous() && isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
     // Login only user names that match a pattern.
     $user_regex = variable_get('restws_basic_auth_user_regex', '/^restws.*/');
+
+    //echo $_SERVER['PHP_AUTH_USER'];
+
     if (preg_match($user_regex, $_SERVER['PHP_AUTH_USER'])) {
       $form_state = array();
       $form_state['values']['name'] = $_SERVER['PHP_AUTH_USER'];

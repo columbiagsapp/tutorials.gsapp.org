@@ -247,11 +247,53 @@ searchresult = [];
         return returnVal;
       }
 
+      function editSyllabus(){
+        if($(this).text() == "Edit"){
+
+          $('#syllabus-content-wrapper').addClass('edit-mode');
+          $('#cancel-edit-syllabus-button').show();
+
+          $('#syllabus .syllabus-content').hallo({
+            editable: true
+          }); 
+
+          $(this).text('Save');
+
+        }else{
+
+          $('#syllabus .syllabus-content').hallo({
+            editable: false
+          }); 
+
+          var ar = [];
+
+          ar[0] = {
+              "value": $('#syllabus .syllabus-content').html()
+            };
+/*
+          
+          course.set({
+            "body": {
+              "und": ar
+              
+            }
+          });*/
+          
+          course.save();
+
+
+          $('#syllabus-content-wrapper').removeClass('edit-mode');
+          $('#cancel-edit-syllabus-button').hide();
+          $(this).text('Edit');
+
+        }
+      }
+
       function transitionSyllabus(){
         var contentSectionHTML = 
-              '<section id="syllabus" class="span9 outer" role="complementary"><h2 class="heading float-left">Syllabus</h2><div id="syllabus-content" class="brick roman"><div class="inner">';
+              '<section id="syllabus" class="span9 outer" role="complementary"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
 
-        contentSectionHTML = contentSectionHTML + course.get('field_course_syllabus').value + '</div></div></section><!-- /.span3 -->';
+        contentSectionHTML = contentSectionHTML + course.get('body').value + '</div></div></div></section><!-- /.span3 -->';
 
         if( $('#lesson-content').length){
           //remove the temporary lesson model and view
@@ -275,6 +317,27 @@ searchresult = [];
           updates_detached = $('#updates').detach();
         }
         $('#main').append(contentSectionHTML);
+
+
+        $('#syllabus .syllabus-content').hallo({
+          plugins: {
+            'halloformat': {},
+            'halloheadings': {},
+            'halloblock': {},
+            'hallojustify': {},
+            'hallolists': {},
+            'hallolink': {},
+            'halloreundo': {},
+            'halloimage': {}
+          },
+          editable: false,
+          toolbar: 'halloToolbarFixed',
+          placeholder: 'Add syllabus here'
+        }); 
+
+
+        $('#edit-syllabus-button').bind('click', editSyllabus);
+
 
         return false;
       }

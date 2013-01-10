@@ -1,16 +1,19 @@
+/******************************************************************************************
+ * BASE
+******************************************************************************************/
+
+@textColor: black;
 @bgColor: white;
 @lightBGColor: #efefef;
 @darkBGColor: #aaa;
 @standardBrickHoverBG: #dfdfdf;
-@selectedBGColor: #ccc;
+@selectedBGColor: #ccc; /* used for the bg of a week in the schedule when a lesson of that week is open/selected */
 
 @baseFontSize: 14px;
 @baseLineHeight: 20px;
 @baseFontFamily: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-
-@mobileScale: 0.6;
-
+/* SMLXL and Huge (used for scaling icons) font variables */
 @smallFontSize: 1em;
 @smallLineHeight: 1em;
 @mediumFontSize: 1.5714em;/*22px*/
@@ -21,86 +24,111 @@
 @xLargeLineHeight: 1em;
 @hugeFontSize: 120px;
 
-@smallFontSizeTablet: (@smallFontSize * 1.2857);/*18px*/
-@mediumFontSizeTablet: @smallFontSizeTablet;
-@largeFontSizeTablet: @mediumFontSize;
-@xLargeFontSizeTablet: (@xLargeFontSize * @mobileScale);/*30px*/
-
-
+/* fonts */
 @baseFont: @baseFontSize/@baseLineHeight @baseFontFamily;
 @smallFont: @smallFontSize/@smallLineHeight @baseFontFamily;
 @mediumFont: bold @mediumFontSize/@mediumLineHeight @baseFontFamily;
 @largeFont: bold @largeFontSize/@largeLineHeight @baseFontFamily;
 @xLargeFont: bold @xLargeFontSize/@xLargeLineHeight @baseFontFamily;
 
+/* tablet font variables */
+@smallFontSizeTablet: (@smallFontSize * 1.2857);/*18px*/
+@mediumFontSizeTablet: @smallFontSizeTablet;
+@largeFontSizeTablet: @mediumFontSize;
+@xLargeFontSizeTablet: (@xLargeFontSize * 0.6);/*30px*/
 
+/* tablet fonts */
 @xLargeFontTablet: bold @xLargeFontSizeTablet/@xLargeLineHeight @baseFontFamily;
 
+/* spacing for elements such as bricks */
+@verticalpadding: 20px;
+@horizontalpadding: 0;
+@innerPadding: 10px; /* used to separate elements, such as paragraphs, within containers such as bricks */
+@inlineMarginRight: 1em; /* horizontal spacing between inlined elements */
 
-@textColor: black;
+/* header */
+@headerHeightAndMargin: 62px; /* pushes content down the page to allow for fixed header menu at top */
+
+
+/******************************************************************************************
+ * EDIT MODE
+******************************************************************************************/
+
 @editModeTextColor: whiteSmoke;
+@editModeBGColor: @darkBGColor;
 
+/* for "editable" fields that Hallo.js editor will make available for in-place-editing */
 @editableBGColor: transparent;
 @editableBGColorHover: black;
-@editableBorder: 1px solid @textColor;
+@editableBorder: none;
+@editableMinHeight: 30px;
+
+/******************************************************************************************
+ * BRICKS
+******************************************************************************************/
 
 @brickPadding: 20px;
 @brickBorder: none;
 @brickBGColor: @lightBGColor;
-@editModeBGColor: @darkBGColor;
 
-@verticalpadding: 20px;
-@horizontalpadding: 0;
 @standardBrickWidth: 230px;
 @standardBrickHeight: 280px;
-@fullStandardBrickWidth: 230px;
-@fullStandardBrickHeight: 280px;
+
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
 
-@FLWbrickHeight: 80px;
-@FLWbrickWidth: @standardBrickWidth;
-@FLWbrickMargin: @standardBrickMargin;
-@FLWbrickPadding: 10px;
 
+/******************************************************************************************
+ * ELEMENTS (WEEKS, LESSONS, ...)
+******************************************************************************************/
 
-@innerPadding: 10px;
+/* weeks */
+@weekStandardHeight: 420px; /* used for sizing preloader */
 
-@weekStandardHeight: 420px;
-@lessonStandardHeight: 200px;
-
-
-@phoneBrickPadding: 10px;
-@editableBorder: none;
-
-@preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
-@playBGURL25: url('/sites/all/themes/gsapp_tutorials/assets/play25x25.png');
-
-
-@headerHeightAndMargin: 62px;
-
-@inlineMarginRight: 1em;
-
-@attachmentMarginTop: 40px;
-
-@arrowUpSmallURL: url('/sites/all/themes/gsapp_tutorials/assets/arrow_up.png');
-@arrowDownSmallURL: url('/sites/all/themes/gsapp_tutorials/assets/arrow_down.png');
-
-
-/* Lesson */
+/* lessons */
+@lessonStandardHeight: 200px; /* used for sizing preloader */
+@attachmentMarginTop: 40px; /* spaces attachments such as Q&A below open lessons */
 @lessonIconHeight = 16px;
 @lessonTextWrapperMaxHeight = ( @standardBrickHeight - (2*@brickPadding) - @lessonIconHeight - 6 );/* use 6px for innerPadding */
 
 
-/* EDITABLES */
-@editableMinHeight: 30px;
 
-/* MODALS */
+
+/******************************************************************************************
+ * MODALS (used for jQuery File Upload)
+******************************************************************************************/
+
 @modalWidth: 700px;
 @modalMarginLeft = (-1 * @modalWidth / 2);
 @mobileModalWidth: 380px;
 @mobileModalMarginLeft = (-1 * @mobileModalWidth / 2);
 
+
+/******************************************************************************************
+ * PRELOADERS
+******************************************************************************************/
+
+@preloaderBGURL: url('/sites/all/themes/gsapp_tutorials/assets/preloader.gif');
+
+
+/******************************************************************************************
+ * MOBILE
+******************************************************************************************/
+
+@phoneBrickPadding: 10px;
+
+
+
+/******************************************************************************************
+*******************************************************************************************
+*******************************************************************************************
+ * END OF GLOBALS
+******************************************************************************************/
+
+
+/******************************************************************************************
+ * Headings
+******************************************************************************************/
 
 
 h1 a{
@@ -112,6 +140,11 @@ h1 a{
 h1 a:hover{
   color:@darkBGColor !important;
 }
+
+
+/******************************************************************************************
+ * Utilities
+******************************************************************************************/
 
 .clearfix{
   clear:both;
@@ -417,13 +450,6 @@ body{
   color:@textColor;
 }
 
-.brick.FLW{
-  height: @FLWbrickHeight;
-  width: @FLWbrickWidth;
-  margin: @FLWbrickMargin;
-  padding: 0;
-}
-
 .edit-mode{
   color:@editModeTextColor;
   background-color:@editModeBGColor;
@@ -647,7 +673,10 @@ iframe {
 
 .course #add-update-container,
 .course #add-week-container,
-.course #resort-week-container{
+.course #resort-week-container,
+.course #edit-schedule-button,
+.course #edit-syllabus-button,
+.course #cancel-edit-syllabus-button{
   float:right;
   margin-right:@standardBrickPadding;
 }
