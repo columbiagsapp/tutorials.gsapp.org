@@ -71,7 +71,7 @@
 ******************************************************************************************/
 
 @brickPadding: 20px;
-@brickBorder: solid 2px;
+@brickBorder: solid 2px black;
 @brickBorderHidden: solid 2px @brickBGColor;
 @brickBGColor: @lightBGColor;
 
@@ -271,18 +271,19 @@ h1 a:hover{
 }
 
 .heading{
-  margin:0 0 @brickPadding @brickPadding;
   color: @buttonTextColor;
   text-transform: uppercase;
   font-size: @mediumFontSize;
+  background-color: @buttonBGColor;
+  min-height: 20px;
+  display:block;
+  float:left;
+  position:relative;
+  margin-bottom: 0px;
+  border: @brickBorder;
 }
 
-.heading-button{
-  width: 100%;
-  background: @buttonBGColor;
-}
 .heading-button:hover{
-  border:none;
   text-decoration: none;
   cursor:pointer;
   background-color:@buttonBGColorHover;

@@ -37,7 +37,7 @@
 
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
-      <h2 id="schedule-button" class="heading float-left heading-button editable">Schedule</h2>
+      <h2 id="schedule-button" class="heading float-left heading-button editable roman">Schedule</h2>
       <?php if($editable){ ?>
         <div class="schedule-button-container edit-button-container">
           <div id="resort-week-container" class="button">Resort</div>
@@ -52,7 +52,7 @@
 
 
     <section id="updates" class="span3 collapsed outer" role="complementary">
-      <h2 id="updates-button" class="heading float-left heading-button">Announcements</h2>
+      <h2 id="updates-button" class="heading float-left heading-button roman">Announcements</h2>
         <?php if($editable){ ?>
           <div class="edit-button-container">
             <div id="add-update-container" class="button">+ Announcement</div>
