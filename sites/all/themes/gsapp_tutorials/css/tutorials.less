@@ -181,14 +181,6 @@ h1 a:hover{
   width:100%;
 }
 
-.heading{
-  margin:0 0 @brickPadding @brickPadding;
-  color: @buttonTextColor;
-  background: @buttonBGColor;
-  text-transform: uppercase;
-  font-size: @mediumFontSize;
-}
-
 .title{
   margin:0;
   font: @largeFont;
@@ -278,6 +270,17 @@ h1 a:hover{
   .hidden;
 }
 
+.heading{
+  margin:0 0 @brickPadding @brickPadding;
+  color: @buttonTextColor;
+  text-transform: uppercase;
+  font-size: @mediumFontSize;
+}
+
+.heading-button{
+  width: 100%;
+  background: @buttonBGColor;
+}
 .heading-button:hover{
   border:none;
   text-decoration: none;
@@ -434,10 +437,6 @@ h1 a:hover{
 body{
   color:@textColor;
   font:@baseFont;
-}
-
-li{
-  font:inherit !important;
 }
 
 
@@ -1119,6 +1118,7 @@ textarea[readonly]{
   height:auto;
   width:auto;
   float:left;
+  font: inherit;
 }
 
 .week-list-container > li,
