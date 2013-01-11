@@ -5,7 +5,8 @@ var openLessonView = null;
 
 var COURSE_SUMMARY_CHAR_LEN = 400;
 
-var WeeksCollection;
+var WeeksCollection, 
+    WeeksCollectionView;
 
 var LessonsCollection,
     LessonsCollectionView;
@@ -66,13 +67,22 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             console.log('*******each .week-list-container li, number: '+ i);
             var thisNID = $(this).find('.week').attr('id');
             thisNID = thisNID.substr(5);
-            var model = WeeksCollection.get( thisNID );
-            model.set({
-              "field_order": i
-            });
-            model.save();
-          });
+            var WCV_iVLength = WeeksCollectionView._itemViews.length;
 
+            for(var j = 0; j < WCV_iVLength; j++){
+              var weekView = WeeksCollectionView._itemViews[j];
+
+              if(weekView.model.get('nid') == thisNID){
+                var iStr = '' + i;
+                weekView.model.set({
+                  "field_order": iStr
+                });
+                weekView.model.save();
+                break;
+              }
+            }
+          });
+          
           $('#add-week-container').show();
           $(this).text('Resort');
         }
@@ -1992,18 +2002,24 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           setWeekLessonsOrder: function(this_selector, save){
             if(save){
               //save out new order
-              $('.lesson-list-container > li', this_selector).each(function(i){
-                console.log('*******each .lesson-list-container li, number: '+ i);
-                var thisNID = $(this).find('.lesson').attr('id');
+              $('.week-list-container > li').each(function(i){
+           
+                var thisNID = $(this).find('.week').attr('id');
                 thisNID = thisNID.substr(5);
-                var weekID = this_selector.substr(6);
-                console.log('weekID: '+ weekID);
-                console.log('thisNID: '+ thisNID);
-                var model = LessonsCollection[weekID].get( thisNID );
-                model.set({
-                  "field_order": i
-                });
-                model.save();
+                var WCV_iVLength = WeeksCollectionView._itemViews.length;
+
+                for(var j = 0; j < WCV_iVLength; j++){
+                  var weekView = WeeksCollectionView._itemViews[j];
+
+                  if(weekView.model.get('nid') == thisNID){
+                    var iStr = '' + i;
+                    weekView.model.set({
+                      "field_order": iStr
+                    });
+                    weekView.model.save();
+                    break;
+                  }
+                }
               });
 
             }else{//cancel clicked
@@ -2018,9 +2034,6 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             $('.lesson.preloader', this_selector).hide();
 
             $(this_selector).closest('li').prependTo( $(this_selector).closest('li').parent() );
-
-
-
 
             $(this_selector).removeClass('hidden');
 
@@ -2342,7 +2355,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           }
         });
 
-        var WeeksCollectionView = new WeekCollectionViewPrototype({
+        WeeksCollectionView = new WeekCollectionViewPrototype({
           collection: WeeksCollection,
           templateSelector: '#week-list',
           renderer: 'underscore',
@@ -2513,9 +2526,13 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
         */
         $('#add-week-container').bind('click',function(){
 
-          min_order = '10000';
-          _.each(WeeksCollection.models, function(model, index, list){
-            var order = model.get('field_order');
+          min_order = 10000;
+          _.each(WeeksCollectionView._itemViews, function(view, index, list){
+
+            var order = view.model.get('field_order');
+            order = parseInt(order);
+            console.log('index: '+ index + ' order: '+ order);
+
             if( order < min_order ){
               min_order = order;
             }
