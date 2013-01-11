@@ -183,8 +183,8 @@ h1 a:hover{
 
 .heading{
   margin:0 0 @brickPadding @brickPadding;
-  line-height: 1.25em;
-  color: @textLinkColor;
+  color: @buttonTextColor;
+  background: @buttonBGColor;
 }
 
 .title{
@@ -279,8 +279,8 @@ h1 a:hover{
 .heading-button:hover{
   border:none;
   text-decoration: none;
-  color:@textLinkColor;
   cursor:pointer;
+  background-color:@buttonBGColorHover;
 }
 
 
@@ -623,11 +623,11 @@ iframe {
 
 
 
-@buttonBGColor: #aaa;
+@buttonBGColor: black;
 @buttonPadding: 5px 10px 7px;
-@buttonTextColor: whitesmoke;
-@buttonBGColorHover:black;
-@inverseButtonTextColor:whitesmoke;
+@buttonTextColor: white;
+@buttonBGColorHover:#aaa;
+@inverseButtonTextColor:black;
 @buttonTextSize: 16px;
 @buttonTextWeight: 500;
 @buttonWidth: auto;
@@ -715,7 +715,6 @@ iframe {
 .course .add-lesson-note-plus{
   font-size:@hugeFontSize;
   line-height: 1em;
-  font-weight: bold;
   text-align: center;
   color:@buttonBGColor;
   margin:60px auto 0;
