@@ -37,7 +37,7 @@
 
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
-      <h2 id="schedule-button" class="heading float-left heading-button editable roman">Schedule</h2>
+      <div id="schedule-button" class="heading float-left heading-button editable roman"><h2>Schedule</h2></div>
       <?php if($editable){ ?>
         <div class="schedule-button-container edit-button-container">
           <div id="resort-week-container" class="button">Resort</div>
