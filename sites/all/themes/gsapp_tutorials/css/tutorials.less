@@ -6,7 +6,6 @@
 @bgColor: white;
 @lightBGColor: whitesmoke;
 @darkBGColor: #aaa;
-@standardBrickHoverBG: #dfdfdf;
 @selectedBGColor: #ccc; /* used for the bg of a week in the schedule when a lesson of that week is open/selected */
 
 @baseFontSize: 13px;
@@ -76,7 +75,8 @@
 
 @standardBrickWidth: 230px;
 @standardBrickHeight: 280px;
-@standardBrickBGColor: @bgColor;
+@standardBrickBGColor: dodgerblue;
+@standardBrickHoverBG: dodgerblue;
 
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
@@ -163,11 +163,11 @@ h1 a:hover{
   .box-shadow(@style, rgba(0, 0, 0, @alpha));
 }
 .glowing-box { 
-  .box-shadow(5px 5px, 20%);
+  .box-shadow(5px 5px, 15%);
 }
 
 .glowing-box-inset{
-  .box-shadow(inset 5px 5px, 20%);
+  .box-shadow(inset 5px 5px, 15%);
 }
 
 .noglow{
@@ -463,7 +463,8 @@ li{
 }
 
 .brick.standard{
-  border: solid 1px;
+  border: none;
+  background-color: @standardBrickBGColor;
 }
 
 .edit-mode{
