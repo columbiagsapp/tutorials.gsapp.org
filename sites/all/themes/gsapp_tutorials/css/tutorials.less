@@ -221,10 +221,6 @@ h1 a:hover{
   margin-right:@inlineMarginRight;
 }
 
-.outer{
-  width:100%;
-}
-
 .inner{
   margin:@brickPadding;
 }
@@ -241,28 +237,18 @@ h1 a:hover{
 }
 
 .preloader{
+  /*
   background-position: center;
   background-image: @preloaderBGURL;
   background-repeat: no-repeat;
-}
-
-#week-preloader,
-#lesson-content-preloader{
-  height: @weekStandardHeight;
-}
-
-#lesson-content-preloader{
-  height: @lessonStandardHeight;
-}
-
-#update-preloader,
-.lesson.preloader
-{
-  height:300px;
-}
-
-.embed.preloader{
-  height:150px;
+  */
+  text-align:center;
+  margin:auto;
+  position:relative;
+  font-size:@mediumFontSize;
+  margin-bottom:@verticalpadding;
+  width:100%;
+  display: block;
 }
 
 .collapsed .collapsible{
@@ -732,7 +718,7 @@ textarea[readonly]{
 }
 
 .week-number{
-  max-width:40px;
+  min-width:40px;
 }
 
 .course .lesson textarea,
@@ -1149,7 +1135,7 @@ textarea[readonly]{
   margin-bottom:@innerPadding;
 }
 
-#add-link-popup .course-link-item{
+#course-links .course-link-item{
   width:100%;
   float:left;
 }

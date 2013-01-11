@@ -35,7 +35,6 @@ lessonEditHallo.placeholder = {};
 lessonEditHallo.placeholder.field_description = 'Add description here';
 lessonEditHallo.placeholder.title = 'Add title here';
 lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
-lessonEditHallo.placeholder.number = "##";
 
 (function ($){
   Drupal.behaviors.app = {
@@ -1166,9 +1165,6 @@ lessonEditHallo.placeholder.number = "##";
               placeholder: this.placeholder.title
             });
 
-
-       
-
             $('.lesson-open .lesson-description').hallo({
               plugins: {
                 'halloformat': {},
@@ -1224,8 +1220,6 @@ lessonEditHallo.placeholder.number = "##";
           },
 
           saveUploads: function(newModel){
-
-
             //if EmbedsCollection is empty, need to re-initialize
             if(UploadsCollection.length == 0){
               thisLessonOpenView.initUploadsCollectionAndView(lessonID);
@@ -1275,8 +1269,6 @@ lessonEditHallo.placeholder.number = "##";
                   uploadView.model.save({},{
                     
                     success: function(model, response, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('upload save success');
                       console.log('re-initializing Uploads collection stuff');
@@ -1286,8 +1278,6 @@ lessonEditHallo.placeholder.number = "##";
 
                     },
                     error: function(model, xhr, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('upload save error');
                       console.log('re-initializing Uploads collection stuff');
@@ -1310,6 +1300,7 @@ lessonEditHallo.placeholder.number = "##";
             }
 
             clearState(FIRST_EDIT_UPLOAD);
+            //setState(MODIFIED);
 
             return uploadsArray.join(',');
           },
@@ -1344,12 +1335,10 @@ lessonEditHallo.placeholder.number = "##";
                 });
 
                 //only fire for the last 
-                if( (i == (ECV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_EMBED) || getState(MODIFIED) ) ){
+                if( i == (ECV_iVLength - 1) ){
                   embedView.model.save({},{
                     
                     success: function(model, response, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('embed save success');
                       console.log('re-initializing Embeds collection stuff');
@@ -1359,8 +1348,6 @@ lessonEditHallo.placeholder.number = "##";
 
                     },
                     error: function(model, xhr, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('embed save error');
                       console.log('re-initializing Embeds collection stuff');
@@ -1383,12 +1370,13 @@ lessonEditHallo.placeholder.number = "##";
             }
 
             clearState(FIRST_EDIT_EMBED);
-            clearState(MODIFIED);
 
             return embedsArray.join(',');
           },
 
           attachUpload: function(){
+
+            console.log('attachUpload()');
 
             var lessonID = this.model.get("nid");
 
@@ -1403,7 +1391,7 @@ lessonEditHallo.placeholder.number = "##";
             }, {
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.upload.preloader', '#open-node-'+lessonID).remove();
+                $('.upload.preloader', '#open-node-'+lessonID).hide();
                 $('.attachments-header').removeClass('hidden');
 
                 console.log('upload fetch success');
@@ -1412,7 +1400,7 @@ lessonEditHallo.placeholder.number = "##";
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.upload.preloader', '#open-node-'+lessonID).remove();
+                $('.upload.preloader', '#open-node-'+lessonID).hide();
 
                 console.log('upload fetch error');
               }
@@ -1421,6 +1409,8 @@ lessonEditHallo.placeholder.number = "##";
           },
 
           attachEmbed: function(){
+
+            console.log('attachEmbed()');
 
             var lessonID = this.model.get("nid");
 
@@ -1435,7 +1425,7 @@ lessonEditHallo.placeholder.number = "##";
             }, {
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.embed.preloader', '#open-node-'+lessonID).remove();
+                $('.embed.preloader', '#open-node-'+lessonID).hide();
 
                 console.log('embed fetch success');
 
@@ -1448,13 +1438,13 @@ lessonEditHallo.placeholder.number = "##";
                     },
                     editable: true,
                     toolbar: 'halloToolbarFixed',
-                    placeholder: 'Paste code asaaaa'
+                    placeholder: 'Paste embed code here'
                   });
                 });
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.embed.preloader', '#open-node-'+lessonID).remove();
+                $('.embed.preloader', '#open-node-'+lessonID).hide();
 
                 console.log('embed fetch error');
               }
@@ -1463,7 +1453,8 @@ lessonEditHallo.placeholder.number = "##";
           },
 
           editLesson: function(){
-            var this_selector = '#open-node-' + this.model.get('nid');
+            var lessonID = this.model.get('nid');
+            var this_selector = '#open-node-' + lessonID;
             
             //user clicked button to go into edit mode
             if($('.edit', this_selector).text() == "Edit"){
@@ -1504,6 +1495,8 @@ lessonEditHallo.placeholder.number = "##";
               //Iterate through all models in the EmbedsCollection and 
               //save out the values
               var embeds = this.saveEmbeds();
+
+            //  this.attachUpload();
               //var uploads = this.saveUploads();//only call on init_fileuploader:completed()
 
               //TODO TCT2003 add this.saveUploads();
@@ -1523,17 +1516,43 @@ lessonEditHallo.placeholder.number = "##";
 
               var thisLessonOpenView = this;
 
+              console.log('----about to save lesson');
+
               this.model.save({},{
                 success: function(){//TODO TCT2003 why do I have to refetch these?
-                  //thisLessonOpenView.attachEmbed();
-                  //thisLessonOpenView.attachUpload();
+                  //$('.embed.preloader', thisLessonOpenView).remove(); 
+                  //$('.upload.preloader', thisLessonOpenView).remove(); 
+                  //if(getState(MODIFIED)){
+                    console.log('attaching upload');
+                    thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                    thisLessonOpenView.attachUpload();
+
+                    clearState(MODIFIED);
+                  //}
+                  console.log('----saved lesson');
+                },
+                error: function(){
+                  $('.embed.preloader', thisLessonOpenView).hide(); 
+                  $('.upload.preloader', thisLessonOpenView).hide(); 
+                  console.log('----save lesson error');
+                  //dont clear modified state b/c hasn't been modified yet?
+                  //TODO TCT2003 need to throw alert
+                  //if(getState(MODIFIED)){
+                    console.log('attaching upload');
+                    thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                    thisLessonOpenView.attachUpload();
+
+                    clearState(MODIFIED);
+                  //}
                 }
               });
 
+              this.model.trigger('change');//force reload of embeds and uploads
+
               if(getState(FIRST_EDIT_LESSON)){
-                clearState(FIRST_EDIT_LESSON);
                 this.initQuestionSubmitHalloEditorsLesson();
               }
+              clearState(FIRST_EDIT_LESSON);
 
               this.cancelEdit();
             }//end of save mode
@@ -1544,6 +1563,9 @@ lessonEditHallo.placeholder.number = "##";
             //var weekID = $('.open').closest('.week').attr('id');
             //weekID = weekID.substr(5);
             //LessonsCollectionView[weekID].remove(this.model);
+
+            console.log('deleteLesson()');
+
             this.model.destroy();
             this.remove();
 
@@ -1561,10 +1583,16 @@ lessonEditHallo.placeholder.number = "##";
             //disable Hallo.js editors
             this.disableHalloEditorsLesson();
 
+            console.log('cancelEdit()');
+
             if( getState(FIRST_EDIT_LESSON) ){
               clearState(FIRST_EDIT_LESSON);
               //TODO TCT2003 do I need to save the model first?
+
               this.model.save();
+              //remove from the DOM (only useful when )
+              var thisID = this.model.get('nid');
+              $('#node-'+thisID).closest('li').remove();
               this.deleteLesson();
             }else{
               $('.edit', this_selector).text('Edit');
@@ -1584,6 +1612,7 @@ lessonEditHallo.placeholder.number = "##";
                 }
               });
             }
+            
           },
 
           addUpload: function(result, uploadType){
@@ -1619,6 +1648,8 @@ lessonEditHallo.placeholder.number = "##";
             console.log('***result passed to addUpload():');
             console.dir(result);
 
+            setState(MODIFIED);
+
             var resp = f.save({}, {
               success: function(model, response, options){
                 //not sure why the BB drupal module can't handle this
@@ -1649,17 +1680,31 @@ lessonEditHallo.placeholder.number = "##";
 
                 var uploads = [];
 
+                console.log('about to loop through UploadsCollection');
                 //loop through each upload in UploadsCollection and push it's type into uploads[]
                 _.each(UploadsCollection.models, function(element, index, list){
-                  console.dir(element);
-                  uploads.push( element.get('field_upload_type') );
+
+                  console.log('looping through UploadsCollection');
+                  
+                  var type = element.get('field_upload_type');
+                  if($.inArray(type, uploads) < 0){
+                    console.log(type+ ' is not in uploads array&&&&&&&&&&&&&&&&&&&&&');
+                    uploads.push( element.get('field_upload_type') );
+                  }else{
+                    console.log(type+ ' is in uploads array, but still adding&&&&&&&&&&&&&&&&&&&&&');
+                    uploads.push( element.get('field_upload_type') );
+                  }
                 });
 
                 uploads = uploads.join(',');
 
                 thisLessonOpenView.model.set({
                   "field_uploads": uploads
-                });
+                }, {silent: true});
+
+                console.log('JUST SET LESSON VIEW MODEL WITH UPLOADS');
+
+                /*
 
                 thisLessonOpenView.model.save({}, {
                   success: function(){
@@ -1669,6 +1714,8 @@ lessonEditHallo.placeholder.number = "##";
 
                   }
                 });
+
+*/
                   
                 //thisLessonOpenView.initUploadsCollectionAndView(lessonID);
         //        thisLessonOpenView.attachUpload();
@@ -1700,8 +1747,11 @@ lessonEditHallo.placeholder.number = "##";
             //when the node is new... must be a better way!
             e.url = "/node";
 
+            $('.embed.preloader', '#node-'+lessonID).show();
+
             var resp = e.save({}, {
               success: function(model, response, options){
+                $('.embed.preloader', '#node-'+lessonID).hide();
                 //not sure why the BB drupal module can't handle this
                 //need to set the model's id explicitly, otherwise it
                 //triggers the isNew() function in backbone.js and it
@@ -1720,7 +1770,7 @@ lessonEditHallo.placeholder.number = "##";
                 
                 console.log('*****adding new embed to EmbedsCollection');
 
-                setState(FIRST_EDIT_EMBED);
+                setState(MODIFIED);
 
                 //if EmbedsCollection is empty, need to re-initialize
                 if(EmbedsCollection.length == 0){
@@ -1730,6 +1780,9 @@ lessonEditHallo.placeholder.number = "##";
                   var newEmbedView = EmbedsCollectionView.addOne(e);
                   newEmbedView.firstEditEmbed();
                 }
+              },
+              error: function(){
+                $('.embed.preloader', '#node-'+lessonID).hide();
               }
             });
           },//end addEmbed()
@@ -1867,6 +1920,7 @@ lessonEditHallo.placeholder.number = "##";
 
             console.log('addLesson() called by week : '+ weekID);
 
+            //TODO TCT2003 do I need to default these fields to empty strings?
             var l = new Lesson({
               "title": "",
               "field_description": "",
@@ -1878,6 +1932,8 @@ lessonEditHallo.placeholder.number = "##";
             //need to set this explicitly for a node create
             //because the Drupal Backbone module doesn't know
             //when the node is new... must be a better way!
+            //Perhaps the way to do it is to check isNew, then
+            //set the url based on that. I think BB has this method.
             l.url = "/node";
 
             var resp = l.save({}, {
@@ -1959,7 +2015,14 @@ lessonEditHallo.placeholder.number = "##";
 
           firstEditWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            $('.lesson.preloader', this_selector).remove();
+            $('.lesson.preloader', this_selector).hide();
+
+            $(this_selector).closest('li').prependTo( $(this_selector).closest('li').parent() );
+
+
+
+
+            $(this_selector).removeClass('hidden');
 
             setState(FIRST_EDIT_WEEK);
             //$('#main').addClass('first-edit');
@@ -1981,7 +2044,7 @@ lessonEditHallo.placeholder.number = "##";
                 },
                 editable: true,
                 toolbar: 'halloToolbarFixed',
-                placeholder: lessonEditHallo.placeholder.number
+                placeholder: "Week ##"
               });
 
               $('.week .week-title').hallo({
@@ -2012,6 +2075,7 @@ lessonEditHallo.placeholder.number = "##";
             }else{
               clearState(FIRST_EDIT_WEEK);
               //$('#main').removeClass('first-edit');
+              /* Strips week number to 2 digits and adds preceding 0 if only 1 digit
               var weekNumber = $('.week-number', this_selector).text();
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
@@ -2019,10 +2083,11 @@ lessonEditHallo.placeholder.number = "##";
               }else if(weekNumber.length > 2){
                 weekNumber = weekNumber.substr(0,2);
               }
+              */
               
               this.model.set({
                 "title": $(this_selector + ' .week-title').text(),
-                "field_week_number": weekNumber,
+                "field_week_number": $('.week-number', this_selector).text(),
                 "field_description": $(this_selector + ' .week-description').html()
               });//TODO TCT2003 should have {silent: true}, see TODO DEC 20 in initialize
 
@@ -2059,6 +2124,7 @@ lessonEditHallo.placeholder.number = "##";
             }else{
               $('.edit', this_selector).text('Edit');
               $(this_selector).removeClass('edit-mode');
+              $('.add-lesson', this_selector).removeClass('hidden');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('.week-title', this_selector).text( this.model.get('title') );
@@ -2373,7 +2439,8 @@ lessonEditHallo.placeholder.number = "##";
           "type":"week"
           }, {
             success: function(model, response, options){
-              $('#week-preloader').remove();
+              $('#week-preloader').hide();
+              $('.week').removeClass('hidden');
               $('.course .weeks .week').each(function(i){
                 var weekID = $(this).attr('id');
                 if(weekID != "week-preloader"){
@@ -2405,14 +2472,16 @@ lessonEditHallo.placeholder.number = "##";
                   }, {
                     success: function(model, response, options){
                       //remove preloader for lesson for this particular week based on weekID
-                      $('.lesson.preloader', '#node-'+weekID).remove();
+                      $('.lesson.preloader', '#node-'+weekID).hide();
+                      $('.add-lesson', '#node-'+weekID).removeClass('hidden');
                       $('.open', '#node-'+weekID).removeClass('theOpenLesson');
                       $('.lesson-list-container', '#node-'+weekID).sortable();
                       $('.lesson-list-container', '#node-'+weekID).sortable('disable');
                     },
                     error: function(model, xhr, options){
                       //remove preloader for lesson for this particular week based on weekID
-                      $('.lesson.preloader', '#node-'+weekID).remove();
+                      $('.lesson.preloader', '#node-'+weekID).hide();
+                      $('.add-lesson', '#node-'+weekID).removeClass('hidden');
                       $('.lesson.open', '#node-'+weekID).removeClass('theOpenLesson');
                     }
 
@@ -2422,7 +2491,7 @@ lessonEditHallo.placeholder.number = "##";
               });
             },
             error: function(){
-              $('#week-preloader').remove();
+              $('#week-preloader').hide();
             }
         });
 
@@ -2431,10 +2500,10 @@ lessonEditHallo.placeholder.number = "##";
           "type":"update"
           }, {
             success: function(model, response, options){
-              $('#update-preloader').remove();
+              $('#update-preloader').hide();
             }, 
             error: function(){
-              $('#update-preloader').remove();
+              $('#update-preloader').hide();
             }
         });
 
@@ -2443,10 +2512,26 @@ lessonEditHallo.placeholder.number = "##";
           Create an empty question for new question to be asked
         */
         $('#add-week-container').bind('click',function(){
+
+          min_order = '10000';
+          _.each(WeeksCollection.models, function(model, index, list){
+            var order = model.get('field_order');
+            if( order < min_order ){
+              min_order = order;
+            }
+          });
+
+          min_order = parseInt( min_order ) - 1;
+          min_order = '' + min_order;
+
+          console.log('min_order: '+ min_order);
+
+
           var w = new Week({
             "title": "Optional title",
             "field_description": "Optional description",
-            "field_week_number": "##",
+            "field_week_number": "Week ##",
+            "field_order": min_order,
             "type": "week"
           });
 
@@ -2455,7 +2540,8 @@ lessonEditHallo.placeholder.number = "##";
           //when the node is new... must be a better way!
           w.url = "/node";
           
-          $('.week-list-container').append('<div id="week-preloader" class="week brick roman preloader edit-mode"></div>');
+          //$('.week-list-container').append('<div id="week-preloader" class="week preloader edit-mode"></div>');
+          $('#week-preloader').show();
           var resp = w.save({}, {
             success: function(model, response, options){
               //not sure why the BB drupal module can't handle this
@@ -2475,7 +2561,7 @@ lessonEditHallo.placeholder.number = "##";
               w.save();
               
               $('#node-temp').attr('id', 'node-'+response.id);
-              $('#week-preloader').remove();
+              $('#week-preloader').hide();
               var newWeekView = WeeksCollectionView.addOne(w);
               newWeekView.firstEditWeek();
             }
@@ -2515,7 +2601,7 @@ lessonEditHallo.placeholder.number = "##";
 
               u.save();
               $('#node-temp').attr('id', 'node-'+response.id);
-              $('#update-preloader').remove();
+              $('#update-preloader').hide();
               var newUpdateView = UpdatesCollectionView.addOne(u, false);
               //var newUpdateView = UpdatesCollectionView.addOne(u);
               newUpdateView.firstEditUpdate();

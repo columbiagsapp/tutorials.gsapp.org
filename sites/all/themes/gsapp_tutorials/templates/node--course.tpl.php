@@ -56,21 +56,23 @@
 
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
-      <h2 id="schedule-button" class="heading float-left heading-button editable">Schedule</h2>
-      <?php if($editable){ ?>
-        <div class="schedule-button-container edit-button-container">
-          <div id="resort-week-container" class="button">Resort</div>
-          <div id="add-week-container" class="button">+ Section</div>
-        </div>
-      <?php } ?>
-      <div class="weeks">
+      <div class="schedule-header roman float-left">
+        <h2 id="schedule-button" class="heading float-left heading-button editable">Schedule</h2>
+        <?php if($editable){ ?>
+          <div class="schedule-button-container edit-button-container">
+            <div id="resort-week-container" class="button">Resort</div>
+            <div id="add-week-container" class="button">+ Section</div>
+          </div>
+        <?php } ?>
+      </div>
+      <div class="weeks roman float-left">
+        <div id="week-preloader" class="week preloader"><i class="icon-spinner icon-spin"></i></div>
         <div id="weeks-list-el"></div>
-        <div id="week-preloader" class="week brick roman preloader"></div>
       </div>
     </section> <!-- /.node -->
 
 
-    <section id="updates" class="span3 collapsed outer" role="complementary">
+    <section id="updates" class="span3 collapsed roman" role="complementary">
       <h2 id="updates-button" class="heading float-left heading-button">Announcements</h2>
         <?php if($editable){ ?>
           <div class="edit-button-container">
@@ -78,7 +80,7 @@
           </div>
         <?php } ?>
         <div id="updates-list-el" class="el"></div>
-        <div id="update-preloader" class="update brick standard preloader"></div>
+        <div id="update-preloader" class="update preloader"><i class="icon-spinner icon-spin"></i></div>
     </section>  <!-- /.span3 -->
 
   </div><!-- /.row-fluid -->
@@ -123,17 +125,17 @@
 
 <script type="text/template" id="bb_lesson_open_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>open-node-<%= nid %><% }else{ %>open-node-temp<% } %>" class="lesson-open brick roman">
-    <div id="lesson-open-anchor" class="inner float-left">
+    <div id="lesson-open-anchor" class="inner">
       <div class="content">
         <h2 class="title"><div class="editable lesson-title editable-title"><% if ( typeof(title) != "undefined" ) { %><%= title %><% } %></div></h2><!-- /.title -->
 
         <div class="editable collapsible lesson-description editable-description"><% if (typeof(field_description) != "undefined" ) { %><%= field_description %><% } %></div><!-- /.lesson-description -->
 
         <div class="embeds-list-el"></div>
-        <div class="embed brick roman preloader"></div>
+        <div class="embed preloader"><i class="icon-spinner icon-spin"></i>&nbsp;&nbsp;Loading Embeded Content</div>
 
         <div class="uploads-list-el"></div>
-        <div class="upload brick roman preloader"></div>
+        <div class="upload preloader"><i class="icon-spinner icon-spin"></i>&nbsp;&nbsp;Loading Attachments</div>
         
 
       </div><!-- /.content -->
@@ -257,13 +259,13 @@
 </script>
 
 <script type="text/template" id="bb_week_template">
-  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman outer">
+  <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman hidden">
     <div class="inner">
       <div class="week-header">
         <div class="week-header-top">
           <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
             <h2 class="title">
-              <div class="float-left">Week <span class="editable week-field week-number"><%= field_week_number %></span>:</div><div class="editable week-field week-title"><%= title %></div>
+              <div class="float-left editable week-field week-number"><%= field_week_number %></div>:<div class="editable week-field week-title"><%= title %></div>
             </h2>
           <% } %>
         </div><!-- /.week-header-top -->
@@ -273,10 +275,10 @@
       </div><!-- /.week-header -->
 
       <div class="lessons-list-el"></div>
-      <div class="lesson brick standard preloader"></div>
+      <div class="lesson preloader"><i class="icon-spinner icon-spin"></i></div>
       
       <?php if($editable){ ?>
-        <div class="add-lesson brick standard collapsible glowing-box">
+        <div class="add-lesson brick standard collapsible glowing-box hidden">
           <div class="add-lesson-note-plus">+</div>
         </div>
       <?php } ?>

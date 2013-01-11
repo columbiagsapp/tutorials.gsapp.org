@@ -12,6 +12,10 @@
   <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+
+  <!--[if IE 7]>
+    <link rel="stylesheet" href="/sites/all/themes/gsapp_tutorials/css/font-awesome-ie7.min.css">
+  <![endif]-->
   
   <!-- Fav and touch icons -->
   <link rel="shortcut icon" href="../assets/ico/favicon.ico">
