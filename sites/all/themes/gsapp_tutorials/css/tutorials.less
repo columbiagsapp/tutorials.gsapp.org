@@ -206,12 +206,12 @@ h1 a:hover{
   margin:auto;
 }
 
-.inactive{
-  color:@darkBGColor;
+.active{
+  color:@textColor !important;
 }
 
-.inactive:hover{
-  cursor:pointer;
+.active:hover{
+  cursor:default !important;
   color:@textColor;
 }
 
@@ -1146,5 +1146,14 @@ textarea[readonly]{
 
 .jumbotron .header-right{
   position:relative;
+}
+
+#lesson-addon-nav li{
+  color:@darkBGColor;
+}
+
+#lesson-addon-nav li:hover{
+  cursor:pointer;
+  color:@textColor;
 }
 

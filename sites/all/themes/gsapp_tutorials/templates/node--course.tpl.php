@@ -144,18 +144,6 @@
       </div><!-- /.content -->
 
       <div class="content-edit">
-        <div class="btn-group dropup button-group-text float-left">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-reorder"></i>&nbsp;&nbsp;Text
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a tabindex="-1" href="#lesson-open-anchor" class="button-text-text"><i class="icon-reorder"></i> Text</a></li>
-            <li><a tabindex="-1" href="#lesson-open-anchor" class="button-text-link"><i class="icon-link"></i> Link</a></li>
-            <li><a tabindex="-1" href="#lesson-open-anchor" class="button-text-bibliography"><i class="icon-book"></i> Bibliography</a></li>
-          </ul>
-        </div>
-
         <div class="btn-group dropup button-group-embed float-left">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-globe"></i>&nbsp;&nbsp;Embed
@@ -188,29 +176,23 @@
   </div>
 
   <div id="lesson-attachment" class="roman">
-    <ul id="lesson-nav">
-      <li class="inline"><h2 class="inline">Q&amp;A</h2></li>
-      <li class="inline inactive"><h2 class="inline">Assignments</h2></li>
-      <li class="inline inactive"><h2 class="inline">Transcript</h2></li>
+
+    <div class="btn-group button-group-text float-right">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <i class="icon-plus"></i>&nbsp;&nbsp;Add-on
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu">
+        <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-tumblr"><i class="icon-rss"></i>&nbsp;&nbsp;Tumblr Feed</a></li>
+        <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-qanda"><i class="icon-question-sign"></i>&nbsp;&nbsp;Q&amp;A</a></li>
+        <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-page"><i class="icon-file-alt"></i>&nbsp;&nbsp;Page</a></li>
+      </ul>
+    </div>
+
+    <ul id="lesson-addon-nav">
     </ul>
 
-    <div id="lesson-attachment-content">
-      <div id="questions-list-el"></div>
-        <div class="add-question brick roman edit-mode">
-          <div class="inner">
-            <h4 class="float-left">Ask a question</h4>
-            <div class="submit-question-buttons float-right">
-              <div id="question-submit" class="button save">Save</div>
-              <div id="question-submit-cancel" class="button cancel">Cancel</div>
-            </div>
-            <div class="roman float-left submit-question-content-container">
-              <h2><div id="submit-question-title" class="editable"></div></h2>
-              <div id="submit-question-question" class="editable"></div>
-            </div>
-          </div><!-- /.inner -->
-        </div><!-- /.add-question -->
-      </div><!-- /#questions-list-el-->
-    </div><!-- /#lesson-content -->
+    <div id="lesson-attachment-content"></div><!-- /#lesson-content -->
   </div><!-- /#lesson-attachment -->
 
 </script>

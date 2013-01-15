@@ -1001,17 +1001,13 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               openLessonView.initUploadsCollectionAndView(NID);
 
               openLessonView.initHalloEditorLesson(false);
-              openLessonView.initQuestionSubmitHalloEditorsLesson();
 
               //attach any embeds
               openLessonView.attachEmbed();
               openLessonView.attachUpload();
 
-              //TODO TCT2003 need to attach any uploads
+              openLessonView.attachAddons();
 
-              //attach Q&A
-              //TODO TCT2003 perhaps make this a fcn of LessonOpenView?
-              attachQuestionAndAnswer(NID);
 
               //point the global openLessonView to the new LessonOpenView
               //openLessonView = this._openLessonView;
@@ -1059,7 +1055,9 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             "click .button-embed-slideshare": "addSlideshareEmbed",
             "click .button-embed-scribd": "addScribdEmbed",
             "click .button-embed-soundcloud": "addSoundcloudEmbed",
-            "click .button-upload-file": "uploadFile"
+            "click .button-upload-file": "uploadFile",
+            "click .button-addon-tumblr": "addOnTumblr",
+            "click .button-addon-qanda": "addOnQandA"
           },
 
           initUploadsCollectionAndView: function(lessonID){
@@ -1118,6 +1116,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+
             this.model.bind('change', this.render, this);//this calls the fetch
             console.log('LessonOpenView initialize()');
           },
@@ -1561,9 +1560,11 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
               this.model.trigger('change');//force reload of embeds and uploads
 
+              /* Not used any more because Q&A no longer a default
               if(getState(FIRST_EDIT_LESSON)){
                 this.initQuestionSubmitHalloEditorsLesson();
               }
+              */
               clearState(FIRST_EDIT_LESSON);
 
               this.cancelEdit();
@@ -1825,6 +1826,128 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             init_fileuploader();
             $('#fileupload-modal').modal('show');
             return false;
+
+          },
+
+          addOnQandA: function(){
+            console.log('addOnQandA');
+
+            //add tumblr to list of addons
+            //TODO TCT2003 move this to a saveAddon() function
+            var addons = this.model.get('field_addons');
+            if(addons != null){
+              if(addons.indexOf('qanda') < 0){
+                addons = addons + ',qanda';
+              }
+            }else{
+              addons = 'qanda';
+            }
+            this.model.set({
+              "field_addons": addons
+            });
+
+            this.model.save({}, {silent:true});
+
+            this.appendQandA();
+
+          },
+
+          appendQandA: function(){
+            var navHTML = '<li class="inline active"><h2 class="inline">Q&amp;A</h2></li>';
+            $('#lesson-addon-nav').append( navHTML );
+
+            var QandAhtmlArray = [];
+
+            QandAhtmlArray.push('<div id="lesson-attachment-questions-wrapper">');
+              QandAhtmlArray.push('<div id="questions-list-el"></div>');
+                QandAhtmlArray.push('<div class="add-question brick roman edit-mode">');
+                  QandAhtmlArray.push('<div class="inner">');
+                    QandAhtmlArray.push('<h4 class="float-left">Ask a question</h4>');
+                    QandAhtmlArray.push('<div class="submit-question-buttons float-right">');
+                      QandAhtmlArray.push('<div id="question-submit" class="button save">Save</div>');
+                      QandAhtmlArray.push('<div id="question-submit-cancel" class="button cancel">Cancel</div>');
+                    QandAhtmlArray.push('</div>');
+                    QandAhtmlArray.push('<div class="roman float-left submit-question-content-container">');
+                      QandAhtmlArray.push('<h2><div id="submit-question-title" class="editable"></div></h2>');
+                      QandAhtmlArray.push('<div id="submit-question-question" class="editable"></div>');
+                    QandAhtmlArray.push('</div>');
+                  QandAhtmlArray.push('</div><!-- /.inner -->');
+                QandAhtmlArray.push('</div><!-- /.add-question -->');
+              QandAhtmlArray.push('</div><!-- /#questions-list-el-->');
+            QandAhtmlArray.push('</div><!-- /#lesson-attachment-questions-wrapper -->');
+
+            var QandAhtml = QandAhtmlArray.join('');
+
+            $('#lesson-attachment-content').append( QandAhtml );
+
+            if(attachQuestionAndAnswer(this.model.get('nid'))){
+              this.initQuestionSubmitHalloEditorsLesson();
+            }
+
+          },
+
+          addOnTumblr: function(){
+            $('#lesson-addon-nav li.active').removeClass('active');
+            var navHTML = '<li class="inline active"><h2 class="inline">Tumblr Feed</h2></li>';
+            $('#lesson-addon-nav').append( navHTML );
+
+
+
+            //add tumblr to list of addons
+            //TODO TCT2003 move this to a saveAddon() function
+            var addons = this.model.get('field_addons');
+            if(addons.indexOf('tumblr') < 0){
+              if(addons.length > 0){
+                addons = addons + ',tumblr';
+              }else{
+                addons = 'tumblr';
+              }
+            }
+
+            this.model.set({
+              "field_addons": addons
+            })
+            this.model.save();
+
+          },
+
+          appendTumblrAddon: function(){
+
+
+          },
+
+          /*
+           * Render the addons in the order added?
+          */
+          attachAddons: function(){
+            console.log('');
+            console.log('*********************attachAddons()');
+
+
+            var addons = this.model.get('field_addons');
+            if(addons != null){
+              console.log('addons =! null');
+
+              var lessonID = this.model.get('nid');
+              var addonsArray = [];
+              addonsArray = addons.split(',');
+
+              var _this = this;
+              _.each(addonsArray, function(element, i){
+                console.log('_each, i: '+ i);
+                console.log('element: '+element);
+
+                if(element === 'qanda'){
+                  _this.appendQandA();
+                  
+                }else if(element === 'tumblr'){
+                  _this.appendTumblrAddon();
+                  _this.initTumblrAddon();
+                }
+              });
+            }
+            console.log('');
+            console.log('');
 
           }
 
