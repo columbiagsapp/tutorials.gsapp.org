@@ -89,6 +89,9 @@
 </div><!-- /.course -->
 
 
+<div id="tumblr"></div>
+
+
 
 <script type="text/template" id="bb_lesson_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="lesson brick standard glowing-box open">
@@ -411,6 +414,28 @@
 </script>
 
 
+<script type="text/template" id="tpl-tumblr-post">
 
+      <% if(typeof title !== 'undefined' && title){ %>
+        <h2 class="title">
+          <a href="<%= post_url %>"><%= title %></a>
+        </h2>
+      <% } %>
+
+      <% if(typeof photos !== 'undefined' && photos.length){ %>
+        <% for (var i=0; i < photos.length; i++) { %>
+        <a href="<%= photos[i].original_size.url %>">
+          <img src="<%= photos[i].alt_sizes[0].url %>"></a>
+          <% if(photos[i].caption){ %>
+          <a href="<%= post_url %>"><%= photos[i].caption %></a>
+          <% } %>
+        <% } %>
+      <% } %>
+
+      <% if(typeof body !== 'undefined' && body){ %>
+        <%= body %>
+      <% } %>
+  
+    </script>
 
 
