@@ -37,11 +37,13 @@
 
   <div id="main" class="row-fluid">
     <section id="schedule" class="span9"> 
-      <div id="schedule-button" class="heading float-left heading-button editable roman"><h2>Schedule</h2></div>
+      <div id="schedule-button" class="float-left heading-button editable roman">
+        <h2 class="heading float-left">Schedule</h2>
       <?php if($editable){ ?>
-        <div class="schedule-button-container edit-button-container">
+        <div class="schedule-button-container edit-button-container float-right">
           <div id="resort-week-container" class="button">Resort</div>
           <div id="add-week-container" class="button">+ Section</div>
+        </div>
         </div>
       <?php } ?>
       <div class="weeks">
@@ -52,11 +54,13 @@
 
 
     <section id="updates" class="span3 collapsed outer" role="complementary">
-      <h2 id="updates-button" class="heading float-left heading-button roman">Announcements</h2>
+      <div id="updates-button" class="float-left heading-button roman">
+        <h2 class="heading float-left">Announcements</h2>
         <?php if($editable){ ?>
           <div class="edit-button-container">
             <div id="add-update-container" class="button">+ Announcement</div>
           </div>
+        </div>
         <?php } ?>
         <div id="updates-list-el" class="el"></div>
         <div id="update-preloader" class="update brick standard preloader"></div>

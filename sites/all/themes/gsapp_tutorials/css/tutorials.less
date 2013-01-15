@@ -5,9 +5,9 @@
 @textColor: black;
 @textLinkColor: orange;
 @bgColor: white;
-@lightBGColor: mintcream;
-@darkBGColor: #aaa;
-@selectedBGColor: #ccc; /* used for the bg of a week in the schedule when a lesson of that week is open/selected */
+@lightBGColor: whitesmoke;
+@darkBGColor: powderblue;
+@selectedBGColor: blue; /* used for the bg of a week in the schedule when a lesson of that week is open/selected */
 
 @baseFontSize: 13px;
 @baseLineHeight: 17px;
@@ -77,8 +77,8 @@
 
 @standardBrickWidth: 230px;
 @standardBrickHeight: 280px;
-@standardBrickBGColor: mintcream;
-@standardBrickHoverBG: mintcream;
+@standardBrickBGColor: whiteSmoke;
+@standardBrickHoverBG: whiteSmoke;
 
 @standardBrickPadding: 20px;
 @standardBrickMargin: 0 20px 20px 0;
@@ -270,11 +270,9 @@ h1 a:hover{
   .hidden;
 }
 
-.heading{
+.heading-button{
   color: @buttonTextColor;
-  text-transform: uppercase;
-  font-size: @mediumFontSize;
-  background-color: @buttonBGColor;
+  background-color: black;
   min-height: 20px;
   display:block;
   position:relative;
@@ -282,15 +280,24 @@ h1 a:hover{
   border: @brickBorder;
 }
 
+.heading{  
+  text-transform: uppercase;
+  font: @mediumFont; 
+  margin: 10px 20px;
+}
+
 
 .heading-button:hover{
   text-decoration: none;
   cursor:pointer;
   background-color:@buttonBGColorHover;
+  border-color:@buttonBGColorHover;
+  color:@inverseButtonTextColor;
 }
 
-.schedule-button-container {
-  position: absolute;
+.schedule-button-container, .edit-button-container{
+  position: relative;
+  margin:5px 0;
   
 }
 
@@ -630,10 +637,10 @@ iframe {
 
 
 
-@buttonBGColor: black;
+@buttonBGColor: lightSalmon;
 @buttonPadding: 5px 10px 7px;
 @buttonTextColor: white;
-@buttonBGColorHover:#aaa;
+@buttonBGColorHover: powderblue;
 @inverseButtonTextColor:black;
 @buttonTextSize: 16px;
 @buttonTextWeight: 500;
@@ -717,6 +724,10 @@ iframe {
   color:@inverseButtonTextColor;
 }
 
+
+.course .add-lesson{
+  border: solid 2px @buttonBGColor;
+}
 
 
 .course .add-lesson-note-plus{
