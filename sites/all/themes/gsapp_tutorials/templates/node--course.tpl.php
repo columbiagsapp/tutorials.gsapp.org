@@ -89,7 +89,6 @@
 </div><!-- /.course -->
 
 
-<div id="tumblr"></div>
 
 
 

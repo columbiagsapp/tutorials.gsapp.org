@@ -1118,6 +1118,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
 
             this.model.bind('change', this.render, this);//this calls the fetch
+
+            _(this).bindAll('editTumblrAddon');
             console.log('LessonOpenView initialize()');
           },
 
@@ -1848,17 +1850,22 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
             this.model.save({}, {silent:true});
 
-            this.appendQandA();
+            if( this.appendQandA() ){
+              $('#lesson-addon-nav li.active').removeClass('active');
+              $('.nav-qanda').addClass('active');
+              $('.addon.active').removeClass('active');
+              $('#lesson-attachment-questions-wrapper').addClass('active');
+            }
 
           },
 
           appendQandA: function(){
-            var navHTML = '<li class="inline active"><h2 class="inline">Q&amp;A</h2></li>';
+            var navHTML = '<li class="inline nav-qanda"><h2 class="inline">Q&amp;A</h2></li>';
             $('#lesson-addon-nav').append( navHTML );
 
             var QandAhtmlArray = [];
 
-            QandAhtmlArray.push('<div id="lesson-attachment-questions-wrapper">');
+            QandAhtmlArray.push('<div id="lesson-attachment-questions-wrapper" class="addon">');
               QandAhtmlArray.push('<div id="questions-list-el"></div>');
                 QandAhtmlArray.push('<div class="add-question brick roman edit-mode">');
                   QandAhtmlArray.push('<div class="inner">');
@@ -1884,35 +1891,187 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               this.initQuestionSubmitHalloEditorsLesson();
             }
 
+            return true;
+
+          },
+
+          editTumblrAddon: function(){
+            console.log('editTumblrAddon()');
+
+            if($(this).text == "Edit"){
+              $('#tumblr-wrapper').addClass('edit-mode');
+              initTumblrEditorHallo();
+
+              
+
+              
+              
+
+            }else{
+
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
+                editable: false,
+                placeholder: 'title'
+              });
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
+                editable: false,
+                placeholder: 'sitename'
+              });
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
+                editable: false,
+                placeholder: 'tag1, tag2, tag3'
+              });
+
+              $('#tumblr-wrapper').removeClass('edit-mode');
+
+              //TODO TCT2003
+              //these variables should be pulled from divs
+              var tumblr_el = '#tumblr-feed-el';
+              var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').text() + '.tumblr.com';
+              var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
+              console.log('tagStr: '+ tagStr);
+
+              var tags = tagStr.split(', ');
+              var limit = 1; //set to maximum always
+
+              console.log('calling initTumblrFeed() with hostname: '+ hostname + ', ' + 'tags: ');
+              console.dir(tags);
+
+
+              if($('#tumblr-feed-el').children().length > 0){//not first time
+                refreshTumblrFeed();
+              }else{
+                var lessionID = this.model.get('nid');
+
+                var tumblrFeed = new TumblrFeed();
+
+                tumblrFeed.set({
+                  "field_tumblr_hostname": hostname,
+                  "field_tumblr_tags": tagStr,
+                  "field_tumblr_limit": limit,
+                  "field_tumblr_group_by_student": 'false',
+                  "field_parent_lesson_nid": lessionID,
+                  "type": 'tumblr_feed'
+                });
+
+                tumblrFeed.url = "/node";
+
+                
+                
+
+                tumblrFeed.save({},{
+                  success: function(model, response, options){
+                    console.log('saved new tumblr_feed');
+
+                    tumblrFeed.id = response.id;
+                    tumblrFeed.url = "/node/" + response.id + ".json";
+                    tumblrFeed.set({
+                      "nid":response.id
+                    });
+                    tumblrFeed.save();
+                  },
+                  error: function(model, xhr, options){
+                    alert('error saving tumblr feed');
+                  }
+                });
+
+                initTumblrFeed(tumblr_el, hostname, tags, limit);
+              }
+
+            }
+
+          },
+
+          initTumblrEditorHallo: function(){
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
+              editable: true,
+              placeholder: 'title'
+            });
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
+              editable: true,
+              placeholder: 'sitename'
+            });
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
+              editable: true,
+              placeholder: 'tag1, tag2, tag3'
+            });
           },
 
           addOnTumblr: function(){
-            $('#lesson-addon-nav li.active').removeClass('active');
-            var navHTML = '<li class="inline active"><h2 class="inline">Tumblr Feed</h2></li>';
-            $('#lesson-addon-nav').append( navHTML );
-
-
-
-            //add tumblr to list of addons
-            //TODO TCT2003 move this to a saveAddon() function
+            //Step 1
+            //Update the lesson's list of addons to include tumblr
             var addons = this.model.get('field_addons');
-            if(addons.indexOf('tumblr') < 0){
-              if(addons.length > 0){
+            if(addons != null){
+              if(addons.indexOf('tumblr') < 0){
                 addons = addons + ',tumblr';
-              }else{
-                addons = 'tumblr';
               }
+            }else{
+              addons = 'tumblr';
             }
-
             this.model.set({
               "field_addons": addons
-            })
-            this.model.save();
+            });
+
+            this.model.save({}, {silent:true});
+
+            //Step 2
+            //reset active tab and hide other tabs
+            $('#lesson-addon-nav li.active').removeClass('active');
+            $('.addon.active').removeClass('active');
+
+            //Step 3
+            //Append tumblr html infrastructure
+            if( this.appendTumblrAddon() ){
+              //Step 4
+              //Init edit mode
+              $('#tumblr-wrapper').addClass('edit-mode active');
+              $('.nav-tumblr').addClass('active');
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').bind('click', this.editTumblrAddon);
+              this.initTumblrEditorHallo();
+            }
 
           },
 
           appendTumblrAddon: function(){
+            var navHTML = '<li class="inline nav-tumblr"><h2 class="inline">Tumblr Feed</h2></li>';
+            $('#lesson-addon-nav').append( navHTML );
+            var tumblr_el_id = "tumblr-feed-el";
+            var tumblr_el = "#" + tumblr_el_id;
 
+            var tumblrHTMLarray = [];
+
+            tumblrHTMLarray.push('<div id="tumblr-wrapper" class="addon">');
+              tumblrHTMLarray.push('<div class="tumblr-feed-edit-wrapper">');
+                tumblrHTMLarray.push('<div class="inner">');
+                  tumblrHTMLarray.push('<div class="edit-tumblr-buttons">');
+                    tumblrHTMLarray.push('<div class="button edit">Save</div>');
+                    tumblrHTMLarray.push('<div class="button delete">Delete</div>');
+                  tumblrHTMLarray.push('</div>');
+
+                  tumblrHTMLarray.push('<div class="tumblr-input-title editable"></div>');
+                  tumblrHTMLarray.push('<div>Hostname:&nbsp;<span class="tumblr-input-hostname editable"></span>&nbsp;.tumblr.com</div>');
+                  tumblrHTMLarray.push('<div>Tags (separated by commas):&nbsp;<span class="tumblr-input-tags editable"></span></div>');
+                  tumblrHTMLarray.push('<div class="btn-group" data-toggle="buttons-checkbox">');
+                    tumblrHTMLarray.push('<button type="button" class="btn btn-primary tumblr-input-group">Click to group by student name</button>');
+                  tumblrHTMLarray.push('</div>');
+                tumblrHTMLarray.push('</div>');
+              tumblrHTMLarray.push('</div><!-- .tumblr-feed-edit-wrapper -->');
+              tumblrHTMLarray.push('<div class="tumblr-feed-content">');
+                tumblrHTMLarray.push('<div id="');
+                tumblrHTMLarray.push(tumblr_el_id);
+                tumblrHTMLarray.push('"></div>');
+              tumblrHTMLarray.push('</div><!-- .tumblr-feed-content -->');
+              tumblrHTMLarray.push('<div class="pagination">');
+                tumblrHTMLarray.push('<div class="next button">Next</div>');
+                tumblrHTMLarray.push('<div class="prev button">Prev</div>');
+              tumblrHTMLarray.push('</div><!-- .pagination -->');
+            tumblrHTMLarray.push('</div><!-- #tumblr-wrapper -->');
+
+            var tumblrHTML = tumblrHTMLarray.join('');
+
+            $('#lesson-attachment-content').append( tumblrHTML );
+
+            return true;
 
           },
 
@@ -1932,19 +2091,62 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               var addonsArray = [];
               addonsArray = addons.split(',');
 
-              var _this = this;
-              _.each(addonsArray, function(element, i){
-                console.log('_each, i: '+ i);
-                console.log('element: '+element);
+              //TODO TCT2003 SOON! instead of _each, just do .indexOf for addons
+              //in the order you want them to appear (eg. start with Q&A??)
 
-                if(element === 'qanda'){
-                  _this.appendQandA();
+              var removeAddon = false;
+              var removeAddonArray = [];
+
+              removeAddonArray.push('<div class="btn-group button-group-text float-right">');
+                removeAddonArray.push('<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">');
+                  removeAddonArray.push('<i class="icon-plus"></i>&nbsp;&nbsp;Add-on');
+                  removeAddonArray.push('<span class="caret"></span>');
+                removeAddonArray.push('</a>');
+                removeAddonArray.push('<ul class="dropdown-menu">');
                   
-                }else if(element === 'tumblr'){
-                  _this.appendTumblrAddon();
-                  _this.initTumblrAddon();
+
+              if(addons.indexOf('qanda') >= 0){
+                if( this.appendQandA() ){
+
+                  $('.nav-qanda').addClass('active');
                 }
-              });
+                removeAddon = true;
+                removeAddonArray.push('<li><a tabindex="-1" href="#" class="button-addon-qanda-remove"><i class="icon-question-sign"></i>&nbsp;&nbsp;Q&amp;A</a></li>');
+              }
+
+              if(addons.indexOf('tumblr') > 0){
+                var TumblrFeedCollection = Drupal.Backbone.Collections.RestWS.EntityIndex.extend({
+                  model: TumblrFeed
+                });
+
+                var tumblrFeedCollection = new TumblrFeedCollection();
+
+                tumblrFeedCollection.fetch({
+                  "field_parent_lesson_nid": lessonID,
+                  "type": "tumblr_feed"
+                });
+
+                _.each(tumblrFeedCollection.models, function(model, index){
+                  console.log('************* model at index: '+ index);
+                });
+
+                removeAddon = true;
+                removeAddonArray.push('<li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-tumblr-remove"><i class="icon-rss"></i>&nbsp;&nbsp;Tumblr Feed</a></li>');
+              }
+
+              if(removeAddon){
+                  removeAddonArray.push('</ul>');
+                removeAddonArray.push('</div>');
+                var removeAddonHTML = removeAddonArray.join('');
+
+                $('#lesson-attachment').prepend( )
+
+              }else{
+                removeAddonArray.length = 0;
+              }
+
+                
+
             }
             console.log('');
             console.log('');
@@ -2763,12 +2965,20 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
 
         /* Tumblr API functionality, inspired by https://github.com/jokull/tumblr-widget */
+        var TumblrFeed = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
+          }
+        });
+
+
         var TumblrPost = Backbone.Model.extend({});
 
         var NextPage = Backbone.View.extend({
-          el: ".pagination .next",
+          el: "#tumblr .pagination .next",
           events: {
-            "click": "click"
+            "click .next": "click"
           },
           initialize: function(options){
             return this.collection.bind("last", this.hide);
@@ -2871,14 +3081,14 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             el: el,
             collection: tumblr.collection
           });
-          
+
           tumblr.collection.page();
+
+          tumblr.nextPage = new NextPage({
+            collection: tumblr.collection
+          });
+
         }
-
-        var tags = [];
-        tags[0] = 'test1';
-        initTumblrFeed('#tumblr', 'api-test-gsapp.tumblr.com', tags, 5);
-
 
       }//end if course
     }//end behavior attach

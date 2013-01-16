@@ -441,7 +441,7 @@ body{
 }
 
 .edit-mode{
-  color:@editModeTextColor;
+  color:@editModeTextColor !important;
   background-color:@editModeBGColor;
 }
 
@@ -737,7 +737,8 @@ textarea[readonly]{
 
 .course .edit-week-buttons,
 .course .edit-lesson-buttons,
-.course .edit-update-buttons{
+.course .edit-update-buttons,
+.edit-tumblr-buttons{
   position:absolute;
   right:@brickPadding;
 }
@@ -752,7 +753,8 @@ textarea[readonly]{
 .course .edit-week-buttons .button,
 .course .edit-lesson-buttons .button,
 .course .edit-update-buttons .button,
-.course .submit-question-buttons .button{
+.course .submit-question-buttons .button,
+.edit-tumblr-buttons .button{
   float:right;
   margin:@buttonMargin;
 }
@@ -1155,5 +1157,22 @@ textarea[readonly]{
 #lesson-addon-nav li:hover{
   cursor:pointer;
   color:@textColor;
+}
+
+/* TUMBLR */
+.tumblr-feed-edit-wrapper{
+  display: none;
+}
+
+.edit-mode .tumblr-feed-edit-wrapper{
+  display: block;
+  background-color:@darkBGColor;
+}
+
+.addon{
+  display:none;
+}
+.addon.active{
+  display: block;
 }
 
