@@ -207,12 +207,12 @@ h1 a:hover{
   margin:auto;
 }
 
-.inactive{
-  color:@darkBGColor;
+.active{
+  color:@textColor !important;
 }
 
-.inactive:hover{
-  cursor:pointer;
+.active:hover{
+  cursor:default !important;
   color:@textColor;
 }
 
@@ -220,10 +220,6 @@ h1 a:hover{
   list-style: none;
   display:inline;
   margin-right:@inlineMarginRight;
-}
-
-.outer{
-  width:100%;
 }
 
 .inner{
@@ -242,28 +238,22 @@ h1 a:hover{
 }
 
 .preloader{
+  /*
   background-position: center;
   background-image: @preloaderBGURL;
   background-repeat: no-repeat;
+  */
+  text-align:center;
+  margin:auto;
+  position:relative;
+  font-size:@mediumFontSize;
+  margin-bottom:@verticalpadding;
+  width:100%;
+  display: block;
 }
 
-#week-preloader,
-#lesson-content-preloader{
-  height: @weekStandardHeight;
-}
-
-#lesson-content-preloader{
-  height: @lessonStandardHeight;
-}
-
-#update-preloader,
-.lesson.preloader
-{
-  height:300px;
-}
-
-.embed.preloader{
-  height:150px;
+.state-first-edit-lesson .preloader{
+  display:none;
 }
 
 .collapsed .collapsible{
@@ -485,7 +475,7 @@ body{
 }
 
 .edit-mode{
-  color:@editModeTextColor;
+  color:@editModeTextColor !important;
   background-color:@editModeBGColor;
 }
 
@@ -570,8 +560,8 @@ iframe {
 
 .jumbotron {
   position: relative;
-  margin:20px 0 40px;/*height of fixed menu */
-  padding: 40px 20px;
+  margin:40px 0 60px;/*height of fixed menu */
+  padding: 0;
   text-align: left;
   float:left;
 }
@@ -771,7 +761,7 @@ textarea[readonly]{
 }
 
 .week-number{
-  max-width:40px;
+  min-width:40px;
 }
 
 .course .lesson textarea,
@@ -786,7 +776,8 @@ textarea[readonly]{
 
 .course .edit-week-buttons,
 .course .edit-lesson-buttons,
-.course .edit-update-buttons{
+.course .edit-update-buttons,
+.edit-tumblr-buttons{
   position:absolute;
   right:@brickPadding;
 }
@@ -801,7 +792,8 @@ textarea[readonly]{
 .course .edit-week-buttons .button,
 .course .edit-lesson-buttons .button,
 .course .edit-update-buttons .button,
-.course .submit-question-buttons .button{
+.course .submit-question-buttons .button,
+.edit-tumblr-buttons .button{
   float:right;
   margin:@buttonMargin;
 }
@@ -1159,6 +1151,69 @@ textarea[readonly]{
   color: inherit !important;
 }
 
+/* additions after branched by Troy */
+#add-link{
+  float:left;
+  margin-top:@innerPadding;
+}
 
+#add-link-popup{
+  display:none;
+  margin-top:@innerPadding;
+  position:relative;
+  width:100%;
+  z-index:1000;
+}
 
+#add-link-popup .button{
+  float:right;
+  margin-left:@innerPadding;
+}
+
+#add-link-popup .edit-course-links-buttons{
+  width:100%;
+  float:left;
+}
+
+#add-link-popup .editable{
+  width:100%;
+  float:left;
+  background:@lightBGColor;
+  margin-bottom:@innerPadding;
+}
+
+#course-links .course-link-item{
+  width:100%;
+  float:left;
+}
+
+.jumbotron .header-right{
+  position:relative;
+}
+
+#lesson-addon-nav li{
+  color:@darkBGColor;
+}
+
+#lesson-addon-nav li:hover{
+  cursor:pointer;
+  color:@textColor;
+}
+
+/* TUMBLR */
+.tumblr-feed-edit-wrapper{
+  display: none;
+}
+
+.edit-mode .tumblr-feed-edit-wrapper{
+  display: block;
+  background-color:@darkBGColor;
+}
+
+.addon{
+  display:none;
+}
+.addon.active{
+  display: block;
+}
 
