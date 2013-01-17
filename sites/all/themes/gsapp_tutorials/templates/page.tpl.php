@@ -17,7 +17,7 @@
   	  
   	  <?php if ($logo): ?>
     		<a class="brand" href="<?php print $front_page; ?>" title="<?php print t('Home'); ?>">
-    		  <img src="<?php print $logo; ?>" alt="<?php print t('Home'); ?>" />
+    		  <img src="/sites/all/themes/gsapp_tutorials/assets/GSAPP_COURSES.png" alt="<?php print t('Home'); ?>" />
     		</a>
   	  <?php endif; ?>
 

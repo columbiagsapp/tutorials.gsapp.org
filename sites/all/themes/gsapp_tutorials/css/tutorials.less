@@ -36,10 +36,10 @@
 @smallFontSizeTablet: (@smallFontSize * 1.2857);/*18px*/
 @mediumFontSizeTablet: @smallFontSizeTablet;
 @largeFontSizeTablet: @mediumFontSize;
-@xLargeFontSizeTablet: (@xLargeFontSize * 0.6);/*30px*/
+@xLargeFontSizeTablet: 2.3077em;/*30px*/
 
 /* tablet fonts */
-@xLargeFontTablet: bold @xLargeFontSizeTablet/@xLargeLineHeight @baseFontFamily;
+@xLargeFontTablet: @xLargeFontSizeTablet e('/') @xLargeLineHeight @boldFontFamily;
 
 /* spacing for elements such as bricks */
 @verticalpadding: 20px;
@@ -232,6 +232,10 @@ h1 a:hover{
   position:relative;
 }
 
+.editable{
+  min-width:20px;
+}
+
 .flatten{
   margin:0 !important;
   padding:0 !important;
@@ -368,7 +372,7 @@ h1 a:hover{
 /* tablet and phone - starts to stack*/
 @media (max-width: 767px) {
   .jumbotron h1{
-    font-size: @xLargeFontTablet;
+    font: @xLargeFontTablet;
   }
 }
 
@@ -404,6 +408,10 @@ h1 a:hover{
   .modal{
     width: @mobileModalWidth;
     margin-left: @mobileModalMarginLeft;
+  }
+  .list-container > li{
+    width:100% !important;
+    margin-bottom: @verticalpadding;
   }
 }
 
@@ -493,6 +501,11 @@ body{
   margin-top:@verticalpadding;
 }
 
+.edit-mode .week-title{
+  min-width:100px;
+  display: inline-block;
+}
+
 
 .collapsed .week .week-title,
 .collapsed .week .week-description,
@@ -566,8 +579,8 @@ iframe {
 
 .jumbotron {
   position: relative;
-  margin:20px 0 40px;/*height of fixed menu */
-  padding: 40px 20px;
+  margin:60px 0 40px;/*height of fixed menu */
+  padding: 0;
   text-align: left;
   float:left;
 }
@@ -777,7 +790,6 @@ textarea[readonly]{
 }
 
 .course .edit-week-buttons,
-.course .edit-lesson-buttons,
 .course .edit-update-buttons,
 .edit-tumblr-buttons{
   position:absolute;
@@ -785,9 +797,13 @@ textarea[readonly]{
 }
 
 .course .edit-week-buttons,
-.course .edit-lesson-buttons,
 .course .edit-update-buttons{
   top:@brickPadding;
+}
+
+.edit-lesson-buttons{
+  width:35%;
+  float:right;
 }
 
 
@@ -881,7 +897,8 @@ textarea[readonly]{
   bottom:auto;
   display:block;
   height:auto;
-  margin-top:@innerPadding;
+  margin:@innerPadding 0;
+
 }
 
 .lesson-open{
@@ -902,24 +919,33 @@ textarea[readonly]{
   min-height:@weekStandardHeight;
 }
 
-.lesson-open .lesson-title{
+.lesson-open .lesson-title-container{
   max-width: 65%;
   margin-bottom:@verticalpadding;
+  float:left;
 }
 
 .lesson-open .lesson-description{
   margin-bottom:@verticalpadding;
 }
 
+
+.lesson-open .content-edit .btn-group{
+  float:left;
+  margin: 0 @innerPadding @innerPadding 0;
+}
+
 .content-edit{
   .hidden;
   float:left;
-  margin-top:@brickPadding;
+  margin-top:@innerPadding;
+  margin-bottom:@innerPadding;
 }
 
 .content{
   float:left;
   width:100%;
+  margin-bottom:@innerPadding;
 }
 
 .edit-mode .content-edit{
@@ -1145,6 +1171,10 @@ textarea[readonly]{
 .week-list-container > li,
 .update-list-container > li, 
 .embed-list-container > li{
+  width:100%;
+}
+
+.embeds-list-el{
   width:100%;
 }
 

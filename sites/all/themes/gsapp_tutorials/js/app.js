@@ -99,7 +99,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           else return b + " b";
       }
 
-      function init_fileuploader(){
+      function init_fileuploader(type){
         console.log('*******init_fileuploader(), with vars:');
         console.log(vars);
         space_allowed = vars.space_remaining;
@@ -156,7 +156,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               console.dir(data.result);
 
               //TODO TCT2003 add logic for deciding the image type
-              var upload_file_type = 'image';
+              var upload_file_type = type;
               openLessonView.addUpload(data.result, upload_file_type);
 
               //openLessonView.saveUploads(data.result, upload_file_type);
@@ -394,11 +394,12 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
       function transitionSyllabus(){
         var contentSectionHTML = 
-              '<section id="syllabus" class="span9 outer" role="complementary"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
+              '<section id="syllabus" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
 
         contentSectionHTML = contentSectionHTML + course.get('field_syllabus').value + '</div></div></div></section><!-- /.span3 -->';
 
         if( $('#lesson-content').length){
+          console.log('#lesson-content transition');
           //remove the temporary lesson model and view
           openLessonView.remove();
           openLessonView = null;
@@ -413,7 +414,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           $('#lesson-content').remove();
 
           //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
-          $('#main').append(updates_detached);
+          //$('#main').append(updates_detached);
         }else{
           console.log('detaching updates');
           $('#schedule').removeClass('span9').addClass('span3 collapsed');
@@ -984,6 +985,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               }else{
                 $('#schedule').removeClass('span9').addClass('span3 collapsed');
                 updates_detached = $('#updates').detach();
+                $('#syllabus').remove();
                 $('#main').append(contentSectionHTML);
               }
               
@@ -1007,6 +1009,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               openLessonView.attachUpload();
 
               openLessonView.attachAddons();
+
+              $('html, body').animate({scrollTop:0}, 'slow');
 
 
               //point the global openLessonView to the new LessonOpenView
@@ -1055,7 +1059,11 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             "click .button-embed-slideshare": "addSlideshareEmbed",
             "click .button-embed-scribd": "addScribdEmbed",
             "click .button-embed-soundcloud": "addSoundcloudEmbed",
-            "click .button-upload-file": "uploadFile",
+
+            "click .button-upload-image": "uploadImageFile",
+            "click .button-upload-pdf": "uploadPDFFile",
+            "click .button-upload-code": "uploadCodeFile",
+            "click .button-upload-file": "uploadFileFile",
             "click .button-addon-tumblr": "addOnTumblr",
             "click .button-addon-qanda": "addOnQandA"
           },
@@ -1175,7 +1183,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
-              placeholder: this.placeholder.title
+              placeholder: 'Optional subtitle'
             });
 
             $('.lesson-open .lesson-description').hallo({
@@ -1190,7 +1198,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
-              placeholder: this.placeholder.field_description
+              placeholder: 'Add description'
             });    
 
             //$('body #main').append('<div class="field-type-file field-name-field-assignment-attachment field-widget-file-generic form-wrapper" id="edit-field-assignment-attachment"><div id="edit-field-assignment-attachment-und-0-ajax-wrapper"><div class="form-item form-type-managed-file form-item-field-assignment-attachment-und-0"><label for="edit-field-assignment-attachment-und-0">Assignment Attachment </label><div class="file-widget form-managed-file clearfix"><input type="file" id="edit-field-assignment-attachment-und-0-upload" name="files[field_assignment_attachment_und_0]" size="22" class="form-file" /><input type="submit" id="edit-field-assignment-attachment-und-0-upload-button" name="field_assignment_attachment_und_0_upload_button" value="Upload" class="form-submit" /><input type="hidden" name="field_assignment_attachment[und][0][fid]" value="0" /><input type="hidden" name="field_assignment_attachment[und][0][display]" value="1" /></div><div class="description">A PDF of the assignment<br />Files must be less than <strong>5 MB</strong>.<br />Allowed file types: <strong>txt pdf doc</strong>.</div></div></div>');
@@ -1213,7 +1221,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               },
               editable: true,
               toolbar: 'halloToolbarFixed',
-              placeholder: this.placeholder.title
+              placeholder: 'Add question title'
             });
 
             $('#submit-question-question').hallo({
@@ -1228,7 +1236,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               },
               editable: true,
               toolbar: 'halloToolbarFixed',
-              placeholder: this.placeholder.field_question_submit
+              placeholder: 'Add question content'
             }); 
           },
 
@@ -1820,15 +1828,37 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             this.addEmbed('Scribd');
           },
 
-          uploadFile: function(){
-            console.log('*****   called uploadFile()');
-
-            //setState(FIRST_EDIT_UPLOAD);//put it in addUpload()
-
-            init_fileuploader();
+          uploadImageFile: function(){
+            init_fileuploader('image');
             $('#fileupload-modal').modal('show');
             return false;
+          },
 
+          uploadPDFFile: function(){
+            init_fileuploader('pdf');
+            $('#fileupload-modal').modal('show');
+            return false;
+          },
+
+          uploadCodeFile: function(){
+            init_fileuploader('code');
+            $('#fileupload-modal').modal('show');
+            return false;
+          },
+
+          uploadFileFile: function(){
+            init_fileuploader('file');
+            $('#fileupload-modal').modal('show');
+            return false;
+          },
+
+          uploadAssignmentFile: function(){
+            init_fileuploader('assignment');
+            $('#fileupload-modal').modal('show');
+
+            //TODO TCT2003 add assignment to the lesson field_has_assignment
+
+            return false;
           },
 
           addOnQandA: function(){
@@ -2384,7 +2414,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                 },
                 editable: true,
                 toolbar: 'halloToolbarFixed',
-                placeholder: "Week ##"
+                placeholder: "Section title"
               });
 
               $('.week .week-title').hallo({
@@ -2392,8 +2422,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                   'halloreundo': {}
                 },
                 editable: true,
-                toolbar: 'halloToolbarFixed',
-                placeholder: lessonEditHallo.placeholder.title
+                toolbar: 'halloToolbarFixed'
               });
 
               $('.week .week-description').hallo({
@@ -2872,9 +2901,9 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
 
           var w = new Week({
-            "title": "Optional title",
-            "field_description": "Optional description",
-            "field_week_number": "Week ##",
+            "title": "",
+            "field_description": "",
+            "field_week_number": "Section Title",
             "field_order": min_order,
             "type": "week"
           });
@@ -2918,7 +2947,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           transitionUpdates();
           var u = new Update({
             "title": "Title",
-            "field_description": "Text",
+            "field_description": "",
             "type": "update"
           });
 

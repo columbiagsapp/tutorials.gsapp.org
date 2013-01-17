@@ -1,11 +1,33 @@
-<?php if(( in_array("administrator", $user->roles) || in_array("faculty", $user->roles) )){
-  $editable = true;
+<?php 
+  if( in_array("administrator", $user->roles) ){
+    $editable = true;
+  }else if( in_array("faculty", $user->roles) ){
+    $instructors = field_get_items('node', $node, 'field_instructors', $node->language); 
+    if(isset($instructors) && !empty($instructors)){
+      $i = 0;
+      foreach($instructors as $instructor){
+        if( $instructor[uid] == $user->uid){
+          $editable = true;
+          break;
+        }
+        $i++;
+      }
+    }
+  }else if( in_array("ta", $user->roles) ){
+    $assistants = field_get_items('node', $node, 'field_assistants', $node->language);
+    if(isset($instructors) && !empty($instructors)){
+      $i = 0;
+      foreach($instructors as $instructor){
+        if( $instructor[uid] == $user->uid){
+          $editable = true;
+          break;
+        }
+        $i++;
+      }
+    }
   }else{
     $editable = false;
   }
-
-  dsm($node);
-  //echo '$_SERVER['PHP_AUTH_USER']: ' . $_SERVER['PHP_AUTH_USER'];
 ?>
 
 
@@ -30,15 +52,22 @@
           <?php 
             //print out links in the links field with external link icon
             $items = field_get_items('node', $node, 'field_links', $node->language); 
-            $i = 0;
-            foreach($items as $item){
-              print '<div id="course-link-item-'.$i.'" class="course-link-item"><a class="float-left" href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i><a class="float-right remove">Remove</a></div>';
-              $i++;
+            if(isset($items) && !empty($items)){
+              $i = 0;
+              foreach($items as $item){
+                print '<div id="course-link-item-'.$i.'" class="course-link-item"><a class="float-left" href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i>';
+                if($editable){
+                  print '<a class="float-right remove">Remove</a>';
+                }
+                print '</div>';
+                $i++;
+              }
             }
-      
           ?>
         </div><!-- /#course-links -->
-        <div id="add-link" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Link</div>
+        <?php if($editable){ ?>
+          <div id="add-link" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Link</div>
+        <?php } ?>
         <div id="add-link-popup" class="brick edit-mode">
           <div class="inner float-left">
             <div class="new-link-title editable"></div>
@@ -58,13 +87,13 @@
     <section id="schedule" class="span9"> 
       <div id="schedule-button" class="float-left heading-button roman">
         <h2 class="heading float-left">Schedule</h2>
-      <?php if($editable){ ?>
-        <div class="schedule-button-container edit-button-container float-right">
-          <div id="resort-week-container" class="button"><i class="icon-move"></i>&nbsp;&nbsp;<span class="resort-text-container">Resort</span></div>
-          <div id="add-week-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Section</div>
-        </div>
-        </div>
-      <?php } ?>
+        <?php if($editable){ ?>
+          <div class="schedule-button-container edit-button-container float-right">
+            <div id="resort-week-container" class="button"><i class="icon-move"></i>&nbsp;&nbsp;<span class="resort-text-container">Resort</span></div>
+            <div id="add-week-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Section</div>
+          </div>
+        <?php } ?>
+      </div>
       <div class="weeks roman float-left">
         <div id="week-preloader" class="week preloader"><i class="icon-spinner icon-spin"></i></div>
         <div id="weeks-list-el"></div>
@@ -73,13 +102,13 @@
 
     <section id="updates" class="span3 collapsed outer" role="complementary">
       <div id="updates-button" class="float-left heading-button roman">
-        <h2 class="heading float-left">Announcements</h2>
-        <?php if($editable){ ?>
-          <div class="edit-button-container">
-            <div id="add-update-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Announcement</div>
-          </div>
+        <h2 class="heading float-left">News</h2>
+          <?php if($editable){ ?>
+            <div class="edit-button-container">
+              <div id="add-update-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Post</div>
+            </div>
+          <?php } ?>
         </div>
-        <?php } ?>
         <div id="updates-list-el" class="el"></div>
         <div id="update-preloader" class="update preloader"><i class="icon-spinner icon-spin"></i></div>
     </section>  <!-- /.span3 -->
@@ -129,8 +158,18 @@
 <script type="text/template" id="bb_lesson_open_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>open-node-<%= nid %><% }else{ %>open-node-temp<% } %>" class="lesson-open brick roman">
     <div id="lesson-open-anchor" class="inner">
+      
+      <h2 class="title lesson-title-container"><div class="editable lesson-title editable-title"><% if ( typeof(title) != "undefined" ) { %><%= title %><% } %></div></h2><!-- /.title -->
+
+      <?php if($editable){ ?>
+        <div class="edit-lesson-buttons collapsible">
+          <div class="edit button">Edit</div>
+          <div class="cancel button">Cancel</div>
+          <div class="delete button">Delete</div>
+        </div>
+      <?php } ?>
+
       <div class="content">
-        <h2 class="title"><div class="editable lesson-title editable-title"><% if ( typeof(title) != "undefined" ) { %><%= title %><% } %></div></h2><!-- /.title -->
 
         <div class="editable collapsible lesson-description editable-description"><% if (typeof(field_description) != "undefined" ) { %><%= field_description %><% } %></div><!-- /.lesson-description -->
 
@@ -159,35 +198,42 @@
           </ul>
         </div>
 
+        <div class="btn-group dropup button-group-embed float-left">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-upload-alt"></i>&nbsp;&nbsp;Upload
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a tabindex="-1" href="#" class="button-upload-image"><i class="icon-picture"></i> Image</a></li>
+            <li><a tabindex="-1" href="#" class="button-upload-pdf"><i class="icon-file-alt"></i> PDF</a></li>
+            <li><a tabindex="-1" href="#" class="button-upload-code"><i class="icon-github"></i> Code</a></li>
+            <li><a tabindex="-1" href="#" class="button-upload-file"><i class="icon-file"></i> File</a></li>
+          </ul>
+        </div>
+
         <a tabindex="-1" href="#" class="btn float-left button-upload-file"><i class="icon-upload-alt"></i>&nbsp;&nbsp;Upload</a>
 
       </div><!-- /.lesson-embed-upload -->
-      
-      <?php if($editable){ ?>
-        <div class="edit-lesson-buttons collapsible">
-          <div class="edit button">Edit</div>
-          <div class="cancel button">Cancel</div>
-          <div class="delete button">Delete</div>
-        </div>
-      <?php } ?>
     </div><!-- /.inner -->
 
 
   </div>
 
   <div id="lesson-attachment" class="roman">
+    <?php if($editable){ ?>
 
-    <div class="btn-group button-group-text float-right">
-      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-        <i class="icon-plus"></i>&nbsp;&nbsp;Add-on
-        <span class="caret"></span>
-      </a>
-      <ul class="dropdown-menu">
-        <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-tumblr"><i class="icon-rss"></i>&nbsp;&nbsp;Tumblr Feed</a></li>
-        <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-qanda"><i class="icon-question-sign"></i>&nbsp;&nbsp;Q&amp;A</a></li>
-        <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-page"><i class="icon-file-alt"></i>&nbsp;&nbsp;Page</a></li>
-      </ul>
-    </div>
+      <div class="btn-group button-group-text float-right">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="icon-plus"></i>&nbsp;&nbsp;Add-on
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-tumblr"><i class="icon-rss"></i>&nbsp;&nbsp;Tumblr Feed</a></li>
+          <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-qanda"><i class="icon-question-sign"></i>&nbsp;&nbsp;Q&amp;A</a></li>
+          <li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-page"><i class="icon-file-alt"></i>&nbsp;&nbsp;Page</a></li>
+        </ul>
+      </div>
+    <?php } ?>
 
     <ul id="lesson-addon-nav">
     </ul>
@@ -228,8 +274,18 @@
     <div id="node-<% if (typeof(nid) != "undefined" ){ %><%= nid %><% } %>" class="lesson-upload-element <% if (typeof(field_upload_type) != "undefined" ){ %><%= field_upload_type %><% } %>">
         
       <div class="field-upload-content-wrapper">
-        <% if ( (typeof(field_upload_filename) != "undefined") && ( typeof(field_upload_url) != "undefined" ) ){ %>
-          <i class="icon-picture"></i><a href="<%= field_upload_url %>" target="_blank"><%= field_upload_filename %></a>
+        <% if ( (typeof(field_upload_filename) != "undefined") && ( typeof(field_upload_url) != "undefined" ) && (typeof(field_upload_type) != "undefined") ){ %>
+          <% if(field_upload_type == "image"){ %>
+            <i class="icon-picture"></i>
+          <% }else if(field_upload_type == "pdf"){ %>
+            <i class="icon-file-alt"></i>
+          <% }else if(field_upload_type == "code"){ %>
+            <i class="icon-github"></i>
+          <% }else if(field_upload_type == "file"){ %>
+            <i class="icon-file"></i>
+          <% }else if(field_upload_type == "assignment"){ %>
+            <i class="icon-check"></i>
+          <% } %><a href="<%= field_upload_url %>" target="_blank"><%= field_upload_filename %></a>
         <% } %>
       </div><!-- /.field-upload-content-wrapper -->
 
@@ -250,7 +306,7 @@
         <div class="week-header-top float-left">
           <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
             <h2 class="title">
-              <span class="editable week-field week-number"><%= field_week_number %></span>: <span class="editable week-field week-title"><%= title %></span>
+              <span class="editable week-field week-number float-left"><%= field_week_number %></span><span class="float-left">: </span><span class="editable week-field week-title float-left"><%= title %></span>
             </h2>
           <% } %>
         </div><!-- /.week-header-top -->
