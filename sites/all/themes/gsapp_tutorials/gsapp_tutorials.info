@@ -18,7 +18,7 @@ stylesheets[all][] = hallo/examples/hallo.css
 stylesheets[all][] = hallo/examples/image.css
 stylesheets[all][] = hallo/examples/overlay.css
 stylesheets[all][] = hallo/examples/annotate.css
-stylesheets[all][] = hallo/examples/fontawesome/css/font-awesome.css
+stylesheets[all][] = css/font-awesome.min.css
 
 
 scripts[] = js/underscore-min.js
