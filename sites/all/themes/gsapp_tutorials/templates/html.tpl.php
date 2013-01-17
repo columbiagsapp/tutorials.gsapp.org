@@ -7,19 +7,14 @@
   <title><?php print $head_title; ?></title>
   
   <?php print $styles; ?>
-  <script>
-    <?php 
-      if(isset($_SERVER['PHP_AUTH_USER'])){
-        print $_SERVER['PHP_AUTH_USER'];
-      }else{
-        print 'not set';
-      }
-    ?>
-  </script>
 
   <!-- HTML5 element support for IE6-8 -->
   <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <!--[if IE 7]>
+    <link rel="stylesheet" href="/sites/all/themes/gsapp_tutorials/css/font-awesome-ie7.min.css">
   <![endif]-->
   
   <!-- Fav and touch icons -->
