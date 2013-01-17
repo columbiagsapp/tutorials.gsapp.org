@@ -513,16 +513,20 @@ body{
   width:100%;
 }
 
-.week .week-header-top .week-title{
-  display:inline-block;
-  margin-left:@innerPadding;
-  width: 80%;
-}
 
 .collapsed .week .week-header-top div{
   display:block;
   margin-left:0;
 }
+
+.edit-mode .week-header-top{
+  width:65%;
+}
+
+.edit-mode .edit-week-buttons{
+  width:33%;
+}
+
 
 
 .ajax-submission{
@@ -560,8 +564,8 @@ iframe {
 
 .jumbotron {
   position: relative;
-  margin:40px 0 60px;/*height of fixed menu */
-  padding: 0;
+  margin:20px 0 40px;/*height of fixed menu */
+  padding: 40px 20px;
   text-align: left;
   float:left;
 }
@@ -758,10 +762,6 @@ textarea[readonly]{
 .faculty .edit-mode textarea{
   background-color: @editableBGColor;
   border-bottom: @editableBorder;
-}
-
-.week-number{
-  min-width:40px;
 }
 
 .course .lesson textarea,

@@ -247,15 +247,24 @@
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman hidden">
     <div class="inner">
       <div class="week-header">
-        <div class="week-header-top">
+        <div class="week-header-top float-left">
           <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
             <h2 class="title">
-              <div class="float-left editable week-field week-number"><%= field_week_number %></div>:<div class="editable week-field week-title"><%= title %></div>
+              <span class="editable week-field week-number"><%= field_week_number %></span>:&nbsp;<span class="editable week-field week-title"><%= title %></span>
             </h2>
           <% } %>
         </div><!-- /.week-header-top -->
+
+        <?php if($editable){ ?>
+          <div class="edit-week-buttons collapsible float-right">
+            <div class="edit button">Edit</div>
+            <div class="cancel button">Cancel</div>
+            <div class="delete button">Delete</div>
+          </div>
+        <?php } ?>
+
         <% if (typeof(field_description) != "undefined" ) { %>
-          <div class="editable collapsible week-field week-description"><%= field_description %></div>
+          <div class="editable collapsible week-field week-description clearfix"><%= field_description %></div>
         <% } %>
       </div><!-- /.week-header -->
 
@@ -265,14 +274,6 @@
       <?php if($editable){ ?>
         <div class="add-lesson brick standard collapsible glowing-box hidden">
           <div class="add-lesson-note-plus">+</div>
-        </div>
-      <?php } ?>
-
-      <?php if($editable){ ?>
-        <div class="edit-week-buttons collapsible">
-          <div class="edit button">Edit</div>
-          <div class="cancel button">Cancel</div>
-          <div class="delete button">Delete</div>
         </div>
       <?php } ?>
 
