@@ -38,7 +38,7 @@
       
           ?>
         </div><!-- /#course-links -->
-        <div id="add-link" class="button">+ Link</div>
+        <div id="add-link" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Link</div>
         <div id="add-link-popup" class="brick edit-mode">
           <div class="inner float-left">
             <div class="new-link-title editable"></div>
@@ -61,7 +61,7 @@
       <?php if($editable){ ?>
         <div class="schedule-button-container edit-button-container float-right">
           <div id="resort-week-container" class="button">Resort</div>
-          <div id="add-week-container" class="button">+ Section</div>
+          <div id="add-week-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Section</div>
         </div>
         </div>
       <?php } ?>
@@ -76,7 +76,7 @@
         <h2 class="heading float-left">Announcements</h2>
         <?php if($editable){ ?>
           <div class="edit-button-container">
-            <div id="add-update-container" class="button">+ Announcement</div>
+            <div id="add-update-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Announcement</div>
           </div>
         </div>
         <?php } ?>
