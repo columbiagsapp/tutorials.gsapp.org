@@ -60,7 +60,7 @@
         <h2 class="heading float-left">Schedule</h2>
       <?php if($editable){ ?>
         <div class="schedule-button-container edit-button-container float-right">
-          <div id="resort-week-container" class="button">Resort</div>
+          <div id="resort-week-container" class="button"><i class="icon-move"></i>&nbsp;&nbsp;<span class="resort-text-container">Resort</span></div>
           <div id="add-week-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Section</div>
         </div>
         </div>

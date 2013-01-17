@@ -50,14 +50,14 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
       }
 
       function resortWeekOrder(){
-        if($(this).text() == 'Resort'){
+        if($('.resort-text-container', this).text() == 'Resort'){
           $('.week').addClass('resort-mode');
 
           $('.week-list-container').sortable();
           $('.week-list-container, .week-list-container li').disableSelection();
 
           $('#add-week-container').hide();
-          $(this).text('Save Order');
+          $('.resort-text-container', this).text('Save Order');
         }else{
           $('.week').removeClass('resort-mode');
           $('.week-list-container').sortable("disable");
@@ -86,7 +86,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           });
           
           $('#add-week-container').show();
-          $(this).text('Resort');
+          $('.resort-text-container', this).text('Resort');
         }
 
       }
