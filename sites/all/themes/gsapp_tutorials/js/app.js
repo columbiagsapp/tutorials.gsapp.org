@@ -1,10 +1,12 @@
-
 var app = app || {};
 var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
 var openLessonView = null;
 
-var WeeksCollection;
+var COURSE_SUMMARY_CHAR_LEN = 400;
+
+var WeeksCollection, 
+    WeeksCollectionView;
 
 var LessonsCollection,
     LessonsCollectionView;
@@ -20,6 +22,8 @@ var EmbedsCollectionView = [];
 var UploadsCollection = [];
 var UploadsCollectionView = [];
 
+var tumblr = {};
+
 var FIRST_EDIT_LESSON = 'first-edit-lesson';
 var FIRST_EDIT_WEEK = 'first-edit-week';
 var FIRST_EDIT_UPDATE = 'first-edit-update';
@@ -34,15 +38,6 @@ lessonEditHallo.placeholder = {};
 lessonEditHallo.placeholder.field_description = 'Add description here';
 lessonEditHallo.placeholder.title = 'Add title here';
 lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
-lessonEditHallo.placeholder.number = "##";
-
-
-var LessonPointer;
-var tempPointer; 
-var LC;
-
-searchresult = [];
-
 
 (function ($){
   Drupal.behaviors.app = {
@@ -74,13 +69,22 @@ searchresult = [];
             console.log('*******each .week-list-container li, number: '+ i);
             var thisNID = $(this).find('.week').attr('id');
             thisNID = thisNID.substr(5);
-            var model = WeeksCollection.get( thisNID );
-            model.set({
-              "field_order": i
-            });
-            model.save();
-          });
+            var WCV_iVLength = WeeksCollectionView._itemViews.length;
 
+            for(var j = 0; j < WCV_iVLength; j++){
+              var weekView = WeeksCollectionView._itemViews[j];
+
+              if(weekView.model.get('nid') == thisNID){
+                var iStr = '' + i;
+                weekView.model.set({
+                  "field_order": iStr
+                });
+                weekView.model.save();
+                break;
+              }
+            }
+          });
+          
           $('#add-week-container').show();
           $(this).text('Resort');
         }
@@ -232,6 +236,107 @@ searchresult = [];
         */
       }
 
+      function cancelExternalLinkToCourse(){
+        $('#add-link-popup').hide();
+        $('#add-link').show();
+
+        $('#add-link-popup .new-link-title').hallo({
+          editable: false
+        }); 
+
+        $('#add-link-popup .new-link-url').hallo({
+          editable: false
+        });
+      }
+
+      function saveExternalLinkToCourse(){
+        var links = course.get("field_links");
+        var url = $('#add-link-popup .new-link-url').text();
+
+        if( url.substr(4) != "http"){
+          var appendURL = "http://" + url;
+        }else{
+          var appendURL = url;
+        }
+
+        var html = $('<div id="course-link-item-' + links.length + '" class="course-link-item"><a class="float-left" href="' + appendURL + '" target="_blank">'+$('#add-link-popup .new-link-title').text()+'</a>&nbsp;&nbsp;<i class="icon-external-link"></i><a class="float-right remove">Remove</a></div>');
+
+        var obj = {
+          "title": $('#add-link-popup .new-link-title').text(),
+          "url": url
+        };
+
+        links.push(obj);
+        course.set({
+            "field_links": links
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links').append( html );
+            $('#course-links .remove').bind('click', removeExternalLinkToCourse);
+          },
+          error: function(){
+            alert('Please re-submit your new link');
+          }
+        });
+
+        cancelExternalLinkToCourse();
+
+      }
+
+      function removeExternalLinkToCourse(){
+        var links = course.get("field_links");
+        var id = $(this).closest('.course-link-item').attr('id');
+        id = id.substr(17);
+        id = parseInt(id);
+
+        console.log('links: ');
+        console.dir(links);
+
+        console.log('id: '+ id);
+
+        links.splice( id ,1);
+
+        console.log('links post splice ');
+        console.dir(links);
+
+        course.set({
+            "field_links": links
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links #course-link-item-'+ id ).remove();
+          },
+          error: function(){
+            alert('Please try to remove the link again');
+          }
+        });
+
+
+        $(this).closest('.course-link-item').remove();
+      }
+
+      function addExternalLinkToCourse(){
+        $('#add-link-popup').show();
+        $('#add-link').hide();
+
+        $('#add-link-popup .new-link-title').hallo({
+          editable: true,
+          placeholder: 'Add link title'
+        }); 
+
+        $('#add-link-popup .new-link-url').hallo({
+          editable: true,
+          placeholder: 'Add link url'
+        }); 
+      }
+
+      $('#add-link').bind('click', addExternalLinkToCourse);
+      $('#course-links .remove').bind('click', removeExternalLinkToCourse);
+      $('#add-link-popup .save').bind('click', saveExternalLinkToCourse);
+      $('#add-link-popup .cancel').bind('click', cancelExternalLinkToCourse);
 
       function extractBodyProperty(property){
         var bodyClasses = $('body').attr('class');
@@ -261,26 +366,24 @@ searchresult = [];
 
         }else{
 
+          if( $('#syllabus .syllabus-content').hasClass('isModified')){
+            var value = $('#syllabus .syllabus-content').html();
+            var summary = $('#syllabus .syllabus-content').text();
+            summary = summary.substr(0,COURSE_SUMMARY_CHAR_LEN);
+
+            course.set({
+              "field_syllabus": {
+                "value": value,
+                "summary": summary,
+                "format": "full_html"
+              }
+            });
+            course.save();
+          }
+
           $('#syllabus .syllabus-content').hallo({
             editable: false
           }); 
-
-          var ar = [];
-
-          ar[0] = {
-              "value": $('#syllabus .syllabus-content').html()
-            };
-/*
-          
-          course.set({
-            "body": {
-              "und": ar
-              
-            }
-          });*/
-          
-          course.save();
-
 
           $('#syllabus-content-wrapper').removeClass('edit-mode');
           $('#cancel-edit-syllabus-button').hide();
@@ -293,7 +396,7 @@ searchresult = [];
         var contentSectionHTML = 
               '<section id="syllabus" class="span9 outer" role="complementary"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
 
-        contentSectionHTML = contentSectionHTML + course.get('body').value + '</div></div></div></section><!-- /.span3 -->';
+        contentSectionHTML = contentSectionHTML + course.get('field_syllabus').value + '</div></div></div></section><!-- /.span3 -->';
 
         if( $('#lesson-content').length){
           //remove the temporary lesson model and view
@@ -754,7 +857,20 @@ searchresult = [];
           we want to load dynamically through Backbone so that the user can dynamically update them
         */
         courseNid = pathArray[2];//nid from URL
-        course = new Drupal.Backbone.Models.Node({ nid: courseNid });//get this from the url eventually
+        var Course = Drupal.Backbone.Models.Node.extend({ 
+          
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+
+            //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+            //needed to take out a bunch when using REST WS - last_view seems to be the culprit
+            this.addNoSaveAttributes(['body', 'field_answers_reference',
+             'views', 'day_views', 'last_view', 'uri', 'resource', 'id' ]);
+          }
+
+        });//get this from the url eventually
+
+        course = new Course({nid: courseNid });
 
         course.fetch();
 
@@ -885,17 +1001,13 @@ searchresult = [];
               openLessonView.initUploadsCollectionAndView(NID);
 
               openLessonView.initHalloEditorLesson(false);
-              openLessonView.initQuestionSubmitHalloEditorsLesson();
 
               //attach any embeds
               openLessonView.attachEmbed();
               openLessonView.attachUpload();
 
-              //TODO TCT2003 need to attach any uploads
+              openLessonView.attachAddons();
 
-              //attach Q&A
-              //TODO TCT2003 perhaps make this a fcn of LessonOpenView?
-              attachQuestionAndAnswer(NID);
 
               //point the global openLessonView to the new LessonOpenView
               //openLessonView = this._openLessonView;
@@ -943,7 +1055,9 @@ searchresult = [];
             "click .button-embed-slideshare": "addSlideshareEmbed",
             "click .button-embed-scribd": "addScribdEmbed",
             "click .button-embed-soundcloud": "addSoundcloudEmbed",
-            "click .button-upload-file": "uploadFile"
+            "click .button-upload-file": "uploadFile",
+            "click .button-addon-tumblr": "addOnTumblr",
+            "click .button-addon-qanda": "addOnQandA"
           },
 
           initUploadsCollectionAndView: function(lessonID){
@@ -1002,7 +1116,10 @@ searchresult = [];
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+
             this.model.bind('change', this.render, this);//this calls the fetch
+
+            _(this).bindAll('editTumblrAddon');
             console.log('LessonOpenView initialize()');
           },
 
@@ -1061,9 +1178,6 @@ searchresult = [];
               placeholder: this.placeholder.title
             });
 
-
-       
-
             $('.lesson-open .lesson-description').hallo({
               plugins: {
                 'halloformat': {},
@@ -1119,8 +1233,6 @@ searchresult = [];
           },
 
           saveUploads: function(newModel){
-
-
             //if EmbedsCollection is empty, need to re-initialize
             if(UploadsCollection.length == 0){
               thisLessonOpenView.initUploadsCollectionAndView(lessonID);
@@ -1170,8 +1282,6 @@ searchresult = [];
                   uploadView.model.save({},{
                     
                     success: function(model, response, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('upload save success');
                       console.log('re-initializing Uploads collection stuff');
@@ -1181,8 +1291,6 @@ searchresult = [];
 
                     },
                     error: function(model, xhr, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('upload save error');
                       console.log('re-initializing Uploads collection stuff');
@@ -1205,6 +1313,7 @@ searchresult = [];
             }
 
             clearState(FIRST_EDIT_UPLOAD);
+            //setState(MODIFIED);
 
             return uploadsArray.join(',');
           },
@@ -1239,12 +1348,10 @@ searchresult = [];
                 });
 
                 //only fire for the last 
-                if( (i == (ECV_iVLength - 1)) && ( getState(FIRST_EDIT_LESSON) || getState(FIRST_EDIT_EMBED) || getState(MODIFIED) ) ){
+                if( i == (ECV_iVLength - 1) ){
                   embedView.model.save({},{
                     
                     success: function(model, response, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('embed save success');
                       console.log('re-initializing Embeds collection stuff');
@@ -1254,8 +1361,6 @@ searchresult = [];
 
                     },
                     error: function(model, xhr, options){
-                      //remove preloader for lesson for this particular week based on weekID
-                      //$('.embed.preloader', '#open-node-'+lessonID).remove();
 
                       console.log('embed save error');
                       console.log('re-initializing Embeds collection stuff');
@@ -1278,12 +1383,13 @@ searchresult = [];
             }
 
             clearState(FIRST_EDIT_EMBED);
-            clearState(MODIFIED);
 
             return embedsArray.join(',');
           },
 
           attachUpload: function(){
+
+            console.log('attachUpload()');
 
             var lessonID = this.model.get("nid");
 
@@ -1298,7 +1404,7 @@ searchresult = [];
             }, {
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.upload.preloader', '#open-node-'+lessonID).remove();
+                $('.upload.preloader', '#open-node-'+lessonID).hide();
                 $('.attachments-header').removeClass('hidden');
 
                 console.log('upload fetch success');
@@ -1307,7 +1413,7 @@ searchresult = [];
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.upload.preloader', '#open-node-'+lessonID).remove();
+                $('.upload.preloader', '#open-node-'+lessonID).hide();
 
                 console.log('upload fetch error');
               }
@@ -1316,6 +1422,8 @@ searchresult = [];
           },
 
           attachEmbed: function(){
+
+            console.log('attachEmbed()');
 
             var lessonID = this.model.get("nid");
 
@@ -1330,7 +1438,7 @@ searchresult = [];
             }, {
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.embed.preloader', '#open-node-'+lessonID).remove();
+                $('.embed.preloader', '#open-node-'+lessonID).hide();
 
                 console.log('embed fetch success');
 
@@ -1343,13 +1451,13 @@ searchresult = [];
                     },
                     editable: true,
                     toolbar: 'halloToolbarFixed',
-                    placeholder: 'Paste code asaaaa'
+                    placeholder: 'Paste embed code here'
                   });
                 });
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
-                $('.embed.preloader', '#open-node-'+lessonID).remove();
+                $('.embed.preloader', '#open-node-'+lessonID).hide();
 
                 console.log('embed fetch error');
               }
@@ -1358,7 +1466,8 @@ searchresult = [];
           },
 
           editLesson: function(){
-            var this_selector = '#open-node-' + this.model.get('nid');
+            var lessonID = this.model.get('nid');
+            var this_selector = '#open-node-' + lessonID;
             
             //user clicked button to go into edit mode
             if($('.edit', this_selector).text() == "Edit"){
@@ -1399,6 +1508,8 @@ searchresult = [];
               //Iterate through all models in the EmbedsCollection and 
               //save out the values
               var embeds = this.saveEmbeds();
+
+            //  this.attachUpload();
               //var uploads = this.saveUploads();//only call on init_fileuploader:completed()
 
               //TODO TCT2003 add this.saveUploads();
@@ -1418,17 +1529,45 @@ searchresult = [];
 
               var thisLessonOpenView = this;
 
+              console.log('----about to save lesson');
+
               this.model.save({},{
                 success: function(){//TODO TCT2003 why do I have to refetch these?
-                  //thisLessonOpenView.attachEmbed();
-                  //thisLessonOpenView.attachUpload();
+                  //$('.embed.preloader', thisLessonOpenView).remove(); 
+                  //$('.upload.preloader', thisLessonOpenView).remove(); 
+                  //if(getState(MODIFIED)){
+                    console.log('attaching upload');
+                    thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                    thisLessonOpenView.attachUpload();
+
+                    clearState(MODIFIED);
+                  //}
+                  console.log('----saved lesson');
+                },
+                error: function(){
+                  $('.embed.preloader', thisLessonOpenView).hide(); 
+                  $('.upload.preloader', thisLessonOpenView).hide(); 
+                  console.log('----save lesson error');
+                  //dont clear modified state b/c hasn't been modified yet?
+                  //TODO TCT2003 need to throw alert
+                  //if(getState(MODIFIED)){
+                    console.log('attaching upload');
+                    thisLessonOpenView.initUploadsCollectionAndView(lessonID);
+                    thisLessonOpenView.attachUpload();
+
+                    clearState(MODIFIED);
+                  //}
                 }
               });
 
+              this.model.trigger('change');//force reload of embeds and uploads
+
+              /* Not used any more because Q&A no longer a default
               if(getState(FIRST_EDIT_LESSON)){
-                clearState(FIRST_EDIT_LESSON);
                 this.initQuestionSubmitHalloEditorsLesson();
               }
+              */
+              clearState(FIRST_EDIT_LESSON);
 
               this.cancelEdit();
             }//end of save mode
@@ -1439,6 +1578,9 @@ searchresult = [];
             //var weekID = $('.open').closest('.week').attr('id');
             //weekID = weekID.substr(5);
             //LessonsCollectionView[weekID].remove(this.model);
+
+            console.log('deleteLesson()');
+
             this.model.destroy();
             this.remove();
 
@@ -1456,10 +1598,16 @@ searchresult = [];
             //disable Hallo.js editors
             this.disableHalloEditorsLesson();
 
+            console.log('cancelEdit()');
+
             if( getState(FIRST_EDIT_LESSON) ){
               clearState(FIRST_EDIT_LESSON);
               //TODO TCT2003 do I need to save the model first?
+
               this.model.save();
+              //remove from the DOM (only useful when )
+              var thisID = this.model.get('nid');
+              $('#node-'+thisID).closest('li').remove();
               this.deleteLesson();
             }else{
               $('.edit', this_selector).text('Edit');
@@ -1479,6 +1627,7 @@ searchresult = [];
                 }
               });
             }
+            
           },
 
           addUpload: function(result, uploadType){
@@ -1514,6 +1663,8 @@ searchresult = [];
             console.log('***result passed to addUpload():');
             console.dir(result);
 
+            setState(MODIFIED);
+
             var resp = f.save({}, {
               success: function(model, response, options){
                 //not sure why the BB drupal module can't handle this
@@ -1544,17 +1695,31 @@ searchresult = [];
 
                 var uploads = [];
 
+                console.log('about to loop through UploadsCollection');
                 //loop through each upload in UploadsCollection and push it's type into uploads[]
                 _.each(UploadsCollection.models, function(element, index, list){
-                  console.dir(element);
-                  uploads.push( element.get('field_upload_type') );
+
+                  console.log('looping through UploadsCollection');
+                  
+                  var type = element.get('field_upload_type');
+                  if($.inArray(type, uploads) < 0){
+                    console.log(type+ ' is not in uploads array&&&&&&&&&&&&&&&&&&&&&');
+                    uploads.push( element.get('field_upload_type') );
+                  }else{
+                    console.log(type+ ' is in uploads array, but still adding&&&&&&&&&&&&&&&&&&&&&');
+                    uploads.push( element.get('field_upload_type') );
+                  }
                 });
 
                 uploads = uploads.join(',');
 
                 thisLessonOpenView.model.set({
                   "field_uploads": uploads
-                });
+                }, {silent: true});
+
+                console.log('JUST SET LESSON VIEW MODEL WITH UPLOADS');
+
+                /*
 
                 thisLessonOpenView.model.save({}, {
                   success: function(){
@@ -1564,6 +1729,8 @@ searchresult = [];
 
                   }
                 });
+
+*/
                   
                 //thisLessonOpenView.initUploadsCollectionAndView(lessonID);
         //        thisLessonOpenView.attachUpload();
@@ -1595,8 +1762,11 @@ searchresult = [];
             //when the node is new... must be a better way!
             e.url = "/node";
 
+            $('.embed.preloader', '#node-'+lessonID).show();
+
             var resp = e.save({}, {
               success: function(model, response, options){
+                $('.embed.preloader', '#node-'+lessonID).hide();
                 //not sure why the BB drupal module can't handle this
                 //need to set the model's id explicitly, otherwise it
                 //triggers the isNew() function in backbone.js and it
@@ -1615,7 +1785,7 @@ searchresult = [];
                 
                 console.log('*****adding new embed to EmbedsCollection');
 
-                setState(FIRST_EDIT_EMBED);
+                setState(MODIFIED);
 
                 //if EmbedsCollection is empty, need to re-initialize
                 if(EmbedsCollection.length == 0){
@@ -1625,6 +1795,9 @@ searchresult = [];
                   var newEmbedView = EmbedsCollectionView.addOne(e);
                   newEmbedView.firstEditEmbed();
                 }
+              },
+              error: function(){
+                $('.embed.preloader', '#node-'+lessonID).hide();
               }
             });
           },//end addEmbed()
@@ -1655,6 +1828,328 @@ searchresult = [];
             init_fileuploader();
             $('#fileupload-modal').modal('show');
             return false;
+
+          },
+
+          addOnQandA: function(){
+            console.log('addOnQandA');
+
+            //add tumblr to list of addons
+            //TODO TCT2003 move this to a saveAddon() function
+            var addons = this.model.get('field_addons');
+            if(addons != null){
+              if(addons.indexOf('qanda') < 0){
+                addons = addons + ',qanda';
+              }
+            }else{
+              addons = 'qanda';
+            }
+            this.model.set({
+              "field_addons": addons
+            });
+
+            this.model.save({}, {silent:true});
+
+            if( this.appendQandA() ){
+              $('#lesson-addon-nav li.active').removeClass('active');
+              $('.nav-qanda').addClass('active');
+              $('.addon.active').removeClass('active');
+              $('#lesson-attachment-questions-wrapper').addClass('active');
+            }
+
+          },
+
+          appendQandA: function(){
+            var navHTML = '<li class="inline nav-qanda"><h2 class="inline">Q&amp;A</h2></li>';
+            $('#lesson-addon-nav').append( navHTML );
+
+            var QandAhtmlArray = [];
+
+            QandAhtmlArray.push('<div id="lesson-attachment-questions-wrapper" class="addon">');
+              QandAhtmlArray.push('<div id="questions-list-el"></div>');
+                QandAhtmlArray.push('<div class="add-question brick roman edit-mode">');
+                  QandAhtmlArray.push('<div class="inner">');
+                    QandAhtmlArray.push('<h4 class="float-left">Ask a question</h4>');
+                    QandAhtmlArray.push('<div class="submit-question-buttons float-right">');
+                      QandAhtmlArray.push('<div id="question-submit" class="button save">Save</div>');
+                      QandAhtmlArray.push('<div id="question-submit-cancel" class="button cancel">Cancel</div>');
+                    QandAhtmlArray.push('</div>');
+                    QandAhtmlArray.push('<div class="roman float-left submit-question-content-container">');
+                      QandAhtmlArray.push('<h2><div id="submit-question-title" class="editable"></div></h2>');
+                      QandAhtmlArray.push('<div id="submit-question-question" class="editable"></div>');
+                    QandAhtmlArray.push('</div>');
+                  QandAhtmlArray.push('</div><!-- /.inner -->');
+                QandAhtmlArray.push('</div><!-- /.add-question -->');
+              QandAhtmlArray.push('</div><!-- /#questions-list-el-->');
+            QandAhtmlArray.push('</div><!-- /#lesson-attachment-questions-wrapper -->');
+
+            var QandAhtml = QandAhtmlArray.join('');
+
+            $('#lesson-attachment-content').append( QandAhtml );
+
+            if(attachQuestionAndAnswer(this.model.get('nid'))){
+              this.initQuestionSubmitHalloEditorsLesson();
+            }
+
+            return true;
+
+          },
+
+          editTumblrAddon: function(){
+            console.log('editTumblrAddon()');
+
+            if($(this).text == "Edit"){
+              $('#tumblr-wrapper').addClass('edit-mode');
+              initTumblrEditorHallo();
+
+              
+
+              
+              
+
+            }else{
+
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
+                editable: false,
+                placeholder: 'title'
+              });
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
+                editable: false,
+                placeholder: 'sitename'
+              });
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
+                editable: false,
+                placeholder: 'tag1, tag2, tag3'
+              });
+
+              $('#tumblr-wrapper').removeClass('edit-mode');
+
+              //TODO TCT2003
+              //these variables should be pulled from divs
+              var tumblr_el = '#tumblr-feed-el';
+              var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').text() + '.tumblr.com';
+              var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
+              console.log('tagStr: '+ tagStr);
+
+              var tags = tagStr.split(', ');
+              var limit = 1; //set to maximum always
+
+              console.log('calling initTumblrFeed() with hostname: '+ hostname + ', ' + 'tags: ');
+              console.dir(tags);
+
+
+              if($('#tumblr-feed-el').children().length > 0){//not first time
+                refreshTumblrFeed();
+              }else{
+                var lessionID = this.model.get('nid');
+
+                var tumblrFeed = new TumblrFeed();
+
+                tumblrFeed.set({
+                  "field_tumblr_hostname": hostname,
+                  "field_tumblr_tags": tagStr,
+                  "field_tumblr_limit": limit,
+                  "field_tumblr_group_by_student": 'false',
+                  "field_parent_lesson_nid": lessionID,
+                  "type": 'tumblr_feed'
+                });
+
+                tumblrFeed.url = "/node";
+
+                
+                
+
+                tumblrFeed.save({},{
+                  success: function(model, response, options){
+                    console.log('saved new tumblr_feed');
+
+                    tumblrFeed.id = response.id;
+                    tumblrFeed.url = "/node/" + response.id + ".json";
+                    tumblrFeed.set({
+                      "nid":response.id
+                    });
+                    tumblrFeed.save();
+                  },
+                  error: function(model, xhr, options){
+                    alert('error saving tumblr feed');
+                  }
+                });
+
+                initTumblrFeed(tumblr_el, hostname, tags, limit);
+              }
+
+            }
+
+          },
+
+          initTumblrEditorHallo: function(){
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
+              editable: true,
+              placeholder: 'title'
+            });
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
+              editable: true,
+              placeholder: 'sitename'
+            });
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
+              editable: true,
+              placeholder: 'tag1, tag2, tag3'
+            });
+          },
+
+          addOnTumblr: function(){
+            //Step 1
+            //Update the lesson's list of addons to include tumblr
+            var addons = this.model.get('field_addons');
+            if(addons != null){
+              if(addons.indexOf('tumblr') < 0){
+                addons = addons + ',tumblr';
+              }
+            }else{
+              addons = 'tumblr';
+            }
+            this.model.set({
+              "field_addons": addons
+            });
+
+            this.model.save({}, {silent:true});
+
+            //Step 2
+            //reset active tab and hide other tabs
+            $('#lesson-addon-nav li.active').removeClass('active');
+            $('.addon.active').removeClass('active');
+
+            //Step 3
+            //Append tumblr html infrastructure
+            if( this.appendTumblrAddon() ){
+              //Step 4
+              //Init edit mode
+              $('#tumblr-wrapper').addClass('edit-mode active');
+              $('.nav-tumblr').addClass('active');
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').bind('click', this.editTumblrAddon);
+              this.initTumblrEditorHallo();
+            }
+
+          },
+
+          appendTumblrAddon: function(){
+            var navHTML = '<li class="inline nav-tumblr"><h2 class="inline">Tumblr Feed</h2></li>';
+            $('#lesson-addon-nav').append( navHTML );
+            var tumblr_el_id = "tumblr-feed-el";
+            var tumblr_el = "#" + tumblr_el_id;
+
+            var tumblrHTMLarray = [];
+
+            tumblrHTMLarray.push('<div id="tumblr-wrapper" class="addon">');
+              tumblrHTMLarray.push('<div class="tumblr-feed-edit-wrapper">');
+                tumblrHTMLarray.push('<div class="inner">');
+                  tumblrHTMLarray.push('<div class="edit-tumblr-buttons">');
+                    tumblrHTMLarray.push('<div class="button edit">Save</div>');
+                    tumblrHTMLarray.push('<div class="button delete">Delete</div>');
+                  tumblrHTMLarray.push('</div>');
+
+                  tumblrHTMLarray.push('<div class="tumblr-input-title editable"></div>');
+                  tumblrHTMLarray.push('<div>Hostname:&nbsp;<span class="tumblr-input-hostname editable"></span>&nbsp;.tumblr.com</div>');
+                  tumblrHTMLarray.push('<div>Tags (separated by commas):&nbsp;<span class="tumblr-input-tags editable"></span></div>');
+                  tumblrHTMLarray.push('<div class="btn-group" data-toggle="buttons-checkbox">');
+                    tumblrHTMLarray.push('<button type="button" class="btn btn-primary tumblr-input-group">Click to group by student name</button>');
+                  tumblrHTMLarray.push('</div>');
+                tumblrHTMLarray.push('</div>');
+              tumblrHTMLarray.push('</div><!-- .tumblr-feed-edit-wrapper -->');
+              tumblrHTMLarray.push('<div class="tumblr-feed-content">');
+                tumblrHTMLarray.push('<div id="');
+                tumblrHTMLarray.push(tumblr_el_id);
+                tumblrHTMLarray.push('"></div>');
+              tumblrHTMLarray.push('</div><!-- .tumblr-feed-content -->');
+              tumblrHTMLarray.push('<div class="pagination">');
+                tumblrHTMLarray.push('<div class="next button">Next</div>');
+                tumblrHTMLarray.push('<div class="prev button">Prev</div>');
+              tumblrHTMLarray.push('</div><!-- .pagination -->');
+            tumblrHTMLarray.push('</div><!-- #tumblr-wrapper -->');
+
+            var tumblrHTML = tumblrHTMLarray.join('');
+
+            $('#lesson-attachment-content').append( tumblrHTML );
+
+            return true;
+
+          },
+
+          /*
+           * Render the addons in the order added?
+          */
+          attachAddons: function(){
+            console.log('');
+            console.log('*********************attachAddons()');
+
+
+            var addons = this.model.get('field_addons');
+            if(addons != null){
+              console.log('addons =! null');
+
+              var lessonID = this.model.get('nid');
+              var addonsArray = [];
+              addonsArray = addons.split(',');
+
+              //TODO TCT2003 SOON! instead of _each, just do .indexOf for addons
+              //in the order you want them to appear (eg. start with Q&A??)
+
+              var removeAddon = false;
+              var removeAddonArray = [];
+
+              removeAddonArray.push('<div class="btn-group button-group-text float-right">');
+                removeAddonArray.push('<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">');
+                  removeAddonArray.push('<i class="icon-plus"></i>&nbsp;&nbsp;Add-on');
+                  removeAddonArray.push('<span class="caret"></span>');
+                removeAddonArray.push('</a>');
+                removeAddonArray.push('<ul class="dropdown-menu">');
+                  
+
+              if(addons.indexOf('qanda') >= 0){
+                if( this.appendQandA() ){
+
+                  $('.nav-qanda').addClass('active');
+                }
+                removeAddon = true;
+                removeAddonArray.push('<li><a tabindex="-1" href="#" class="button-addon-qanda-remove"><i class="icon-question-sign"></i>&nbsp;&nbsp;Q&amp;A</a></li>');
+              }
+
+              if(addons.indexOf('tumblr') > 0){
+                var TumblrFeedCollection = Drupal.Backbone.Collections.RestWS.EntityIndex.extend({
+                  model: TumblrFeed
+                });
+
+                var tumblrFeedCollection = new TumblrFeedCollection();
+
+                tumblrFeedCollection.fetch({
+                  "field_parent_lesson_nid": lessonID,
+                  "type": "tumblr_feed"
+                });
+
+                _.each(tumblrFeedCollection.models, function(model, index){
+                  console.log('************* model at index: '+ index);
+                });
+
+                removeAddon = true;
+                removeAddonArray.push('<li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-tumblr-remove"><i class="icon-rss"></i>&nbsp;&nbsp;Tumblr Feed</a></li>');
+              }
+
+              if(removeAddon){
+                  removeAddonArray.push('</ul>');
+                removeAddonArray.push('</div>');
+                var removeAddonHTML = removeAddonArray.join('');
+
+                $('#lesson-attachment').prepend( )
+
+              }else{
+                removeAddonArray.length = 0;
+              }
+
+                
+
+            }
+            console.log('');
+            console.log('');
 
           }
 
@@ -1762,6 +2257,7 @@ searchresult = [];
 
             console.log('addLesson() called by week : '+ weekID);
 
+            //TODO TCT2003 do I need to default these fields to empty strings?
             var l = new Lesson({
               "title": "",
               "field_description": "",
@@ -1773,6 +2269,8 @@ searchresult = [];
             //need to set this explicitly for a node create
             //because the Drupal Backbone module doesn't know
             //when the node is new... must be a better way!
+            //Perhaps the way to do it is to check isNew, then
+            //set the url based on that. I think BB has this method.
             l.url = "/node";
 
             var resp = l.save({}, {
@@ -1831,18 +2329,24 @@ searchresult = [];
           setWeekLessonsOrder: function(this_selector, save){
             if(save){
               //save out new order
-              $('.lesson-list-container > li', this_selector).each(function(i){
-                console.log('*******each .lesson-list-container li, number: '+ i);
-                var thisNID = $(this).find('.lesson').attr('id');
+              $('.week-list-container > li').each(function(i){
+           
+                var thisNID = $(this).find('.week').attr('id');
                 thisNID = thisNID.substr(5);
-                var weekID = this_selector.substr(6);
-                console.log('weekID: '+ weekID);
-                console.log('thisNID: '+ thisNID);
-                var model = LessonsCollection[weekID].get( thisNID );
-                model.set({
-                  "field_order": i
-                });
-                model.save();
+                var WCV_iVLength = WeeksCollectionView._itemViews.length;
+
+                for(var j = 0; j < WCV_iVLength; j++){
+                  var weekView = WeeksCollectionView._itemViews[j];
+
+                  if(weekView.model.get('nid') == thisNID){
+                    var iStr = '' + i;
+                    weekView.model.set({
+                      "field_order": iStr
+                    });
+                    weekView.model.save();
+                    break;
+                  }
+                }
               });
 
             }else{//cancel clicked
@@ -1854,7 +2358,11 @@ searchresult = [];
 
           firstEditWeek: function(){
             var this_selector = '#node-' + this.model.get('nid');
-            $('.lesson.preloader', this_selector).remove();
+            $('.lesson.preloader', this_selector).hide();
+
+            $(this_selector).closest('li').prependTo( $(this_selector).closest('li').parent() );
+
+            $(this_selector).removeClass('hidden');
 
             setState(FIRST_EDIT_WEEK);
             //$('#main').addClass('first-edit');
@@ -1876,7 +2384,7 @@ searchresult = [];
                 },
                 editable: true,
                 toolbar: 'halloToolbarFixed',
-                placeholder: lessonEditHallo.placeholder.number
+                placeholder: "Week ##"
               });
 
               $('.week .week-title').hallo({
@@ -1907,6 +2415,7 @@ searchresult = [];
             }else{
               clearState(FIRST_EDIT_WEEK);
               //$('#main').removeClass('first-edit');
+              /* Strips week number to 2 digits and adds preceding 0 if only 1 digit
               var weekNumber = $('.week-number', this_selector).text();
               //add preceding 0 to single digit week, and remove trailing digits/whitespace past 2 chars
               if( weekNumber.length == 1){
@@ -1914,10 +2423,11 @@ searchresult = [];
               }else if(weekNumber.length > 2){
                 weekNumber = weekNumber.substr(0,2);
               }
+              */
               
               this.model.set({
                 "title": $(this_selector + ' .week-title').text(),
-                "field_week_number": weekNumber,
+                "field_week_number": $('.week-number', this_selector).text(),
                 "field_description": $(this_selector + ' .week-description').html()
               });//TODO TCT2003 should have {silent: true}, see TODO DEC 20 in initialize
 
@@ -1954,6 +2464,7 @@ searchresult = [];
             }else{
               $('.edit', this_selector).text('Edit');
               $(this_selector).removeClass('edit-mode');
+              $('.add-lesson', this_selector).removeClass('hidden');
               
               //Revert textarea values to database values (works for save and cancel b/c already saved to local memory)
               $('.week-title', this_selector).text( this.model.get('title') );
@@ -2171,7 +2682,7 @@ searchresult = [];
           }
         });
 
-        var WeeksCollectionView = new WeekCollectionViewPrototype({
+        WeeksCollectionView = new WeekCollectionViewPrototype({
           collection: WeeksCollection,
           templateSelector: '#week-list',
           renderer: 'underscore',
@@ -2268,7 +2779,8 @@ searchresult = [];
           "type":"week"
           }, {
             success: function(model, response, options){
-              $('#week-preloader').remove();
+              $('#week-preloader').hide();
+              $('.week').removeClass('hidden');
               $('.course .weeks .week').each(function(i){
                 var weekID = $(this).attr('id');
                 if(weekID != "week-preloader"){
@@ -2300,14 +2812,16 @@ searchresult = [];
                   }, {
                     success: function(model, response, options){
                       //remove preloader for lesson for this particular week based on weekID
-                      $('.lesson.preloader', '#node-'+weekID).remove();
+                      $('.lesson.preloader', '#node-'+weekID).hide();
+                      $('.add-lesson', '#node-'+weekID).removeClass('hidden');
                       $('.open', '#node-'+weekID).removeClass('theOpenLesson');
                       $('.lesson-list-container', '#node-'+weekID).sortable();
                       $('.lesson-list-container', '#node-'+weekID).sortable('disable');
                     },
                     error: function(model, xhr, options){
                       //remove preloader for lesson for this particular week based on weekID
-                      $('.lesson.preloader', '#node-'+weekID).remove();
+                      $('.lesson.preloader', '#node-'+weekID).hide();
+                      $('.add-lesson', '#node-'+weekID).removeClass('hidden');
                       $('.lesson.open', '#node-'+weekID).removeClass('theOpenLesson');
                     }
 
@@ -2317,7 +2831,7 @@ searchresult = [];
               });
             },
             error: function(){
-              $('#week-preloader').remove();
+              $('#week-preloader').hide();
             }
         });
 
@@ -2326,10 +2840,10 @@ searchresult = [];
           "type":"update"
           }, {
             success: function(model, response, options){
-              $('#update-preloader').remove();
+              $('#update-preloader').hide();
             }, 
             error: function(){
-              $('#update-preloader').remove();
+              $('#update-preloader').hide();
             }
         });
 
@@ -2338,10 +2852,30 @@ searchresult = [];
           Create an empty question for new question to be asked
         */
         $('#add-week-container').bind('click',function(){
+
+          min_order = 10000;
+          _.each(WeeksCollectionView._itemViews, function(view, index, list){
+
+            var order = view.model.get('field_order');
+            order = parseInt(order);
+            console.log('index: '+ index + ' order: '+ order);
+
+            if( order < min_order ){
+              min_order = order;
+            }
+          });
+
+          min_order = parseInt( min_order ) - 1;
+          min_order = '' + min_order;
+
+          console.log('min_order: '+ min_order);
+
+
           var w = new Week({
             "title": "Optional title",
             "field_description": "Optional description",
-            "field_week_number": "##",
+            "field_week_number": "Week ##",
+            "field_order": min_order,
             "type": "week"
           });
 
@@ -2350,7 +2884,8 @@ searchresult = [];
           //when the node is new... must be a better way!
           w.url = "/node";
           
-          $('.week-list-container').append('<div id="week-preloader" class="week brick roman preloader edit-mode"></div>');
+          //$('.week-list-container').append('<div id="week-preloader" class="week preloader edit-mode"></div>');
+          $('#week-preloader').show();
           var resp = w.save({}, {
             success: function(model, response, options){
               //not sure why the BB drupal module can't handle this
@@ -2370,7 +2905,7 @@ searchresult = [];
               w.save();
               
               $('#node-temp').attr('id', 'node-'+response.id);
-              $('#week-preloader').remove();
+              $('#week-preloader').hide();
               var newWeekView = WeeksCollectionView.addOne(w);
               newWeekView.firstEditWeek();
             }
@@ -2410,7 +2945,7 @@ searchresult = [];
 
               u.save();
               $('#node-temp').attr('id', 'node-'+response.id);
-              $('#update-preloader').remove();
+              $('#update-preloader').hide();
               var newUpdateView = UpdatesCollectionView.addOne(u, false);
               //var newUpdateView = UpdatesCollectionView.addOne(u);
               newUpdateView.firstEditUpdate();
@@ -2423,6 +2958,137 @@ searchresult = [];
           
        
         });
+
+
+
+
+
+
+        /* Tumblr API functionality, inspired by https://github.com/jokull/tumblr-widget */
+        var TumblrFeed = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
+          }
+        });
+
+
+        var TumblrPost = Backbone.Model.extend({});
+
+        var NextPage = Backbone.View.extend({
+          el: "#tumblr .pagination .next",
+          events: {
+            "click .next": "click"
+          },
+          initialize: function(options){
+            return this.collection.bind("last", this.hide);
+          },
+          hide: function(){
+            return ($(this.el)).hide();
+          },
+          click: function(e){
+            e.preventDefault();
+            return this.collection.page();
+          }
+        });//end NextPage
+
+        var Tumblr = Backbone.Collection.extend({
+          model: TumblrPost,
+          endpoint: 'http://api.tumblr.com/v2/blog/',
+          params: {
+            limit: 1
+          },
+          initialize: function(options){
+            this.endpoint = this.endpoint + options.hostname;
+            return this.params = _.extend(this.params, options.params || {});
+          },
+          page: function(){
+            console.log('Tumblr.page()');
+
+            var params,
+                _this = this;
+            params = _.extend(this.params, {
+              offset: this.length - 1
+            });
+            return $.ajax({
+              url: this.endpoint + '/posts/json?' + ($.param(params)),
+              dataType: "jsonp",
+              jsonp: "jsonp",
+              success: function(data, status){
+                console.log('Tumblr.page.success callback reached wtih data:');
+                console.dir(data);
+                console.log('');
+
+                _this.add(data.response.posts);
+                _this.trigger('paged');
+                if(data.response.total_posts === _this.length){
+                  console.log('Tumblr: triggering last');
+                  return _this.trigger('last');
+                }
+              }
+            });
+          }
+        });//end Tumblr
+
+        var TumblrPostView = Backbone.View.extend({
+          className: "tumblr-post",
+          initialize: function(options){
+            if(this.model) return this.model.bind("change", this.render);
+          },
+          render: function(){
+            var tpl;
+            tpl = _.template(($('#tpl-tumblr-post')).html());
+            ($(this.el)).addClass(this.model.get('type'));
+            ($(this.el)).html(tpl(this.model.toJSON()));
+
+            return this;
+          }
+        });//end TumblrPostView
+
+        var TumblrView = Backbone.View.extend({
+          initialize: function(options){
+            this.collection.bind("reset", this.all);
+            //when the Tumblr collection gets added to, call it's view's add too
+            return this.collection.bind('add', this.add, this);
+          },
+          all: function(){
+            ($(this.el)).html('');
+            return this.collection.each(this.add);
+          },
+          add: function(model){
+            model.view = new TumblrPostView({
+              model: model
+            });        
+
+            return ($(this.el)).append(model.view.render().el);
+          }
+        });//end TumblrView
+
+
+        function initTumblrFeed(el, hostname, tags, limit){
+          var tagCSV = tags.join(', ') || '';//default to none
+          limit = limit || 1;
+
+          tumblr.collection = new Tumblr({
+            hostname: hostname,
+            params: {
+                api_key: 'yqwrB2k7eYTxGvQge4S8k9R6wAdQrATjLXhVzGVPgjTXwucNOo'
+               ,tag: tagCSV
+               ,limit: limit
+            }
+          });
+          tumblr.view = new TumblrView({
+            el: el,
+            collection: tumblr.collection
+          });
+
+          tumblr.collection.page();
+
+          tumblr.nextPage = new NextPage({
+            collection: tumblr.collection
+          });
+
+        }
 
       }//end if course
     }//end behavior attach
