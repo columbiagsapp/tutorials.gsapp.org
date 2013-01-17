@@ -59,6 +59,7 @@
 
 @editModeTextColor: whiteSmoke;
 @editModeBGColor: @darkBGColor;
+@editModeBrickBorderHidden: solid 2px @darkBGColor;
 
 /* for "editable" fields that Hallo.js editor will make available for in-place-editing */
 @editableBGColor: transparent;
@@ -477,6 +478,7 @@ body{
 .edit-mode{
   color:@editModeTextColor !important;
   background-color:@editModeBGColor;
+  border: @editModeBrickBorderHidden !important;
 }
 
 .roman{
@@ -901,7 +903,7 @@ textarea[readonly]{
 }
 
 .lesson-open .lesson-title{
-  max-width: 70%;
+  max-width: 65%;
   margin-bottom:@verticalpadding;
 }
 
@@ -1020,6 +1022,12 @@ textarea[readonly]{
   border: @brickBorder;
 }
 
+.edit-mode.update:hover{
+  cursor:default !important;
+  background-color:@darkBGColor;
+  border:@editModeBrickBorderHidden;
+}
+
 .date{
   font:@smallFontSize;
   margin-bottom:@verticalpadding;
@@ -1128,6 +1136,10 @@ textarea[readonly]{
   width:auto;
   float:left;
   font: inherit;
+}
+
+.upload-list-container > li{
+  float:none !important;
 }
 
 .week-list-container > li,
