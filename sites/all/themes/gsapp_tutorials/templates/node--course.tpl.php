@@ -250,7 +250,7 @@
         <div class="week-header-top float-left">
           <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
             <h2 class="title">
-              <span class="editable week-field week-number"><%= field_week_number %></span>:&nbsp;<span class="editable week-field week-title"><%= title %></span>
+              <span class="editable week-field week-number"><%= field_week_number %></span>: <span class="editable week-field week-title"><%= title %></span>
             </h2>
           <% } %>
         </div><!-- /.week-header-top -->

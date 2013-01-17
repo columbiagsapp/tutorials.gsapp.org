@@ -965,7 +965,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             if(!$(this_selector).closest('.week').hasClass('edit-mode')){
               var different_week = true;
               var contentSectionHTML = 
-              '<section id="lesson-content" class="span9 outer" role="complementary"><h2 class="heading float-left">Lesson</h2><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+              '<section id="lesson-content" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Lesson</h2></div><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
 
               //if a lesson is already open, make sure to close it and 
               //return it to the schedule
