@@ -384,7 +384,6 @@
             variables = this.model.renderAttributes();
           }
 
-
           var content = this.executeTemplate(variables);
           $(this.el).html(content);
 
