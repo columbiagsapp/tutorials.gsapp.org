@@ -501,9 +501,13 @@ body{
   margin-top:@verticalpadding;
 }
 
-.edit-mode .week-title{
-  min-width:100px;
-  display: inline-block;
+.week-header-top .week-field{
+  width:100%;
+}
+
+.edit-mode .week-header-top{
+  width:65%;
+  margin-bottom:@verticalpadding;
 }
 
 
@@ -519,10 +523,6 @@ body{
   margin-bottom:@verticalpadding;
 }
 
-.week .week-header-top{
-  width:80%;
-  margin-bottom:@verticalpadding;
-}
 
 .collapsed .week .week-header-top{
   width:100%;
@@ -532,10 +532,6 @@ body{
 .collapsed .week .week-header-top div{
   display:block;
   margin-left:0;
-}
-
-.edit-mode .week-header-top{
-  width:65%;
 }
 
 .edit-mode .edit-week-buttons{
@@ -920,7 +916,7 @@ textarea[readonly]{
 }
 
 .lesson-open .lesson-title-container{
-  max-width: 65%;
+  width: 65%;
   margin-bottom:@verticalpadding;
   float:left;
 }

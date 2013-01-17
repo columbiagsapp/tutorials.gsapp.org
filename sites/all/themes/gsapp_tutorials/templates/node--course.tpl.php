@@ -210,9 +210,7 @@
             <li><a tabindex="-1" href="#" class="button-upload-file"><i class="icon-file"></i> File</a></li>
           </ul>
         </div>
-
-        <a tabindex="-1" href="#" class="btn float-left button-upload-file"><i class="icon-upload-alt"></i>&nbsp;&nbsp;Upload</a>
-
+        
       </div><!-- /.lesson-embed-upload -->
     </div><!-- /.inner -->
 
@@ -304,10 +302,11 @@
     <div class="inner">
       <div class="week-header">
         <div class="week-header-top float-left">
-          <% if ( (typeof(title) != "undefined") && (typeof(field_week_number) != "undefined") ) { %>
-            <h2 class="title">
-              <span class="editable week-field week-number float-left"><%= field_week_number %></span><span class="float-left">: </span><span class="editable week-field week-title float-left"><%= title %></span>
-            </h2>
+          <% if ( typeof(field_week_number) != "undefined" ) { %>
+            <h2 class="title editable week-field week-number float-left"><%= field_week_number %></h2>
+          <% } %>
+          <% if ( typeof(title) != "undefined" ) { %>
+            <h2 class="title editable week-field week-title float-left clearfix"><%= title %></h2>
           <% } %>
         </div><!-- /.week-header-top -->
 

@@ -1002,6 +1002,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               openLessonView.initEmbedsCollectionAndView(NID);
               openLessonView.initUploadsCollectionAndView(NID);
 
+              console.log( 'should call initHalloEditorLesson()-------' );
+
               openLessonView.initHalloEditorLesson(false);
 
               //attach any embeds
@@ -1135,15 +1137,10 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             Enables Hallo.js editor for title and body
           */
           enableHalloEditorsLesson: function(){
-            $('.lesson-open .lesson-title').hallo({
-              editable: true
-            });
-
-            $('.lesson-open .lesson-description').hallo({
-              editable: true
-            });
+            this.initHalloEditorLesson(true);
 
             $('.lesson-open .lesson-embed-element').each(function(){
+              console.log('trying to enable hallo.js for embed code ****');
               $('.field-embed-edit-code', this).hallo({
                 editable: true
               });
@@ -1159,10 +1156,11 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               editable: false
             });
 
+            /*
             $('.lesson-open .lesson-description').hallo({
               editable: false
             });
-
+            */
             $('.lesson-open .lesson-embed-element').each(function(){
               $('.field-embed-edit-code', this).hallo({
                 editable: false
@@ -1176,6 +1174,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             for the first opening of a lesson
           */
           initHalloEditorLesson: function(editmode){
+            console.log( '-------initHalloEditorLesson()-------' );
             //launch Hallo.js
             $('.lesson-open .lesson-title').hallo({
               plugins: {
@@ -1189,17 +1188,15 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             $('.lesson-open .lesson-description').hallo({
               plugins: {
                 'halloformat': {},
-                'halloblock': {},
-                'hallojustify': {},
                 'hallolists': {},
                 'hallolink': {},
-                'halloreundo': {},
-                'halloimage': {}
+                'halloreundo': {}
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
               placeholder: 'Add description'
             });    
+
 
             //$('body #main').append('<div class="field-type-file field-name-field-assignment-attachment field-widget-file-generic form-wrapper" id="edit-field-assignment-attachment"><div id="edit-field-assignment-attachment-und-0-ajax-wrapper"><div class="form-item form-type-managed-file form-item-field-assignment-attachment-und-0"><label for="edit-field-assignment-attachment-und-0">Assignment Attachment </label><div class="file-widget form-managed-file clearfix"><input type="file" id="edit-field-assignment-attachment-und-0-upload" name="files[field_assignment_attachment_und_0]" size="22" class="form-file" /><input type="submit" id="edit-field-assignment-attachment-und-0-upload-button" name="field_assignment_attachment_und_0_upload_button" value="Upload" class="form-submit" /><input type="hidden" name="field_assignment_attachment[und][0][fid]" value="0" /><input type="hidden" name="field_assignment_attachment[und][0][display]" value="1" /></div><div class="description">A PDF of the assignment<br />Files must be less than <strong>5 MB</strong>.<br />Allowed file types: <strong>txt pdf doc</strong>.</div></div></div>');
           },
@@ -1604,7 +1601,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           cancelEdit: function(){
             var this_selector = '#open-node-' + this.model.get('nid');
             //disable Hallo.js editors
-            this.disableHalloEditorsLesson();
+            //this.disableHalloEditorsLesson();
 
             console.log('cancelEdit()');
 
