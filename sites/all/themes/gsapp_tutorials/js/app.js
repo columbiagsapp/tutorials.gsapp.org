@@ -49,6 +49,12 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
          return tmp.textContent||tmp.innerText;
       }
 
+      //Hallo.js seems to apply min-width and min-height to 
+      //the editable fields, and I need to strip this out
+      function refreshHalloFieldStyles(){
+        $('.week-header-top').css('minWidth', '');
+      }
+
       function resortWeekOrder(){
         if($('.resort-text-container', this).text() == 'Resort'){
           $('.week').addClass('resort-mode');
@@ -966,7 +972,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             if(!$(this_selector).closest('.week').hasClass('edit-mode')){
               var different_week = true;
               var contentSectionHTML = 
-              '<section id="lesson-content" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Lesson</h2></div><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
+              '<section id="lesson-content" class="span9" role="complementary"><div class="float-left heading-button roman"></div><div id="lesson-content-el" class="el"></div></section><!-- /.span3 -->';
 
               //if a lesson is already open, make sure to close it and 
               //return it to the schedule
@@ -1013,6 +1019,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               openLessonView.attachAddons();
 
               $('html, body').animate({scrollTop:0}, 'slow');
+
+              refreshHalloFieldStyles();
 
 
               //point the global openLessonView to the new LessonOpenView
@@ -1189,6 +1197,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               plugins: {
                 'halloformat': {},
                 'hallolists': {},
+                'hallojustify': {},
                 'hallolink': {},
                 'halloreundo': {}
               },
@@ -1534,20 +1543,16 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
               var thisLessonOpenView = this;
 
-              console.log('----about to save lesson');
-
               this.model.save({},{
                 success: function(){//TODO TCT2003 why do I have to refetch these?
                   //$('.embed.preloader', thisLessonOpenView).remove(); 
                   //$('.upload.preloader', thisLessonOpenView).remove(); 
                   //if(getState(MODIFIED)){
-                    console.log('attaching upload');
                     thisLessonOpenView.initUploadsCollectionAndView(lessonID);
                     thisLessonOpenView.attachUpload();
 
                     clearState(MODIFIED);
                   //}
-                  console.log('----saved lesson');
                 },
                 error: function(){
                   $('.embed.preloader', thisLessonOpenView).hide(); 
@@ -1556,7 +1561,6 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                   //dont clear modified state b/c hasn't been modified yet?
                   //TODO TCT2003 need to throw alert
                   //if(getState(MODIFIED)){
-                    console.log('attaching upload');
                     thisLessonOpenView.initUploadsCollectionAndView(lessonID);
                     thisLessonOpenView.attachUpload();
 
@@ -1599,7 +1603,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           },
 
           cancelEdit: function(){
-            var this_selector = '#open-node-' + this.model.get('nid');
+            var lessonID = this.model.get('nid');
+            var this_selector = '#open-node-' + lessonID;
             //disable Hallo.js editors
             //this.disableHalloEditorsLesson();
 
@@ -1626,12 +1631,17 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
               //so it doesn't show up in the collapsed week list when you click save for the first time on a new lesson
               
-              $('.selected .lesson').each(function(){
-                if($(this).attr('id') == this_selector){
-                  $(this).addClass('theOpenLesson');
-                }
-              });
+              
             }
+            //add the theOpenLesson class to the open lesson in the schedule
+            $('.selected .lesson').each(function(i){
+              var selector = 'node-' + lessonID;
+
+              if($(this).attr('id') == selector){
+                $(this).addClass('theOpenLesson');
+                return false;
+              }
+            });
             
           },
 

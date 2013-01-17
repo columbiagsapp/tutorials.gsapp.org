@@ -210,7 +210,7 @@
             <li><a tabindex="-1" href="#" class="button-upload-file"><i class="icon-file"></i> File</a></li>
           </ul>
         </div>
-        
+
       </div><!-- /.lesson-embed-upload -->
     </div><!-- /.inner -->
 
@@ -303,10 +303,10 @@
       <div class="week-header">
         <div class="week-header-top float-left">
           <% if ( typeof(field_week_number) != "undefined" ) { %>
-            <h2 class="title editable week-field week-number float-left"><%= field_week_number %></h2>
+            <div class="title editable week-field week-number float-left"><%= field_week_number %></div>
           <% } %>
           <% if ( typeof(title) != "undefined" ) { %>
-            <h2 class="title editable week-field week-title float-left clearfix"><%= title %></h2>
+            <div class="title editable week-field week-title float-left clearfix"><%= title %></div>
           <% } %>
         </div><!-- /.week-header-top -->
 
