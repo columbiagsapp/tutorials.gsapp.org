@@ -720,6 +720,8 @@ iframe {
 .course #resort-week-container,
 .course #edit-schedule-button,
 .course #edit-syllabus-button,
+#edit-page-button,
+#cancel-edit-page-button,
 .course #cancel-edit-syllabus-button{
   float:right;
   margin-right:@standardBrickPadding;
@@ -1193,12 +1195,14 @@ textarea[readonly]{
 }
 
 /* additions after branched by Troy */
-#add-link{
+#add-link,
+#add-page{
   float:left;
-  margin-top:@innerPadding;
+  margin:@innerPadding @innerPadding 0 0;
 }
 
-#add-link-popup{
+#add-link-popup,
+#add-page-popup{
   display:none;
   margin-top:@innerPadding;
   position:relative;
@@ -1206,24 +1210,28 @@ textarea[readonly]{
   z-index:1000;
 }
 
-#add-link-popup .button{
+#add-link-popup .button,
+#add-page-popup .button{
   float:right;
   margin-left:@innerPadding;
 }
 
-#add-link-popup .edit-course-links-buttons{
+#add-link-popup .edit-course-links-buttons,
+#add-page-popup .edit-course-page-buttons{
   width:100%;
   float:left;
 }
 
-#add-link-popup .editable{
+#add-link-popup .editable,
+#add-page-popup .editable{
   width:100%;
   float:left;
   background:@lightBGColor;
   margin-bottom:@innerPadding;
 }
 
-#course-links .course-link-item{
+#course-links .course-link-item,
+#course-links .course-page-item{
   width:100%;
   float:left;
 }

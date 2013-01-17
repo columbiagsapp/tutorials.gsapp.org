@@ -49,6 +49,26 @@
           <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
           <div><a id="link-schedule" href="#schedule">Schedule</a></div>
           <div><a id="link-updates" href="#updates">Updates</a></div>
+
+          <?php 
+            //print out links in the links field with external link icon
+            $pages = field_get_items('node', $node, 'field_course_pages', $node->language); 
+
+            if(isset($pages) && !empty($pages)){
+              $i = 0;
+              foreach($pages as $page){
+                $summaryPlainText = strip_tags( $page['summary'] );
+                print '<div id="course-page-item-'.$i.'" class="course-page-item"><a class="float-left added-page" id="page-'. $i . '" href="#page-'. $i . '">'. $summaryPlainText . '</a>';
+                if($editable){
+                  print '<a class="float-right remove">Remove</a>';
+                }
+                print '</div>';
+                $i++;
+              }
+            }
+          ?>
+
+
           <?php 
             //print out links in the links field with external link icon
             $items = field_get_items('node', $node, 'field_links', $node->language); 
@@ -66,18 +86,30 @@
           ?>
         </div><!-- /#course-links -->
         <?php if($editable){ ?>
+          <div id="add-page" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Page</div>
+          <div id="add-page-popup" class="brick edit-mode">
+            <div class="inner float-left">
+              <div class="new-page-title editable"></div>
+              <div class="edit-course-page-buttons">
+                <div class="button save">Save</div>
+                <div class="button cancel">Cancel</div>
+              </div><!-- /.edit-course-links-buttons --> 
+            </div>
+          </div><!-- /#add-link-popup --> 
+
+
           <div id="add-link" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Link</div>
+          <div id="add-link-popup" class="brick edit-mode">
+            <div class="inner float-left">
+              <div class="new-link-title editable"></div>
+              <div class="new-link-url editable"></div>
+              <div class="edit-course-links-buttons">
+                <div class="button save">Save</div>
+                <div class="button cancel">Cancel</div>
+              </div><!-- /.edit-course-links-buttons --> 
+            </div>
+          </div><!-- /#add-link-popup --> 
         <?php } ?>
-        <div id="add-link-popup" class="brick edit-mode">
-          <div class="inner float-left">
-            <div class="new-link-title editable"></div>
-            <div class="new-link-url editable"></div>
-            <div class="edit-course-links-buttons">
-              <div class="button save">Save</div>
-              <div class="button cancel">Cancel</div>
-            </div><!-- /.edit-course-links-buttons --> 
-          </div>
-        </div><!-- /#add-link-popup --> 
       </div><!-- /.inner -->
     </div><!-- /.header-right -->
   </header>

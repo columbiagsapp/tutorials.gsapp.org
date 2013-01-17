@@ -245,7 +245,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
       function cancelExternalLinkToCourse(){
         $('#add-link-popup').hide();
-        $('#add-link').show();
+        $('#add-link, #add-page').show();
 
         $('#add-link-popup .new-link-title').hallo({
           editable: false
@@ -281,7 +281,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
         course.save({}, {
           success: function(model, response, options){
             $('#course-links').append( html );
-            $('#course-links .remove').bind('click', removeExternalLinkToCourse);
+            $('#course-links .remove').bind('click', removeExternalLinkFromCourse);
           },
           error: function(){
             alert('Please re-submit your new link');
@@ -292,7 +292,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
       }
 
-      function removeExternalLinkToCourse(){
+      function removeExternalLinkFromCourse(){
         var links = course.get("field_links");
         var id = $(this).closest('.course-link-item').attr('id');
         id = id.substr(17);
@@ -327,7 +327,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
       function addExternalLinkToCourse(){
         $('#add-link-popup').show();
-        $('#add-link').hide();
+        $('#add-link, #add-page').hide();
 
         $('#add-link-popup .new-link-title').hallo({
           editable: true,
@@ -341,9 +341,116 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
       }
 
       $('#add-link').bind('click', addExternalLinkToCourse);
-      $('#course-links .remove').bind('click', removeExternalLinkToCourse);
+      $('.course-link-item .remove').bind('click', removeExternalLinkFromCourse);
       $('#add-link-popup .save').bind('click', saveExternalLinkToCourse);
       $('#add-link-popup .cancel').bind('click', cancelExternalLinkToCourse);
+
+
+
+
+
+
+
+
+      function cancelPageToCourse(){
+        $('#add-page-popup').hide();
+        $('#add-link, #add-page').show();
+
+        $('#add-page-popup .new-page-title').hallo({
+          editable: false
+        }); 
+      }
+
+      function savePageToCourse(){
+        console.log('savePageToCourse()');
+
+        var pages = course.get("field_course_pages");
+        var title = $('#add-page-popup .new-page-title').text();
+
+        var pageID = pages.length;
+
+        var html = $('<div id="course-page-item-' + pages.length + '" class="course-page-item"><a class="float-left added-page" id="page-'+ pageID +'" href="#page-' + pageID + '">'+ title +'</a><a class="float-right remove">Remove</a></div>');
+
+        var obj = {
+          "summary": title,
+          "format": "full_html",
+          "description": "Add page content here"
+        };
+
+        pages.push(obj);
+        course.set({
+            "field_course_pages": pages
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links').append( html );
+            $('#course-links .remove').bind('click', removePageFromCourse);
+            transitionPage( pageID );
+          },
+          error: function(){
+            alert('Please re-submit your new link');
+          }
+        });
+
+        cancelPageToCourse();
+
+      }
+
+      function removePageFromCourse(){
+        var pages = course.get("field_course_pages");
+        var id = $(this).closest('.course-page-item').attr('id');
+        id = id.substr(17);
+        id = parseInt(id);
+
+
+
+        pages.splice( id ,1);//cut out exactly 1 page with id = id
+
+        console.log('pages post splice ');
+        console.dir(pages);
+
+        course.set({
+            "field_links": pages
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links #course-page-item-'+ id ).remove();
+          },
+          error: function(){
+            alert('Please try to remove the page again');
+          }
+        });
+
+        //still need to remove from DOM explicitly
+        //TODO TCT2003 I need to bind this to a change event so it does it by itself
+        $(this).closest('.course-page-item').remove();
+      }
+
+
+
+
+      function addPageToCourse(){
+        $('#add-page-popup').show();
+        $('#add-page, #add-link').hide();
+
+        $('#add-page-popup .new-page-title').hallo({
+          editable: true,
+          placeholder: 'Add page title'
+        }); 
+      }
+
+      $('#add-page').bind('click', addPageToCourse);
+      $('.course-page-item .remove').bind('click', removePageFromCourse);
+      $('#add-page-popup .save').bind('click', savePageToCourse);
+      $('#add-page-popup .cancel').bind('click', cancelPageToCourse);
+
+
+
+
+
+
 
       function extractBodyProperty(property){
         var bodyClasses = $('body').attr('class');
@@ -398,6 +505,114 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
         }
       }
+
+      function editPage(){
+        var pageID = $(this).closest('.open-page').attr('id');
+        pageID = pageID.substr(10);
+
+        console.log('editPage() ********** pageID: '+ pageID);
+
+        if($(this).text() == "Edit"){
+
+          $('#page-content-wrapper').addClass('edit-mode');
+          $('#cancel-edit-page-button').show();
+
+          $('.open-page .page-content').hallo({
+            editable: true
+          }); 
+
+          $(this).text('Save');
+
+        }else{
+
+          if( $('.open-page .page-content').hasClass('isModified')){
+            var value = $('.open-page .page-content').html();
+            var pages = course.get('field_course_pages');
+
+            pages[pageID].value = value;
+
+            course.set({
+              "field_course_pages": pages
+            });
+
+            course.save();
+          }
+
+          $('.open-page .page-content').hallo({
+            editable: false
+          }); 
+
+          $('#page-content-wrapper').removeClass('edit-mode');
+          $('#cancel-edit-page-button').hide();
+          $(this).text('Edit');
+
+        }
+      }
+
+      function transitionPage( pageID ){
+        console.log('transitionPage, with pageID: '+ pageID);
+        console.dir(pageID);
+        
+        
+        var titleArray = course.get('field_course_pages');
+        var title = titleArray[pageID].summary;
+
+        var contentSectionHTML = 
+              '<section id="open-page-'+pageID+'" class="span9 open-page" role="complementary"><div class="float-left heading-button roman"><div class="heading float-left">'+ title +'</div><div class="edit-button-container"><div id="edit-page-button" class="button float-right">Edit</div><div id="cancel-edit-page-button" class="cancel button">Cancel</div></div></div><div id="page-content-wrapper" class="brick roman"><div class="inner"><div class="page-content editable">';
+
+        contentSectionHTML = contentSectionHTML + course.get('field_course_pages')[pageID].value + '</div></div></div></section><!-- /.span3 -->';
+
+        if( $('#lesson-content').length){
+          console.log('#lesson-content transition');
+          //remove the temporary lesson model and view
+          openLessonView.remove();
+          openLessonView = null;
+
+          EmbedsCollection.reset();
+          EmbedsCollection = null;
+          EmbedsCollectionView = null;
+
+          $('.theOpenLesson').removeClass('theOpenLesson');
+          $('.selected').removeClass('selected');
+
+          $('#lesson-content').remove();
+
+          //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
+          //$('#main').append(updates_detached);
+        }else{
+          console.log('detaching updates');
+          $('#schedule').removeClass('span9').addClass('span3 collapsed');
+          updates_detached = $('#updates').detach();
+        }
+        $('#main').append(contentSectionHTML);
+
+
+        $('.open-page .page-content').hallo({
+          plugins: {
+            'halloformat': {},
+            'halloheadings': {},
+            'halloblock': {},
+            'hallojustify': {},
+            'hallolists': {},
+            'hallolink': {},
+            'halloreundo': {},
+            'halloimage': {}
+          },
+          editable: false,
+          toolbar: 'halloToolbarFixed',
+          placeholder: 'Add page content here'
+        }); 
+
+
+        $('#edit-page-button').bind('click', editPage);
+
+
+        return false;
+      }
+
+      $('.course-page-item').each(function(i){
+        $(this).bind('click', function(event){ transitionPage(i); });
+      });
 
       function transitionSyllabus(){
         var contentSectionHTML = 
