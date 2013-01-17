@@ -60,6 +60,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           $('.week').addClass('resort-mode');
 
           $('.week-list-container').sortable();
+          $('.week-list-container').sortable('enable');
           $('.week-list-container, .week-list-container li').disableSelection();
 
           $('#add-week-container').hide();
