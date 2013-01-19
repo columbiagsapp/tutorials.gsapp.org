@@ -2,7 +2,6 @@ var app = app || {};
 var pathArray = window.location.pathname.split('/');
 var updates_detached = null;
 var openLessonView = null;
-var openPageView = null;
 
 var COURSE_SUMMARY_CHAR_LEN = 400;
 
@@ -22,9 +21,6 @@ var EmbedsCollectionView = [];
 
 var UploadsCollection = [];
 var UploadsCollectionView = [];
-
-var PagesCollection = [],
-    PagesCollectionView = {};
 
 var tumblr = {};
 
@@ -352,6 +348,110 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
 
 
+
+
+
+
+      function cancelPageToCourse(){
+        $('#add-page-popup').hide();
+        $('#add-link, #add-page').show();
+
+        $('#add-page-popup .new-page-title').hallo({
+          editable: false
+        }); 
+      }
+
+      function savePageToCourse(){
+        console.log('savePageToCourse()');
+
+        var pages = course.get("field_course_pages");
+        var title = $('#add-page-popup .new-page-title').text();
+
+        var pageID = pages.length;
+
+        var html = $('<div id="course-page-item-' + pages.length + '" class="course-page-item"><a class="float-left added-page" id="page-'+ pageID +'" href="#page-' + pageID + '">'+ title +'</a><a class="float-right remove">Remove</a></div>');
+
+        var obj = {
+          "summary": title,
+          "format": "full_html",
+          "description": "Add page content here"
+        };
+
+        pages.push(obj);
+        course.set({
+            "field_course_pages": pages
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links').append( html );
+            $('#course-links .remove').bind('click', removePageFromCourse);
+            transitionPage( pageID );
+          },
+          error: function(){
+            alert('Please re-submit your new link');
+          }
+        });
+
+        cancelPageToCourse();
+
+      }
+
+      function removePageFromCourse(){
+        var pages = course.get("field_course_pages");
+        var id = $(this).closest('.course-page-item').attr('id');
+        id = id.substr(17);
+        id = parseInt(id);
+
+
+
+        pages.splice( id ,1);//cut out exactly 1 page with id = id
+
+        console.log('pages post splice ');
+        console.dir(pages);
+
+        course.set({
+            "field_links": pages
+          });
+
+        course.save({}, {
+          success: function(model, response, options){
+            $('#course-links #course-page-item-'+ id ).remove();
+          },
+          error: function(){
+            alert('Please try to remove the page again');
+          }
+        });
+
+        //still need to remove from DOM explicitly
+        //TODO TCT2003 I need to bind this to a change event so it does it by itself
+        $(this).closest('.course-page-item').remove();
+      }
+
+
+
+
+      function addPageToCourse(){
+        $('#add-page-popup').show();
+        $('#add-page, #add-link').hide();
+
+        $('#add-page-popup .new-page-title').hallo({
+          editable: true,
+          placeholder: 'Add page title'
+        }); 
+      }
+
+      $('#add-page').bind('click', addPageToCourse);
+      $('.course-page-item .remove').bind('click', removePageFromCourse);
+      $('#add-page-popup .save').bind('click', savePageToCourse);
+      $('#add-page-popup .cancel').bind('click', cancelPageToCourse);
+
+
+
+
+
+
+
       function extractBodyProperty(property){
         var bodyClasses = $('body').attr('class');
         var idxStart = bodyClasses.indexOf(property) + property.length;
@@ -406,8 +506,113 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
         }
       }
 
-      
-      
+      function editPage(){
+        var pageID = $(this).closest('.open-page').attr('id');
+        pageID = pageID.substr(10);
+
+        console.log('editPage() ********** pageID: '+ pageID);
+
+        if($(this).text() == "Edit"){
+
+          $('#page-content-wrapper').addClass('edit-mode');
+          $('#cancel-edit-page-button').show();
+
+          $('.open-page .page-content').hallo({
+            editable: true
+          }); 
+
+          $(this).text('Save');
+
+        }else{
+
+          if( $('.open-page .page-content').hasClass('isModified')){
+            var value = $('.open-page .page-content').html();
+            var pages = course.get('field_course_pages');
+
+            pages[pageID].value = value;
+
+            course.set({
+              "field_course_pages": pages
+            });
+
+            course.save();
+          }
+
+          $('.open-page .page-content').hallo({
+            editable: false
+          }); 
+
+          $('#page-content-wrapper').removeClass('edit-mode');
+          $('#cancel-edit-page-button').hide();
+          $(this).text('Edit');
+
+        }
+      }
+
+      function transitionPage( pageID ){
+        console.log('transitionPage, with pageID: '+ pageID);
+        console.dir(pageID);
+        
+        
+        var titleArray = course.get('field_course_pages');
+        var title = titleArray[pageID].summary;
+
+        var contentSectionHTML = 
+              '<section id="open-page-'+pageID+'" class="span9 open-page" role="complementary"><div class="float-left heading-button roman"><div class="heading float-left">'+ title +'</div><div class="edit-button-container"><div id="edit-page-button" class="button float-right">Edit</div><div id="cancel-edit-page-button" class="cancel button">Cancel</div></div></div><div id="page-content-wrapper" class="brick roman"><div class="inner"><div class="page-content editable">';
+
+        contentSectionHTML = contentSectionHTML + course.get('field_course_pages')[pageID].value + '</div></div></div></section><!-- /.span3 -->';
+
+        if( $('#lesson-content').length){
+          console.log('#lesson-content transition');
+          //remove the temporary lesson model and view
+          openLessonView.remove();
+          openLessonView = null;
+
+          EmbedsCollection.reset();
+          EmbedsCollection = null;
+          EmbedsCollectionView = null;
+
+          $('.theOpenLesson').removeClass('theOpenLesson');
+          $('.selected').removeClass('selected');
+
+          $('#lesson-content').remove();
+
+          //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
+          //$('#main').append(updates_detached);
+        }else{
+          console.log('detaching updates');
+          $('#schedule').removeClass('span9').addClass('span3 collapsed');
+          updates_detached = $('#updates').detach();
+        }
+        $('#main').append(contentSectionHTML);
+
+
+        $('.open-page .page-content').hallo({
+          plugins: {
+            'halloformat': {},
+            'halloheadings': {},
+            'halloblock': {},
+            'hallojustify': {},
+            'hallolists': {},
+            'hallolink': {},
+            'halloreundo': {},
+            'halloimage': {}
+          },
+          editable: false,
+          toolbar: 'halloToolbarFixed',
+          placeholder: 'Add page content here'
+        }); 
+
+
+        $('#edit-page-button').bind('click', editPage);
+
+
+        return false;
+      }
+
+      $('.course-page-item').each(function(i){
+        $(this).bind('click', function(event){ transitionPage(i); });
+      });
 
       function transitionSyllabus(){
         var contentSectionHTML = 
@@ -3136,319 +3341,6 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           });
 
         }
-
-
-
-        function clearContentArea(){
-          if($('#lesson-content').length > 0){
-            $('#lesson-content').remove();
-          }
-          
-          if($('#updates').length > 0){
-            updates_detached = $('#updates').detach();
-          }
-
-          if(!$('#schedule').hasClass('collapsed')){
-            $('#schedule').removeClass('span9').addClass('span3 collapsed');
-          }
-
-          if($('#syllabus').length > 0){
-            $('#syllabus').remove();
-          }
-
-          if($('.open-page').length > 0){
-            $('.open-page').remove();
-          }
-        }
-
-        ///////////////////////////////////////////////////////////////
-        ////////////////// PAGE  //////////////////////////////////////
-        ///////////////////////////////////////////////////////////////
-
-        
-
-        var Page = Drupal.Backbone.Models.Node.extend({
-          initialize: function(opts){
-            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
-            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
-          }
-        });
-
-        var OpenPageView = Drupal.Backbone.Views.Base.extend({
-          templateSelector: '#bb_page_template',
-          renderer: 'underscore',
-          el: "#open-page-el",
-
-          events: {
-            "click .edit": "editPage",
-            "click .cancel": "cancelEditPage",
-            "click .delete": "deletePage"
-          },
-
-          initialize: function(opts) {
-            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            this.model.bind('change', this.render, this);//this calls the fetch
-          },
-
-          editPage: function(){
-            console.log('editPage()');
-              var pageID = this.model.get('nid');
-
-              if($(this).text() == "Edit"){
-
-                $('#page-content-wrapper').addClass('edit-mode');
-                $('#cancel-edit-page-button, #delete-edit-page-button').show();
-
-                $('.open-page .page-content').hallo({
-                  editable: true
-                }); 
-
-                $(this).text('Save');
-
-              }else{
-
-                if( $('.open-page .page-content').hasClass('isModified')){
-
-                  var content = {};
-                  content.value = $('.open-page .page-content').html();
-
-                  this.model.set({
-                    "field_page_content": content
-                  });
-
-                  this.model.save({},{
-                    success: function(){
-                      this.cancelEditPage();
-                    },
-                    error: function(){
-                      alert('Updates did not save, please try again. If this persists, contact site administrator');
-                    }
-                  });
-                }
-
-                $(this).text('Edit');
-
-              }
-            
-
-          },
-
-          cancelEditPage: function(){
-            $('.open-page .page-content').hallo({
-              editable: false
-            });
-
-            //if canceled before saved, this will revert to the stored value
-            $('.open-page .page-content').html( this.model.get('field_page_content').value );
-
-            $('#page-content-wrapper').removeClass('edit-mode');
-            $('#cancel-edit-page-button, #delete-edit-page-button').hide();
-          },
-
-          deletePage: function(){
-            //delete the actual model from the database and its view
-            this.model.destroy();
-            this.remove();
-
-            transitionSchedule();
-          }
-
-        });//end OpenPageView
-
-        var PageView = Drupal.Backbone.Views.Base.extend({
-          templateSelector: '#bb_page_list_template',
-
-          events: {
-            "click .page-link": "openPage"
-          },
-
-          initialize: function(opts) {
-            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            this.model.bind('change', this.render, this);//this calls the fetch
-          },
-
-          openPage: function(){
-            console.log('openPage()');
-            var pageID = this.model.get('nid');
-
-
-            clearContentArea();
-
-            var contentSectionHTML = '<section id="open-page-'+pageID+'" class="span9 open-page" role="complementary"><div id="open-page-el"></div></div>';
-            $('#main').append(contentSectionHTML);
-
-            openPageView = new OpenPageView({
-              model: this.model
-            });
-
-            openPageView.render();
-
-            
-
-            return false;
-          }
-
-        });//end PageView
-
-       
-
-
-        var PageCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-          model: Page
-        });
-
-        var PageCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend();
-            
-
-
-        PagesCollection = new PageCollectionPrototype();
-
-        PagesCollection.reset();
-
-        PagesCollectionView = new PageCollectionViewPrototype({
-          templateSelector: '#page-list',
-          collection: PagesCollection,
-          el: '#pages-list-el',
-          ItemView: PageView,
-          itemParent: '.page-list-container',
-          renderer: 'underscore'
-        });
-
-        PagesCollectionView.render();
-
-        PagesCollection.fetchQuery({
-          "field_parent_course_nid":pathArray[2],
-          "type":"attached_page"
-          }, {
-            success: function(model, response, options){
-              $('#page-preloader').hide();
-              console.log('page load success');
-              $('#add-page').bind('click', addPageToCourse);
-              $('#add-page-popup .save').bind('click', savePageToCourse);
-            },
-            error: function(){
-              $('#page-preloader').hide();
-              console.log('page load error');
-            }
-        });
-
-
-
-
-        function cancelPageToCourse(){
-          $('#add-page-popup').hide();
-          $('#add-link, #add-page').show();
-
-          $('#add-page-popup .new-page-title').hallo({
-            editable: false
-          }); 
-        }
-
-        function savePageToCourse(){
-          console.log('savePageToCourse()');
-
-          var title = $('#add-page-popup .new-page-title').text();
-
-          var content = {
-            "summary": "",
-            "value": "",
-            "format": "full_html"
-          };
-
-          var p = new Page({
-              "title": title,
-              "type": "attached_page",
-              "field_parent_course_nid":courseNid,
-              "field_page_content": content
-            });
-
-            p.url = "/node";
-
-            //$('.page.preloader', '#node-'+lessonID).show();
-
-            var resp = p.save({}, {
-              success: function(model, response, options){
-                //$('.embed.preloader', '#node-'+lessonID).hide();
-
-                p.id = response.id;
-                p.url = "/node/" + response.id + ".json";
-                p.set({
-                  "nid":response.id
-                });
-                p.save();
-
-
-                var newPageView = PagesCollectionView.addOne(p);
-                newPageView.openPage();
-                //transitionPage(response.id);
-
-                cancelPageToCourse();
-              },
-              error: function(){
-                //$('.embed.preloader', '#node-'+lessonID).hide();
-              }
-            });
- 
-
-
-          
-
-        }
-
-        function removePageFromCourse(){
-          var pages = course.get("field_course_pages");
-          var id = $(this).closest('.course-page-item').attr('id');
-          id = id.substr(17);
-          id = parseInt(id);
-
-
-
-          pages.splice( id ,1);//cut out exactly 1 page with id = id
-
-          console.log('pages post splice ');
-          console.dir(pages);
-
-          course.set({
-              "field_links": pages
-            });
-
-          course.save({}, {
-            success: function(model, response, options){
-              $('#course-links #course-page-item-'+ id ).remove();
-            },
-            error: function(){
-              alert('Please try to remove the page again');
-            }
-          });
-
-          //still need to remove from DOM explicitly
-          //TODO TCT2003 I need to bind this to a change event so it does it by itself
-          $(this).closest('.course-page-item').remove();
-        }
-
-
-
-
-        function addPageToCourse(){
-          $('#add-page-popup').show();
-          $('#add-page, #add-link').hide();
-
-          $('#add-page-popup .new-page-title').hallo({
-            editable: true,
-            placeholder: 'Add page title'
-          }); 
-        }
-
-        //$('.course-page-item').each(function(i){
-          //$(this).bind('click', function(event){ transitionPage(i); });
-        //});
-
-        
-        //$('.course-page-item .remove').bind('click', removePageFromCourse);
-        
-        //$('#add-page-popup .cancel').bind('click', cancelPageToCourse);
-
-      
 
       }//end if course
     }//end behavior attach

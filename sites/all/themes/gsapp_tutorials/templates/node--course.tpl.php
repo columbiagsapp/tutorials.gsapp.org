@@ -49,24 +49,8 @@
           <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
           <div><a id="link-schedule" href="#schedule">Schedule</a></div>
           <div><a id="link-updates" href="#updates">Updates</a></div>
-
-          <?php 
-            //print out links in the links field with external link icon
-            $pages = field_get_items('node', $node, 'field_course_pages', $node->language); 
-
-            if(isset($pages) && !empty($pages)){
-              $i = 0;
-              foreach($pages as $page){
-                $summaryPlainText = strip_tags( $page['summary'] );
-                print '<div id="course-page-item-'.$i.'" class="course-page-item"><a class="float-left added-page" id="page-'. $i . '" href="#page-'. $i . '">'. $summaryPlainText . '</a>';
-                if($editable){
-                  print '<a class="float-right remove">Remove</a>';
-                }
-                print '</div>';
-                $i++;
-              }
-            }
-          ?>
+          <div id="page-preloader" class="page preloader"><i class="icon-spinner icon-spin"></i></div>
+          <div id="pages-list-el"></div>
 
 
           <?php 
@@ -86,7 +70,7 @@
           ?>
         </div><!-- /#course-links -->
         <?php if($editable){ ?>
-          <div id="add-page" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Page</div>
+          <div id="add-page" class="add-page button"><i class="icon-plus"></i>&nbsp;&nbsp;Page</div>
           <div id="add-page-popup" class="brick edit-mode">
             <div class="inner float-left">
               <div class="new-page-title editable"></div>
@@ -329,6 +313,38 @@
   </div><!-- /.lesson-upload-wrapper -->
 </script>
 
+<script type="text/template" id="bb_page_list_template">
+  <div>
+    <a id="page-<% if(typeof(nid) != "undefined"){ %><%= nid %><% } %>" href="#open-page" class="page-link">
+      <% if(typeof(title) != "undefined"){ %><%= title %><% } %>
+    </a>
+  </div>
+</script>
+
+<script type="text/template" id="bb_page_template">
+  <div class="float-left heading-button roman">
+    <% if(typeof(title) != "undefined"){ %>
+      <h2 class="heading float-left">
+        <%= title %>
+      </h2>
+    <% } %>
+    <div class="edit-button-container">
+      <div id="edit-page-button" class="edit button">Edit</div>
+      <div id="cancel-edit-page-button" class="cancel button">Cancel</div>
+      <div id="delete-edit-page-button" class="delete button">Delete</div>
+    </div>
+  </div>
+  <div id="page-content-wrapper" class="brick roman">
+    <div class="inner">
+      <div class="page-content editable">
+        <% if(typeof(field_page_content) != "undefined"){ %>
+          <%= field_page_content.value %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</script>
+
 <script type="text/template" id="bb_week_template">
   <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="week brick roman hidden">
     <div class="inner">
@@ -417,6 +433,14 @@
     <ul class="week-list-container list-container">
     </ul>
   </div>
+</script>
+
+<script type="text/template" id="page-list">
+  <div>
+    <ul class="page-list-container list-container">
+    </ul>
+  </div>
+
 </script>
 
 <script type="text/template" id="update-list">
