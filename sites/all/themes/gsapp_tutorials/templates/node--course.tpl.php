@@ -46,9 +46,9 @@
     <div class="container header-right span3">
       <div class="inner">
         <div id="course-links">
-          <div><a id="link-syllabus" href="#syllabus">Syllabus</a></div>
-          <div><a id="link-schedule" href="#schedule">Schedule</a></div>
-          <div><a id="link-updates" href="#updates">Updates</a></div>
+          <div><a id="link-syllabus" href="#main">Syllabus</a></div>
+          <div><a id="link-schedule" href="#main">Schedule</a></div>
+          <div><a id="link-updates" href="#main">Updates</a></div>
           <div id="page-preloader" class="page preloader"><i class="icon-spinner icon-spin"></i></div>
           <div id="pages-list-el"></div>
 
@@ -59,7 +59,7 @@
             if(isset($items) && !empty($items)){
               $i = 0;
               foreach($items as $item){
-                print '<div id="course-link-item-'.$i.'" class="course-link-item"><a class="float-left" href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i>';
+                print '<div id="course-link-item-'.$i.'" class="course-link-item hidden"><a class="float-left" href="' . $item['url'] . '">'. $item['title'] . '</a>&nbsp;&nbsp;<i class="icon-external-link"></i>';
                 if($editable){
                   print '<a class="float-right remove">Remove</a>';
                 }
@@ -324,9 +324,9 @@
 <script type="text/template" id="bb_page_template">
   <div class="float-left heading-button roman">
     <% if(typeof(title) != "undefined"){ %>
-      <h2 class="heading float-left">
+      <div class="heading float-left">
         <%= title %>
-      </h2>
+      </div>
     <% } %>
     <div class="edit-button-container">
       <div id="edit-page-button" class="edit button">Edit</div>

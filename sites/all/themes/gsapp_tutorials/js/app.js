@@ -532,10 +532,10 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
         if($('#updates').length <= 0){
           console.log('reappending updates');
           $('#main').append(updates_detached);
+          $('#updates').removeClass('span3 collapsed').addClass('span9');
+        }else{
+          $('#updates').switchClass('span3 collapsed', 'span9', ANIMATION_TIME);
         }
-
-        //$('#updates').removeClass('span3 collapsed').addClass('span9');
-        $('#updates').switchClass('span3 collapsed', 'span9', ANIMATION_TIME);
 
         return false;
       }
@@ -3214,10 +3214,22 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                 console.log('was edit mode');
 
                 $('#page-content-wrapper').addClass('edit-mode');
-                $('#cancel-edit-page-button, #delete-edit-page-button').show();
+                $('.open-page .cancel, .open-page .delete').show();
 
                 $('.open-page .page-content').hallo({
-                  editable: true
+                  plugins: {
+                    'halloformat': {},
+                    'halloheadings': {},
+                    'halloblock': {},
+                    'hallojustify': {},
+                    'hallolists': {},
+                    'hallolink': {},
+                    'halloreundo': {},
+                    'halloimage': {}
+                  },
+                  editable: true,
+                  toolbar: 'halloToolbarFixed',
+                  placeholder: 'Add page content here'
                 }); 
 
                 $(event.currentTarget).text('Save');
@@ -3230,22 +3242,26 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
                   var content = {};
                   content.value = $('.open-page .page-content').html();
+                  content.format = "full_html";
+
+                  console.log('content value: ');
+                  console.log(content.value);
 
                   this.model.set({
                     "field_page_content": content
                   });
 
+                  var _this = this;
+
                   this.model.save({},{
                     success: function(){
-                      this.cancelEditPage();
+                      _this.cancelEditPage();
                     },
                     error: function(){
                       alert('Updates did not save, please try again. If this persists, contact site administrator');
                     }
                   });
                 }
-
-                $(event.currentTarget).text('Edit');
 
               }
             
@@ -3261,7 +3277,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             $('.open-page .page-content').html( this.model.get('field_page_content').value );
 
             $('#page-content-wrapper').removeClass('edit-mode');
-            $('#cancel-edit-page-button, #delete-edit-page-button').hide();
+            $('.open-page .edit').text('Edit');
+            $('.open-page .cancel, .open-page .delete').hide();
           },
 
           deletePage: function(){
@@ -3341,12 +3358,12 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           }, {
             success: function(model, response, options){
               $('#page-preloader').hide();
+              $('.course-link-item').removeClass('hidden');
               console.log('page load success');
-              $('#add-page').bind('click', addPageToCourse);
-              $('#add-page-popup .save').bind('click', savePageToCourse);
             },
             error: function(){
               $('#page-preloader').hide();
+              $('.course-link-item').removeClass('hidden');
               console.log('page load error');
             }
         });
@@ -3375,75 +3392,40 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           };
 
           var p = new Page({
-              "title": title,
-              "type": "attached_page",
-              "field_parent_course_nid":courseNid,
-              "field_page_content": content
-            });
-
-            p.url = "/node";
-
-            //$('.page.preloader', '#node-'+lessonID).show();
-
-            var resp = p.save({}, {
-              success: function(model, response, options){
-                //$('.embed.preloader', '#node-'+lessonID).hide();
-
-                p.id = response.id;
-                p.url = "/node/" + response.id + ".json";
-                p.set({
-                  "nid":response.id
-                });
-                p.save();
-
-
-                var newPageView = PagesCollectionView.addOne(p);
-                newPageView.openPage();
-                //transitionPage(response.id);
-
-                cancelPageToCourse();
-              },
-              error: function(){
-                //$('.embed.preloader', '#node-'+lessonID).hide();
-              }
-            });
- 
-
-
-          
-
-        }
-
-        function removePageFromCourse(){
-          var pages = course.get("field_course_pages");
-          var id = $(this).closest('.course-page-item').attr('id');
-          id = id.substr(17);
-          id = parseInt(id);
-
-
-
-          pages.splice( id ,1);//cut out exactly 1 page with id = id
-
-          console.log('pages post splice ');
-          console.dir(pages);
-
-          course.set({
-              "field_links": pages
-            });
-
-          course.save({}, {
-            success: function(model, response, options){
-              $('#course-links #course-page-item-'+ id ).remove();
-            },
-            error: function(){
-              alert('Please try to remove the page again');
-            }
+            "title": title,
+            "type": "attached_page",
+            "field_parent_course_nid":courseNid,
+            "field_page_content": content
           });
 
-          //still need to remove from DOM explicitly
-          //TODO TCT2003 I need to bind this to a change event so it does it by itself
-          $(this).closest('.course-page-item').remove();
+          p.url = "/node";
+
+          //$('.page.preloader', '#node-'+lessonID).show();
+
+          var resp = p.save({}, {
+            success: function(model, response, options){
+              //$('.embed.preloader', '#node-'+lessonID).hide();
+
+              p.id = response.id;
+              p.url = "/node/" + response.id + ".json";
+              p.set({
+                "nid":response.id
+              });
+              p.save();
+
+
+              var newPageView = PagesCollectionView.addOne(p);
+              newPageView.openPage();
+              //transitionPage(response.id);
+
+              cancelPageToCourse();
+            },
+            error: function(){
+              //$('.embed.preloader', '#node-'+lessonID).hide();
+            }
+          });
         }
+
 
 
 
@@ -3458,14 +3440,9 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           }); 
         }
 
-        //$('.course-page-item').each(function(i){
-          //$(this).bind('click', function(event){ transitionPage(i); });
-        //});
-
-        
-        //$('.course-page-item .remove').bind('click', removePageFromCourse);
-        
-        //$('#add-page-popup .cancel').bind('click', cancelPageToCourse);
+        $('#add-page').bind('click', addPageToCourse);
+        $('#add-page-popup .save').bind('click', savePageToCourse);
+        $('#add-page-popup .cancel').bind('click', cancelPageToCourse);
 
       
 
