@@ -5,6 +5,7 @@ var openLessonView = null;
 var openPageView = null;
 
 var COURSE_SUMMARY_CHAR_LEN = 400;
+var ANIMATION_TIME = 200;
 
 var WeeksCollection, 
     WeeksCollectionView;
@@ -407,105 +408,134 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
       }
 
       
+      ///////////////////////////////////////////////////////////////
+      ////////////////// TRANSITIONS  ///////////////////////////////
+      ///////////////////////////////////////////////////////////////
+
+      /*
+       *  Clears the main content area, for use in transitions
+      */
+      function clearContentArea(exception){
+        if(exception != 'lesson'){
+          if($('#lesson-content').length > 0){
+            //remove the temporary lesson model and view
+            openLessonView.remove();
+            openLessonView = null;
+
+            EmbedsCollection.reset();
+            EmbedsCollection = null;
+            EmbedsCollectionView = null;
+
+            UploadsCollection.reset();
+            UploadsCollection = null;
+            UploadsCollectionView = null;
+
+            $('.theOpenLesson').removeClass('theOpenLesson');
+            $('.selected').removeClass('selected');
+
+            $('#lesson-content').remove();
+          }
+        }
+        
+        if(exception != 'updates'){
+          if($('#updates').length > 0){
+            if($('#updates').hasClass('span9')){
+              console.log('***');
+              $('#updates').switchClass('span9', 'span3 collapsed', ANIMATION_TIME);
+              //$('#updates').removeClass('span9').addClass('span3 collapsed');
+            }
+            updates_detached = $('#updates').detach();
+          }
+        }
+
+        if(exception != 'schedule'){
+          if(!$('#schedule').hasClass('collapsed')){
+            //$('#schedule').removeClass('span9').addClass('span3 collapsed');
+            $('#schedule').switchClass('span9', 'span3 collapsed', ANIMATION_TIME);
+          }
+        }
+
+        if(exception != 'syllabus'){
+          if($('#syllabus').length > 0){
+            $('#syllabus').remove();
+          }
+        }
+
+        if(exception != 'page'){
+          if($('.open-page').length > 0){
+            openPageView.remove();
+            openPageView = null;
+            $('.open-page').remove();
+          }
+        }
+      }
       
 
       function transitionSyllabus(){
-        var contentSectionHTML = 
-              '<section id="syllabus" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
+        //only open if not already open
+        if($('#syllabus').length <= 0){
+          var contentSectionHTML = 
+                '<section id="syllabus" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
 
-        contentSectionHTML = contentSectionHTML + course.get('field_syllabus').value + '</div></div></div></section><!-- /.span3 -->';
+          contentSectionHTML = contentSectionHTML + course.get('field_syllabus').value + '</div></div></div></section><!-- /.span3 -->';
 
-        if( $('#lesson-content').length){
-          console.log('#lesson-content transition');
-          //remove the temporary lesson model and view
-          openLessonView.remove();
-          openLessonView = null;
+          clearContentArea('syllabus');
 
-          EmbedsCollection.reset();
-          EmbedsCollection = null;
-          EmbedsCollectionView = null;
+          $('#main').append(contentSectionHTML);
 
-          $('.theOpenLesson').removeClass('theOpenLesson');
-          $('.selected').removeClass('selected');
+          $('#syllabus .syllabus-content').hallo({
+            plugins: {
+              'halloformat': {},
+              'halloheadings': {},
+              'halloblock': {},
+              'hallojustify': {},
+              'hallolists': {},
+              'hallolink': {},
+              'halloreundo': {},
+              'halloimage': {}
+            },
+            editable: false,
+            toolbar: 'halloToolbarFixed',
+            placeholder: 'Add syllabus here'
+          }); 
 
-          $('#lesson-content').remove();
+          $('#edit-syllabus-button').bind('click', editSyllabus);
 
-          //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
-          //$('#main').append(updates_detached);
+          return true;
         }else{
-          console.log('detaching updates');
-          $('#schedule').removeClass('span9').addClass('span3 collapsed');
-          updates_detached = $('#updates').detach();
+          return false;
         }
-        $('#main').append(contentSectionHTML);
-
-
-        $('#syllabus .syllabus-content').hallo({
-          plugins: {
-            'halloformat': {},
-            'halloheadings': {},
-            'halloblock': {},
-            'hallojustify': {},
-            'hallolists': {},
-            'hallolink': {},
-            'halloreundo': {},
-            'halloimage': {}
-          },
-          editable: false,
-          toolbar: 'halloToolbarFixed',
-          placeholder: 'Add syllabus here'
-        }); 
-
-
-        $('#edit-syllabus-button').bind('click', editSyllabus);
-
-
-        return false;
       }
       /*
         This function transitions from any state to the main state
         with Schedule in focus and Updates in the sidebar
       */
       function transitionSchedule(){
-        if( $('#lesson-content').length){
-          //remove the temporary lesson model and view
-          openLessonView.remove();
-          openLessonView = null;
+        clearContentArea('schedule');
 
-          EmbedsCollection.reset();
-          EmbedsCollection = null;
-          EmbedsCollectionView = null;
-
-          $('.theOpenLesson').removeClass('theOpenLesson');
-          $('.selected').removeClass('selected');
-
-          $('#lesson-content').remove();
-
-          //TODO TCT2003 FRI DEC 21, 2012: perhaps animate this?
-          $('#schedule').removeClass('span3 collapsed').addClass('span9');
-          $('#main').append(updates_detached);
-        }else if( $('#syllabus').length > 0 ){
-          $('#syllabus').remove();
+        if($('#updates').length <= 0){
+          console.log('reappending updates');
           $('#main').append(updates_detached);
         }
-        $('#updates').removeClass('span9').addClass('span3 collapsed');
-        $('#schedule').removeClass('span3 collapsed').addClass('span9');
+        //$('#schedule').removeClass('span3 collapsed').addClass('span9');
+
+        $('#schedule').switchClass('span3 collapsed', 'span9', ANIMATION_TIME);
 
         return false;
       }
 
       function transitionUpdates(){
 
-        if( $('#lesson-content').length){
-          $('#lesson-content').remove();
-          $('.open').removeClass('.open');
-        }
-        if(updates_detached != null){
+        clearContentArea('updates');
+
+        //if detached, attach first, then open
+        if($('#updates').length <= 0){
+          console.log('reappending updates');
           $('#main').append(updates_detached);
-          updates_detached = null;
         }
-        $('#updates').removeClass('span3 collapsed').addClass('span9');
-        $('#schedule').removeClass('span9').addClass('span3 collapsed');
+
+        //$('#updates').removeClass('span3 collapsed').addClass('span9');
+        $('#updates').switchClass('span3 collapsed', 'span9', ANIMATION_TIME);
 
         return false;
       }
@@ -1000,9 +1030,9 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                 //need to replace the el, the view.remove() clears it
                 $('#lesson-content').append('<div id="lesson-content-el" class="el"></div>');
               }else{
-                $('#schedule').removeClass('span9').addClass('span3 collapsed');
-                updates_detached = $('#updates').detach();
-                $('#syllabus').remove();
+                //$('#schedule').removeClass('span9').addClass('span3 collapsed');
+                clearContentArea('lesson');
+
                 $('#main').append(contentSectionHTML);
               }
               
@@ -3139,27 +3169,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
 
 
-        function clearContentArea(){
-          if($('#lesson-content').length > 0){
-            $('#lesson-content').remove();
-          }
-          
-          if($('#updates').length > 0){
-            updates_detached = $('#updates').detach();
-          }
-
-          if(!$('#schedule').hasClass('collapsed')){
-            $('#schedule').removeClass('span9').addClass('span3 collapsed');
-          }
-
-          if($('#syllabus').length > 0){
-            $('#syllabus').remove();
-          }
-
-          if($('.open-page').length > 0){
-            $('.open-page').remove();
-          }
-        }
+        
 
         ///////////////////////////////////////////////////////////////
         ////////////////// PAGE  //////////////////////////////////////
@@ -3190,11 +3200,18 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             this.model.bind('change', this.render, this);//this calls the fetch
           },
 
-          editPage: function(){
+          editPage: function(event){
             console.log('editPage()');
               var pageID = this.model.get('nid');
 
-              if($(this).text() == "Edit"){
+              console.log('this: ');
+              console.dir(this);
+
+              console.log('event: ');
+              console.dir(event);
+
+              if($(event.currentTarget).text() == "Edit"){
+                console.log('was edit mode');
 
                 $('#page-content-wrapper').addClass('edit-mode');
                 $('#cancel-edit-page-button, #delete-edit-page-button').show();
@@ -3203,9 +3220,11 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                   editable: true
                 }); 
 
-                $(this).text('Save');
+                $(event.currentTarget).text('Save');
 
               }else{
+
+                console.log('was save mode');
 
                 if( $('.open-page .page-content').hasClass('isModified')){
 
@@ -3226,7 +3245,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                   });
                 }
 
-                $(this).text('Edit');
+                $(event.currentTarget).text('Edit');
 
               }
             
