@@ -3216,21 +3216,28 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                 $('#page-content-wrapper').addClass('edit-mode');
                 $('.open-page .cancel, .open-page .delete').show();
 
-                $('.open-page .page-content').hallo({
-                  plugins: {
-                    'halloformat': {},
-                    'halloheadings': {},
-                    'halloblock': {},
-                    'hallojustify': {},
-                    'hallolists': {},
-                    'hallolink': {},
-                    'halloreundo': {},
-                    'halloimage': {}
-                  },
-                  editable: true,
-                  toolbar: 'halloToolbarFixed',
-                  placeholder: 'Add page content here'
-                }); 
+
+                if($('.open-page .page-content').attr('contenteditable') == undefined){
+                  $('.open-page .page-content').hallo({
+                    plugins: {
+                      'halloformat': {},
+                      'halloheadings': {},
+                      'halloblock': {},
+                      'hallojustify': {},
+                      'hallolists': {},
+                      'hallolink': {},
+                      'halloreundo': {},
+                      'halloimage': {}
+                    },
+                    editable: true,
+                    toolbar: 'halloToolbarFixed',
+                    placeholder: 'Add page content here'
+                  }); 
+                }else{
+                  $('.open-page .page-content').hallo({
+                    editable: true
+                  });
+                }
 
                 $(event.currentTarget).text('Save');
 
@@ -3261,6 +3268,8 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                       alert('Updates did not save, please try again. If this persists, contact site administrator');
                     }
                   });
+                }else{
+                  this.cancelEditPage();
                 }
 
               }
@@ -3272,6 +3281,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             $('.open-page .page-content').hallo({
               editable: false
             });
+
 
             //if canceled before saved, this will revert to the stored value
             $('.open-page .page-content').html( this.model.get('field_page_content').value );
@@ -3318,8 +3328,6 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             });
 
             openPageView.render();
-
-            
 
             return false;
           }
