@@ -44,6 +44,9 @@ lessonEditHallo.placeholder.field_description = 'Add description here';
 lessonEditHallo.placeholder.title = 'Add title here';
 lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed code here';
 
+var TumblrHostnameOptionsArray = ['api-test-gsapp'];
+
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
@@ -1991,10 +1994,7 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
                 editable: false,
                 placeholder: 'title'
               });
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
-                editable: false,
-                placeholder: 'sitename'
-              });
+              
               $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
                 editable: false,
                 placeholder: 'tag1, tag2, tag3'
@@ -2005,9 +2005,16 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
               //TODO TCT2003
               //these variables should be pulled from divs
               var tumblr_el = '#tumblr-feed-el';
-              var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').text() + '.tumblr.com';
+              var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-hostname').val();
+
+              console.log('HOSTNAME!!!!: '+ hostname);
+
               var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
-              console.log('tagStr: '+ tagStr);
+
+              var group = ($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
+
+              console.log('GROUP: '+ group);
+              
 
               var tags = tagStr.split(', ');
               var limit = 1; //set to maximum always
@@ -2121,18 +2128,43 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
             tumblrHTMLarray.push('<div id="tumblr-wrapper" class="addon">');
               tumblrHTMLarray.push('<div class="tumblr-feed-edit-wrapper">');
                 tumblrHTMLarray.push('<div class="inner">');
-                  tumblrHTMLarray.push('<div class="edit-tumblr-buttons">');
-                    tumblrHTMLarray.push('<div class="button edit">Save</div>');
-                    tumblrHTMLarray.push('<div class="button delete">Delete</div>');
+                  tumblrHTMLarray.push('<div class="row-fluid">');
+                    tumblrHTMLarray.push('<div class="tumblr-input-title editable span4"></div>');
+
+                    tumblrHTMLarray.push('<div class="edit-tumblr-buttons span5">');
+                      tumblrHTMLarray.push('<div class="button edit">Save</div>');
+                      tumblrHTMLarray.push('<div class="button delete">Delete</div>');
+                    tumblrHTMLarray.push('</div>');
                   tumblrHTMLarray.push('</div>');
 
-                  tumblrHTMLarray.push('<div class="tumblr-input-title editable"></div>');
-                  tumblrHTMLarray.push('<div>Hostname:&nbsp;<span class="tumblr-input-hostname editable"></span>&nbsp;.tumblr.com</div>');
-                  tumblrHTMLarray.push('<div>Tags (separated by commas):&nbsp;<span class="tumblr-input-tags editable"></span></div>');
-                  tumblrHTMLarray.push('<div class="btn-group" data-toggle="buttons-checkbox">');
-                    tumblrHTMLarray.push('<button type="button" class="btn btn-primary tumblr-input-group">Click to group by student name</button>');
+                  tumblrHTMLarray.push('<div class="row-fluid">');
+                    tumblrHTMLarray.push('<div class="span4"><select class="tumblr-selected-hostname">');
+                      for(var i = 0; i < TumblrHostnameOptionsArray.length; i++){
+                        tumblrHTMLarray.push('<option>');
+                          tumblrHTMLarray.push(TumblrHostnameOptionsArray[i] + '.tumblr.com');
+                        tumblrHTMLarray.push('</option>');
+                      }
+                    tumblrHTMLarray.push('</select></div><!-- /.span4 -->');
+                    tumblrHTMLarray.push('<div class="span5">Select the Tumblr blog to pull from</div>');
                   tumblrHTMLarray.push('</div>');
-                tumblrHTMLarray.push('</div>');
+
+                  tumblrHTMLarray.push('<div class="row-fluid">');
+                    tumblrHTMLarray.push('<div class="span4"><div class="tumblr-input-tags editable"></div></div>');
+                    tumblrHTMLarray.push('<div class="span5">Enter the tags to sort by separated by a comma</div>');
+                  tumblrHTMLarray.push('</div>');
+
+
+                  tumblrHTMLarray.push('<div class="row-fluid">');
+                    tumblrHTMLarray.push('<div class="span4"><select class="tumblr-selected-group">');
+                      tumblrHTMLarray.push('<option>Group by Student UNI</option>');
+                      tumblrHTMLarray.push('<option>Do not group</option>');
+                    tumblrHTMLarray.push('</select></div><!-- /.span4 -->');
+                    tumblrHTMLarray.push('<div class="span5">Select grouping option</div>');
+                  tumblrHTMLarray.push('</div>');
+
+
+
+                tumblrHTMLarray.push('</div>');//.inner
               tumblrHTMLarray.push('</div><!-- .tumblr-feed-edit-wrapper -->');
               tumblrHTMLarray.push('<div class="tumblr-feed-content">');
                 tumblrHTMLarray.push('<div id="');
@@ -3037,7 +3069,15 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
         });
 
 
+        
 
+
+
+
+
+        ///////////////////////////////////////////////////////////////
+        ////////////////// TUMBLR  ////////////////////////////////////
+        ///////////////////////////////////////////////////////////////
 
 
 
@@ -3166,6 +3206,15 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
           });
 
         }
+
+
+
+
+
+
+
+
+
 
 
 
