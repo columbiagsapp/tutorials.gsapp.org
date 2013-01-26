@@ -39,3 +39,14 @@ function gsapp_tutorials_preprocess_user_profile(&$variables) {
   // Preprocess fields.
   field_attach_preprocess('user', $account, $variables['elements'], $variables);
 }
+
+
+/**
+ * Makes jQuery UI available for all users (even not logged in)
+ *
+ *
+ * @see http://drupal.org/node/1172846
+ */
+function gsapp_tutorials_preprocess_html(&$variables){
+  drupal_add_library('system', 'ui');
+}

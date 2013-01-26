@@ -1,7 +1,27 @@
-<?php if( in_array("administrator", $user->roles) ){
-  $admin = true;
+<?php 
+  global $user;
+  if( in_array("administrator", $user->roles) ){
+    $admin = true;
   }else{
     $admin = false;
+  }
+
+  if( in_array("faculty", $user->roles) ){
+    $faculty = true;
+  }else{
+    $faculty = false;
+  }
+
+  if( in_array("ta", $user->roles) ){
+    $ta = true;
+  }else{
+    $ta = false;
+  }
+
+  if( in_array("student", $user->roles) ){
+    $student = true;
+  }else{
+    $student = false;
   }
 ?>
 
@@ -33,13 +53,47 @@
       		  <?php print $primary_nav; ?>
       		<?php endif; ?>
       	  
-      		<?php if ($search): ?>
+      		<?php //if ($search): ?>
       		  <?php //if ($search): print render($search); endif; ?>
-      		<?php endif; ?>
+      		<?php //endif; ?>
       		
-      		<?php if ($secondary_nav): ?>
-      		  <?php print $secondary_nav; ?>
-      		<?php endif; ?>
+      		<?php //if ($secondary_nav): ?>
+      		  <?php //print $secondary_nav; ?>
+      		<?php //endif; ?>
+
+
+          <div id="user-menu" class="pull-right btn-group">
+            <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">User menu<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <?php if(user_is_logged_in()){ ?>
+                <?php if($admin != true){ ?>
+                  <li class="menu-2 first">
+                    <a href="/user/<?php print $user->uid; ?>/edit">My account</a>
+                  </li>
+                <?php } ?>
+                <?php if($student == true || $ta == true){ ?>
+                  <li class="menu-3">
+                    <a href="/courses/student/<?php print $user->uid; ?>">My courses</a>
+                  </li>
+                <?php }else if($ta == true){ ?>
+                  <li class="menu-4">
+                    <a href="/courses/ta/<?php print $user->uid; ?>">Courses I TA</a>
+                  </li>
+                <?php }else if($faculty == true){ ?>
+                  <li class="menu-4">
+                    <a href="/courses/faculty/<?php print $user->uid; ?>">Courses I teach</a>
+                  </li>
+                <?php } ?>
+                <li class="menu-15 last">
+                  <a href="/user/logout">Log out</a>
+                </li>
+              <?php }else{ ?>
+                 <li class="menu-15 last">
+                  <a href="/user/login">Login</a>
+                </li>
+              <?php } ?>
+            </ul>
+          </div>
     		</nav>
   	  </div>         
   	</div>
@@ -47,6 +101,10 @@
 </nav>
 
 <div id="wrapper" class="container-fluid">
+  <div class="row-fluid">
+    <?php print $messages; ?>
+  </div>
+
   <?php if($admin){ ?>
   <div class="row-fluid">
     <section class="<?php print _twitter_bootstrap_content_span(1); ?>">  

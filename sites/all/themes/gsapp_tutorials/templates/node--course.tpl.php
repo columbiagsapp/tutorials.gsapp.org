@@ -1,12 +1,20 @@
 <?php 
+  global $user;
+
+  $editable = false;
+  $access = false;
+
   if( in_array("administrator", $user->roles) ){
     $editable = true;
+    $access = true;
   }else if( in_array("faculty", $user->roles) ){
-    $instructors = field_get_items('node', $node, 'field_instructors', $node->language); 
+    $instructors = field_get_items('node', $node, 'field_instructors', $node->language);     
     if(isset($instructors) && !empty($instructors)){
       $i = 0;
+
       foreach($instructors as $instructor){
-        if( $instructor[uid] == $user->uid){
+        if( $instructor['uid'] == $user->uid){
+          $access = true;
           $editable = true;
           break;
         }
@@ -15,18 +23,45 @@
     }
   }else if( in_array("ta", $user->roles) ){
     $assistants = field_get_items('node', $node, 'field_assistants', $node->language);
-    if(isset($instructors) && !empty($instructors)){
+    if(isset($assistants) && !empty($assistants)){
       $i = 0;
-      foreach($instructors as $instructor){
-        if( $instructor[uid] == $user->uid){
+      foreach($assistants as $assistant){
+        if( $assistant['uid'] == $user->uid){
+          $access = true;
           $editable = true;
           break;
         }
         $i++;
       }
     }
-  }else{
+  }else if( in_array("student", $user->roles) ){
     $editable = false;
+    $students = field_get_items('node', $node, 'field_course_students', $node->language); 
+    if(isset($students) && !empty($students)){
+      $i = 0;
+      foreach($students as $student){
+        if($student['uid'] == $user->uid){
+          $access = true;
+          break;
+        }
+        $i++;
+      }
+    }
+  }
+?>
+
+
+
+<?php
+  if($access == false){
+    $dest = drupal_get_destination();
+    if ($user->uid) { // this user is already logged in
+      drupal_set_message("Access Denied: You do not have access to this page.");
+      drupal_goto('courses/'.$user->uid, $dest); // this remembers where the user is coming from
+    } else {
+      drupal_set_message("Access Denied: Please Login");
+      drupal_goto('user/login', $dest); // this remembers where the user is coming from
+    }
   }
 ?>
 
@@ -105,8 +140,8 @@
         <h2 class="heading float-left">Schedule</h2>
         <?php if($editable){ ?>
           <div class="schedule-button-container edit-button-container float-right">
-            <div id="resort-week-container" class="button"><i class="icon-move"></i>&nbsp;&nbsp;<span class="resort-text-container">Resort</span></div>
-            <div id="add-week-container" class="button"><i class="icon-plus"></i>&nbsp;&nbsp;Section</div>
+            <div id="resort-week-container" class="resort button"><i class="icon-move"></i>&nbsp;&nbsp;<span class="resort-text-container">Resort</span></div>
+            <div id="add-week-container" class="add-section button"><i class="icon-plus"></i>&nbsp;&nbsp;Section</div>
           </div>
         <?php } ?>
       </div>

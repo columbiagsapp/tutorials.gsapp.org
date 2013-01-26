@@ -410,6 +410,19 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         }
       }
 
+
+      function cancelEditSyllabus(){
+        $('#syllabus .syllabus-content').html( course.get('field_syllabus').value );
+
+        $('#syllabus .syllabus-content').hallo({
+          editable: false
+        }); 
+
+        $('#syllabus-content-wrapper').removeClass('edit-mode');
+        $('#cancel-edit-syllabus-button').hide();
+        $('#edit-syllabus-button').text('Edit');
+      }
+      
       
       ///////////////////////////////////////////////////////////////
       ////////////////// TRANSITIONS  ///////////////////////////////
@@ -478,7 +491,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         //only open if not already open
         if($('#syllabus').length <= 0){
           var contentSectionHTML = 
-                '<section id="syllabus" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
+                '<section id="syllabus" class="span9" role="complementary"><div class="float-left heading-button roman"><h2 class="heading float-left">Syllabus</h2><div class="edit-button-container"><div id="edit-syllabus-button" class="edit button">Edit</div><div id="cancel-edit-syllabus-button" class="cancel button">Cancel</div></div></div><div id="syllabus-content-wrapper" class="brick roman"><div class="inner"><div class="syllabus-content editable">';
 
           contentSectionHTML = contentSectionHTML + course.get('field_syllabus').value + '</div></div></div></section><!-- /.span3 -->';
 
@@ -503,6 +516,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           }); 
 
           $('#edit-syllabus-button').bind('click', editSyllabus);
+          $('#cancel-edit-syllabus-button').bind('click', cancelEditSyllabus);
 
           return true;
         }else{

@@ -223,6 +223,10 @@ h1 a:hover{
   margin-right:@inlineMarginRight;
 }
 
+.centered{
+  text-align:center;
+}
+
 .inner{
   margin:@brickPadding;
 }
@@ -234,6 +238,12 @@ h1 a:hover{
 
 .editable{
   min-width:20px;
+}
+
+.student .edit,
+.student .delete,
+.student .cancel{
+  .hidden;
 }
 
 .flatten{
@@ -1282,4 +1292,21 @@ textarea[readonly]{
 .pagination .prev{
   float:right;
   margin-left:@innerPadding;
+}
+
+/* TEMPORARY */
+#toolbar{
+  display:none !important;
+}
+
+body.toolbar-drawer .navbar-fixed-top{
+  top: 0 !important;
+}
+
+body.toolbar-drawer{
+  padding-top: 0 !important;
+}
+
+#lesson-attachment{
+  display:none !important;
 }
