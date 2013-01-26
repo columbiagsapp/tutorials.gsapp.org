@@ -39,8 +39,11 @@
   	<div class="profile-picture"><?php print drupal_render(field_view_field('profile2', $profile['main'], 'field_portrait')); ?></div>
   	*/ ?>
   	<div class="profile-name">
-  		<?php //<a href="mailto:<?php print render($user_profile['mail']); ?>
-  			<?php print $profile['main']->field_name['und'][0]['value']; ?>
+  		<?php //<a href="mailto:<?php print render($user_profile['mail']); 
+  			if(isset($profile['main'])){
+	  			print $profile['main']->field_name['und'][0]['value'];
+	  		}
+  		?>
   		
   	</div>
 </div>
