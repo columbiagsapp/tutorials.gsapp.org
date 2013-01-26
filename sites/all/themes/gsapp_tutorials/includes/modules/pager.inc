@@ -18,7 +18,7 @@
  *
  * @ingroup themeable
  */
-function twitter_bootstrap_pager($variables) {
+function gsapp_tutorials_pager($variables) {
   $output = "";
   $tags = $variables['tags'];
   $element = $variables['element'];

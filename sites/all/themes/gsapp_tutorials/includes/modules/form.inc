@@ -47,7 +47,7 @@ function twitter_bootstrap_form($variables) {
 /**
  * Implements hook_form_alter().
  */
-function twitter_bootstrap_form_alter(&$form, &$form_state, $form_id) {
+function gsapp_tutorials_form_alter(&$form, &$form_state, $form_id) {
   // Id's of forms that should be ignored
   // Make this configurable?
   $form_ids = array(
@@ -64,7 +64,7 @@ function twitter_bootstrap_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Returns HTML for a form element.
  */
-function twitter_bootstrap_form_element(&$variables) {
+function gsapp_tutorials_form_element(&$variables) {
   $element = &$variables['element'];
   // This is also used in the installer, pre-database setup.
   $t = get_t();
@@ -141,7 +141,7 @@ function twitter_bootstrap_form_element(&$variables) {
 /**
  * Returns HTML for a form element label and required marker.
  */
-function twitter_bootstrap_form_element_label(&$variables) {
+function gsapp_tutorials_form_element_label(&$variables) {
   $element = $variables['element'];
   // This is also used in the installer, pre-database setup.
   $t = get_t();
@@ -190,7 +190,7 @@ function twitter_bootstrap_form_element_label(&$variables) {
 /**
  * Preprocessor for theme('button').
  */
-function twitter_bootstrap_preprocess_button(&$vars) {
+function gsapp_tutorials_preprocess_button(&$vars) {
   $vars['element']['#attributes']['class'][] = 'btn';
 
   if (isset($vars['element']['#value'])) {
@@ -231,7 +231,7 @@ function twitter_bootstrap_preprocess_button(&$vars) {
 /**
  * Returns HTML for a button form element.
  */
-function twitter_bootstrap_button($variables) {
+function gsapp_tutorials_button($variables) {
   $element = $variables['element'];
   $label = check_plain($element['#value']);
   element_set_attributes($element, array('id', 'name', 'value', 'type'));

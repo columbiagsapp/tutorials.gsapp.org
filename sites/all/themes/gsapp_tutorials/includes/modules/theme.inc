@@ -1,6 +1,6 @@
 <?php
 
-function twitter_bootstrap_item_list($variables) {
+function gsapp_tutorials_item_list($variables) {
   $items = $variables['items'];
   $title = $variables['title'];
   $type = $variables['type'];
@@ -56,7 +56,7 @@ function twitter_bootstrap_item_list($variables) {
  * Returns HTML for status and/or error messages, grouped by type.
  *
  */
-function twitter_bootstrap_status_messages($vars) {
+function gsapp_tutorials_status_messages($vars) {
   $display = $vars['display'];
   $output = '';
 
@@ -86,7 +86,7 @@ function twitter_bootstrap_status_messages($vars) {
   return $output;
 }
 
-function twitter_bootstrap_css_alter(&$css) {
+function gsapp_tutorials_css_alter(&$css) {
   //global $theme_key;
   //$theme_path = drupal_get_path('theme', $theme_key);
   
@@ -97,7 +97,7 @@ function twitter_bootstrap_css_alter(&$css) {
 /**
  * Implements hook_js_alter().
  */
-function twitter_bootstrap_js_alter(&$js) {
+function gsapp_tutorials_js_alter(&$js) {
   $excludes = _twitter_bootstrap_alter(twitter_bootstrap_theme_get_info('exclude'), 'js');
   // If twitter_bootstrap_ui available, we should not add js from theme info file.
   if (module_exists('twitter_bootstrap_ui')) {
@@ -107,7 +107,7 @@ function twitter_bootstrap_js_alter(&$js) {
   $js = array_diff_key($js, $excludes);
 }
 
-function _twitter_bootstrap_alter($files, $type) {
+function _gsapp_tutorials_alter($files, $type) {
   $output = array();
   
   foreach($files as $key => $value) {
@@ -123,7 +123,7 @@ function _twitter_bootstrap_alter($files, $type) {
 /**
  * Returns HTML for a set of links.
  */
-function twitter_bootstrap_twitter_bootstrap_links($variables) {
+function gsapp_tutorials_twitter_bootstrap_links($variables) {
   $links = $variables['links'];
   $attributes = $variables['attributes'];
   $heading = $variables['heading'];
@@ -229,7 +229,7 @@ function twitter_bootstrap_twitter_bootstrap_links($variables) {
   return $output;
 }
 
-function twitter_bootstrap_preprocess_table(&$variables) {
+function gsapp_tutorials_preprocess_table(&$variables) {
   $variables['attributes']['class'][] = 'table';
   $variables['attributes']['class'][] = 'table-striped';
 }
