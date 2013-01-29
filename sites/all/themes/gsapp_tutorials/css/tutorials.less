@@ -830,6 +830,10 @@ textarea[readonly]{
   margin:@buttonMargin;
 }
 
+.tumblr-feed-edit-wrapper .edit-tumblr-buttons{
+  float:right;
+}
+
 .lesson:hover,
 .add-lesson:hover{
   cursor:pointer;
@@ -1185,7 +1189,8 @@ textarea[readonly]{
 .week-list-container > li,
 .update-list-container > li, 
 .embed-list-container > li,
-.page-list-container > li{
+.page-list-container > li,
+.tumblr-feed-list-container > li{
   width:100%;
 }
 
@@ -1268,7 +1273,7 @@ textarea[readonly]{
   display: none;
 }
 
-.edit-mode .tumblr-feed-edit-wrapper{
+.edit-mode.tumblr-feed-edit-wrapper{
   display: block;
   background-color:@darkBGColor;
 }
@@ -1294,6 +1299,11 @@ textarea[readonly]{
   margin-left:@innerPadding;
 }
 
+#syllabus-content-wrapper .syllabus-content,
+.open-page #page-content-wrapper .page-content{
+  max-width:500px;
+}
+
 /* TEMPORARY */
 #toolbar{
   display:none !important;
@@ -1305,8 +1315,4 @@ body.toolbar-drawer .navbar-fixed-top{
 
 body.toolbar-drawer{
   padding-top: 0 !important;
-}
-
-#lesson-attachment{
-  display:none !important;
 }

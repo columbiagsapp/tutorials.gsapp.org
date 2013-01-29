@@ -287,7 +287,12 @@
     <ul id="lesson-addon-nav">
     </ul>
 
-    <div id="lesson-attachment-content"></div><!-- /#lesson-content -->
+    <ul id="lesson-attachment-content" class="list-container">
+      <li id="tumblr-addon-wrapper">
+        <div id="tumblr-preloader" class="tumblr preloader"><i class="icon-spinner icon-spin"></i></div>
+        <div id="tumblr-feed-list-el"></div>
+      </li>
+    </ul><!-- /#lesson-content -->
   </div><!-- /#lesson-attachment -->
 
 </script>
@@ -545,21 +550,32 @@
 
 <script type="text/template" id="tpl-tumblr-post">
 
+      <% if(typeof type !== 'undefined' && type){ %>
+        <% if(type == "photo"){ %>
+
+          <% if(typeof photos !== 'undefined' && photos.length){ %>
+            <div class="row-fluid">
+              <% for (var i=0; i < photos.length; i++) { %>
+
+                  <a class="tumblr-img-wrapper" href="<%= photos[i].original_size.url %>">
+                    <img src="<%= photos[i].alt_sizes[2].url %>">
+                  </a>
+                  <% if(caption){ %>
+                    <%= caption %>
+                  <% } %>
+
+              <% } %>
+            </div><!-- /.row-fluid -->  
+          <% } %>
+        <% } %>
+      <% } %>
+
       <% if(typeof title !== 'undefined' && title){ %>
         <h2 class="title">
           <a href="<%= post_url %>"><%= title %></a>
         </h2>
       <% } %>
 
-      <% if(typeof photos !== 'undefined' && photos.length){ %>
-        <% for (var i=0; i < photos.length; i++) { %>
-        <a href="<%= photos[i].original_size.url %>">
-          <img src="<%= photos[i].alt_sizes[0].url %>"></a>
-          <% if(photos[i].caption){ %>
-          <a href="<%= post_url %>"><%= photos[i].caption %></a>
-          <% } %>
-        <% } %>
-      <% } %>
 
       <% if(typeof body !== 'undefined' && body){ %>
         <%= body %>
@@ -568,3 +584,74 @@
     </script>
 
 
+<script type="text/template" id="tumblr_feed_attachment">
+
+
+<div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="addon tumblr-feed">
+
+  <div id="tumblr-wrapper"> 
+    <div class="tumblr-feed-edit-wrapper">
+      <div class="inner">
+        <div class="row-fluid">
+
+          <div class="edit-tumblr-buttons span5">
+            <div class="button edit">Edit</div>
+            <div class="button cancel">Cancel</div>
+            <div class="button delete">Delete</div>
+          </div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span4">
+            <select class="tumblr-selected-hostname">
+
+            <% if( (typeof(field_tumblr_hostname)) != 'undefined' ){ %>
+              <option><%= field_tumblr_hostname %></option>
+            <% } %>
+            </select>
+          </div><!-- /.span4 -->
+          <div class="span5">Select the Tumblr blog to pull from</div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span4">
+            <div class="tumblr-input-tags editable">
+              <% if( (typeof(field_tumblr_tags)) != 'undefined'){ %>
+                <%= field_tumblr_tags %>
+              <% } %>
+            </div>
+          </div>
+          <div class="span5">Enter the tags to sort by separated by a comma</div>
+        </div>
+
+        <div class="row-fluid">
+          <div class="span4">
+            <select class="tumblr-selected-group">
+              <% if( (typeof(field_tumblr_grouping)) != 'undefined' ){ %>
+                <option><%= field_tumblr_grouping %></option>
+              <% } %>
+            </select>
+          </div><!-- /.span4 -->
+          <div class="span5">Select grouping option</div>
+        </div>
+
+      </div>
+    </div><!-- .tumblr-feed-edit-wrapper -->
+
+    <div class="tumblr-feed-content">
+      <div id="tumblr-feed-el"></div>
+    </div><!-- .tumblr-feed-content -->
+    
+    <div class="pagination">
+      <div class="next button">Next</div>
+      <div class="prev button">Prev</div>
+    </div><!-- .pagination -->
+  </div><!-- #tumblr-wrapper -->
+</div><!-- /#node-id -->
+</script>
+
+
+<script type="text/template" id="tumblr-feed">
+    <ul class="tumblr-feed-list-container list-container">
+    </ul>
+</script>
