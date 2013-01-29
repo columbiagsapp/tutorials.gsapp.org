@@ -1011,6 +1011,109 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           }
         });
 
+        var TumblrFeedCollection = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: TumblrFeed
+        });
+
+        var TumblrFeedView = Drupal.Backbone.Views.Base.extend({
+          //the Underscore formated template in node--tutorial.tpl.php stored in a 
+          //<script> tag and identified by its id
+          templateSelector: '#tumblr_feed_attachment',
+          el:'#tumblr-feed-list-el',
+
+          //bind vote up and down events to the buttons and tie these to local functions
+          events: {
+            "click .edit" : "editTumblrFeed",
+            "click .delete": "deleteTumblrFeed",
+            "click .cancel": "cancelEditTumblrFeed"
+          },
+
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            _.bindAll(this, 'show', 'hide', 'enterEditMode', 'exitEditMode');
+          },
+
+          editTumblrFeed: function(){
+            console.log('editTumblrFeed()');
+
+            if($(this).text == "Edit"){
+              
+              //initTumblrEditorHallo();
+
+            }else{
+              
+              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
+                editable: false,
+                placeholder: 'tag1, tag2, tag3'
+              });
+
+              //TODO TCT2003
+              //these variables should be pulled from divs
+              var tumblr_el = '#tumblr-feed-el';
+              var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-hostname').val();
+
+
+              var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
+
+              var group = ($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
+
+              
+
+              var tags = tagStr.split(', ');
+              var limit = 20; //set to maximum always
+
+              console.log('calling initTumblrFeed() with hostname: '+ hostname + ', ' + 'tags: ');
+              console.dir(tags);
+
+
+              if($('#tumblr-feed-el').children().length > 0){//not first time
+                refreshTumblrFeed();
+              }else{
+                var lessionID = this.model.get('nid');
+
+                this.model.set({
+                  "field_tumblr_hostname": hostname,
+                  "field_tumblr_tags": tagStr,
+                  "field_tumblr_limit": limit,
+                  "field_tumblr_group_by_student": 'false',
+                });            
+                
+
+                this.model.save();
+
+                initTumblrFeed(tumblr_el, hostname+'.tumblr.com', tags, limit, '');
+              }
+
+            }
+          },
+
+          deleteTumblrFeed: function(){
+
+          },
+
+          cancelEditTumblrFeed: function(){
+
+          },
+
+          show: function(){
+            console.log('showing');
+            var thisID = this.model.get('nid');
+            $('#node-'+thisID).addClass('active');
+          },
+
+          hide: function(){
+            var thisID = this.model.get('nid');
+            $('#node-'+thisID).removeClass('active');
+          },
+          enterEditMode: function(){
+            var thisID = this.model.get('nid');
+            $('.tumblr-feed-edit-wrapper', '#node-'+thisID).addClass('edit-mode');
+          },
+          exitEditMode: function(){
+            var thisID = this.model.get('nid');
+            $('.tumblr-feed-edit-wrapper', '#node-'+thisID).removeClass('edit-mode');
+          }
+        });
 
         var TumblrPost = Backbone.Model.extend({});
 
@@ -1119,7 +1222,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                         case '':
                           break;
                         default://just get everything
-                          initTumblrFeed(El, hostname, tags, limit, grouping);
+                          //initTumblrFeed(el, hostname, tags, limit, grouping);
                           break;
                       }
 
@@ -2306,18 +2409,13 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           initTumblrEditorHallo: function(){
-            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
-              editable: true,
-              placeholder: 'title'
-            });
-            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
-              editable: true,
-              placeholder: 'sitename'
-            });
             $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
               editable: true,
               placeholder: 'tag1, tag2, tag3'
             });
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').text('Save');
+            
+
           },
 
           /* 
@@ -2340,21 +2438,118 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
             this.model.save({}, {silent:true});
 
+            var lessonID = this.model.get('nid');
+            var tumblr_title = "Tumblr Feed for lesson "+lessonID;
+
+            var t = new Embed({
+              "title": tumblr_title,
+              "type": "tumblr_feed",
+              "field_parent_lesson_nid":lessonID
+            });
+
+            //need to set this explicitly for a node create
+            //because the Drupal Backbone module doesn't know
+            //when the node is new... must be a better way!
+            t.url = "/node";
+
+            $('.tumblr.preloader', '#node-'+lessonID).show();
+            var _this = this;
+
+            var resp = t.save({}, {
+              success: function(model, response, options){
+                $('.tumblr.preloader', '#node-'+lessonID).hide();
+                var tumblrFeedSelector = '#node-' + response.id;
+                t.id = response.id;
+                t.url = "/node/" + response.id + ".json";
+                t.set({
+                  "nid":response.id
+                });
+                t.save({}, {
+                  success: function(){
+                    //_this.renderTumblrFeed();
+
+                    var tv = new TumblrFeedView({
+                      model:t
+                    });
+                    if(tv.render()){
+                      $(tumblrFeedSelector).addClass('active');
+
+                      tumblr.groupingOptions = [];
+                      tumblr.groupingOptions.push('Group by Student UNI');
+                      tumblr.groupingOptions.push('Group by TA');
+
+
+                      var course_tumblr_blogs_hostnames = course.get('field_tumblr_blogs');
+                      var hostnames = [];
+
+                      console.dir(course_tumblr_blogs_hostnames);
+
+                      if(course_tumblr_blogs_hostnames != null){
+                        $.each(course_tumblr_blogs_hostnames, function(key, value) {   
+                          console.log('adding to select key: '+ key + ' value: ' + value);
+                          $('.tumblr-selected-hostname')
+                            .append($("<option></option>")
+                            .attr("value",value)
+                            .text(value));
+                        });
+                      }
+
+                      $.each(tumblr.groupingOptions, function(key, value) {   
+                        $('.tumblr-selected-group')
+                          .append($("<option></option>")
+                          .attr("value",value)
+                          .text(value));
+                      });
+
+
+                      _this.initTumblrEditorHallo();
+                    }
+
+                    
+                    console.log('end success');
+                  }
+                });           
+                /*
+                tumblr.tumblrFeedCollection = new TumblrFeedCollection();
+                tumblr.tumblrFeedCollection.reset();
+
+                tumblr.TumblrFeedCollectionView = new Drupal.Backbone.Views.CollectionView({
+                  collection: tumblr.tumblrFeedCollection,
+                  templateSelector: '#tumblr-feed',
+                  renderer: 'underscore',
+                  el: '#tumblr-feed-list-el',
+                  ItemView: TumblrFeedView,
+                  itemParent: '.tumblr-feed-list-container'
+                });
+
+                tumblr.TumblrFeedCollectionView.render();
+                tumblr.TumblrFeedCollectionView.addOne(t);
+                */
+
+
+              },
+              error: function(){
+                $('.embed.preloader', '#node-'+lessonID).hide();
+              }
+            });
+
+
+
             //Step 2
             //reset active tab and hide other tabs
-            $('#lesson-addon-nav li.active').removeClass('active');
-            $('.addon.active').removeClass('active');
+            //$('#lesson-addon-nav li.active').removeClass('active');
+            //$('.addon.active').removeClass('active');
 
             //Step 3
             //Append tumblr html infrastructure
-            if( this.appendTumblrAddon() ){
+            //if( this.appendTumblrAddon() ){
               //Step 4
               //Init edit mode
-              $('#tumblr-wrapper').addClass('edit-mode active');
-              $('.nav-tumblr').addClass('active');
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').bind('click', this.editTumblrAddon);
-              this.initTumblrEditorHallo();
-            }
+              //$('#tumblr-wrapper').addClass('edit-mode active');
+              //$('.nav-tumblr').addClass('active');
+              //$('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').bind('click', this.editTumblrAddon);
+              //this.initTumblrEditorHallo();
+            //}
 
           },
 
@@ -2426,6 +2621,76 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
           },
 
+          renderTumblrFeed: function(){
+            console.log('adding tumblr addon');
+
+            var lessonID = this.model.get('nid');
+
+            tumblr.tumblrFeedCollection = new TumblrFeedCollection();
+
+            tumblr.tumblrFeedCollection.reset();
+
+
+            tumblr.TumblrFeedCollectionView = new Drupal.Backbone.Views.CollectionView({
+              collection: tumblr.tumblrFeedCollection,
+              templateSelector: '#tumblr-feed',
+              renderer: 'underscore',
+              el: '#tumblr-feed-list-el',
+              ItemView: TumblrFeedView,
+              itemParent: '.tumblr-feed-list-container'
+            });
+
+            tumblr.TumblrFeedCollectionView.render();
+
+            tumblr.tumblrFeedCollection.fetchQuery({
+              "field_parent_lesson_nid": lessonID,
+              "type": "tumblr_feed"
+            }, {
+              success: function(model, response, options){
+                console.log('success fetching tumblr feed from drupal');
+
+                $('.preloader.tumblr').hide();
+
+                _.each(tumblr.TumblrFeedCollectionView._itemViews, function(element, index){
+                  //element.show();
+                  if( isEditor() ){
+                    element.enterEditMode();
+                  }
+
+                  var El = '#tumblr-feed-el';
+                  var hostname = element.model.get('field_tumblr_hostname');
+                  var limit = '20';
+                  var tagsString = element.model.get('field_tumblr_tags');
+                  var tags = [];
+                  if(tagsString != null){
+                    tags = tagsString.split(', ');
+                  }
+                  var grouping = element.model.get('field_tumblr_grouping');
+
+                  console.log('initTumblrFeed(El, hostname, tags, limit, grouping): '+ El + '  '+ hostname + '  '+tagsString+'  '+limit+ '  '+grouping);
+                  console.dir(tags);
+
+                  initTumblrFeed(El, hostname, tags, limit, grouping);
+
+                  var navHTML = '<li class="inline nav-tumblr"><h2 class="inline">Tumblr Feed</h2></li>';
+                  $('#lesson-addon-nav').append( navHTML );
+
+                  $('#lesson-addon-nav .nav-tumblr').bind('click', element.show);
+
+                  //if no Q&A, render the Tumblr Feed
+
+                });
+
+                
+
+              },
+              error: function(){
+                console.log('error fetching tumblr feed from drupal');
+                $('.preloader.tumblr').hide();
+              }
+            });
+          },
+
           /*
            * Render the addons in the order added?
           */
@@ -2455,124 +2720,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               }
 
               if(addons.indexOf('tumblr') >= 0){
-                console.log('adding tumblr addon');
-                var TumblrFeedCollection = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-                  model: TumblrFeed
-                });
-
-                tumblr.tumblrFeedCollection = new TumblrFeedCollection();
-
-                tumblr.tumblrFeedCollection.reset();
-
-                var TumblrFeedView = Drupal.Backbone.Views.Base.extend({
-                  //the Underscore formated template in node--tutorial.tpl.php stored in a 
-                  //<script> tag and identified by its id
-                  templateSelector: '#tumblr_feed_attachment',
-
-                  //bind vote up and down events to the buttons and tie these to local functions
-                  events: {
-                    "click .edit" : "editTumblrFeed",
-                    "click .delete": "deleteTumblrFeed",
-                    "click .cancel": "cancelEditTumblrFeed"
-                  },
-
-                  initialize: function(opts) {
-                    Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-                    _.bindAll(this, 'show', 'hide', 'enterEditMode', 'exitEditMode');
-                  },
-
-                  editTumblrFeed: function(){
-
-                  },
-
-                  deleteTumblrFeed: function(){
-
-                  },
-
-                  cancelEditTumblrFeed: function(){
-
-                  },
-
-                  show: function(){
-                    console.log('showing');
-                    var thisID = this.model.get('nid');
-                    $('#node-'+thisID).addClass('active');
-                  },
-
-                  hide: function(){
-                    var thisID = this.model.get('nid');
-                    $('#node-'+thisID).removeClass('active');
-                  },
-                  enterEditMode: function(){
-                    var thisID = this.model.get('nid');
-                    $('.tumblr-feed-edit-wrapper', '#node-'+thisID).addClass('edit-mode');
-                  },
-                  exitEditMode: function(){
-                    var thisID = this.model.get('nid');
-                    $('.tumblr-feed-edit-wrapper', '#node-'+thisID).removeClass('edit-mode');
-                  }
-                });
-
-
-
-                tumblr.TumblrFeedCollectionView = new Drupal.Backbone.Views.CollectionView({
-                  collection: tumblr.tumblrFeedCollection,
-                  templateSelector: '#tumblr-feed',
-                  renderer: 'underscore',
-                  el: '#tumblr-feed-list-el',
-                  ItemView: TumblrFeedView,
-                  itemParent: '.tumblr-feed-list-container'
-                });
-
-                tumblr.TumblrFeedCollectionView.render();
-
-                tumblr.tumblrFeedCollection.fetchQuery({
-                  "field_parent_lesson_nid": lessonID,
-                  "type": "tumblr_feed"
-                }, {
-                  success: function(model, response, options){
-                    console.log('success fetching tumblr feed from drupal');
-
-                    $('.preloader.tumblr').hide();
-
-                    _.each(tumblr.TumblrFeedCollectionView._itemViews, function(element, index){
-                      //element.show();
-                      if( isEditor() ){
-                        element.enterEditMode();
-                      }
-
-                      var El = '#tumblr-feed-el';
-                      var hostname = element.model.get('field_tumblr_hostname');
-                      var tagsString = element.model.get('field_tumblr_tags');
-                      var limit = '20';
-                      var tags = tagsString.split(', ');
-                      var grouping = element.model.get('field_tumblr_grouping');
-
-                      console.log('initTumblrFeed(El, hostname, tags, limit, grouping): '+ El + '  '+ hostname + '  '+tagsString+'  '+limit+ '  '+grouping);
-                      console.dir(tags);
-
-                      initTumblrFeed(El, hostname, tags, limit, grouping);
-
-                      var navHTML = '<li class="inline nav-tumblr"><h2 class="inline">Tumblr Feed</h2></li>';
-                      $('#lesson-addon-nav').append( navHTML );
-
-                      $('#lesson-addon-nav .nav-tumblr').bind('click', element.show);
-
-                      //if no Q&A, render the Tumblr Feed
-                      if(firstAddon){
-                        element.show();
-                        firstAddon = false;
-                      }
-                    });
-
-                    
-
-                  },
-                  error: function(){
-                    console.log('error fetching tumblr feed from drupal');
-                    $('.preloader.tumblr').hide();
-                  }
-                });
+                //this.renderTumblrFeed();
               }else{
                 $('.preloader.tumblr').hide();
               }
