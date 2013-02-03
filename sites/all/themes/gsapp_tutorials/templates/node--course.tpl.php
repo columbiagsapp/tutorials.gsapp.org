@@ -590,7 +590,11 @@
 <div id="<% if (typeof(nid) != 'undefined' ) { %>node-<%= nid %><% }else{ %>node-temp<% } %>" class="addon tumblr-feed">
 
   <div id="tumblr-wrapper"> 
+<<<<<<< HEAD
     <div class="tumblr-feed-edit-wrapper edit-mode">
+=======
+    <div class="tumblr-feed-edit-wrapper">
+>>>>>>> ip
       <div class="inner">
         <div class="row-fluid">
 
