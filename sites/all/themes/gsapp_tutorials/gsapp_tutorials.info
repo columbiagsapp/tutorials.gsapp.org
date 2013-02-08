@@ -19,6 +19,7 @@ stylesheets[all][] = hallo/examples/image.css
 stylesheets[all][] = hallo/examples/overlay.css
 stylesheets[all][] = hallo/examples/annotate.css
 stylesheets[all][] = css/font-awesome.min.css
+stylesheets[all][] = css/select2.css
 
 
 scripts[] = js/underscore-min.js
@@ -30,6 +31,7 @@ scripts[] = js/jquery.fileupload-gsapp.js
 
 scripts[] = hallo/deps/rangy-core-1.2.3.js
 scripts[] = hallo/examples/hallo.js
+scripts[] = js/select2.js
 
 scripts[] = js/app.js
 scripts[] = js/script.js

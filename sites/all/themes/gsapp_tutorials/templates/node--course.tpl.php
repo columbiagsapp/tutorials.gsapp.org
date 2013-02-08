@@ -615,11 +615,7 @@
 
         <div class="row-fluid">
           <div class="span4">
-            <div class="tumblr-input-tags editable">
-              <% if( (typeof(field_tumblr_tags)) != 'undefined'){ %>
-                <%= field_tumblr_tags %>
-              <% } %>
-            </div>
+            <input type="hidden" id="select2-tumblr-tags" class="tumblr-input-tags" style="width: 300px; display: none;" value>
           </div>
           <div class="span5">Enter the tags to sort by separated by a comma</div>
         </div>

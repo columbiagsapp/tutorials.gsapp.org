@@ -131,7 +131,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
           //save out new order
           $('.week-list-container > li').each(function(i){
-            console.log('*******each .week-list-container li, number: '+ i);
             var thisNID = $(this).find('.week').attr('id');
             thisNID = thisNID.substr(5);
             var WCV_iVLength = WeeksCollectionView._itemViews.length;
@@ -165,8 +164,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
       }
 
       function init_fileuploader(type){
-        console.log('*******init_fileuploader(), with vars:');
-        console.log(vars);
         space_allowed = vars.space_remaining;
         
         var types = vars.filetypes;
@@ -216,9 +213,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
           completed: 
             function(e, data){
-
-              console.log('first return, data.result: ');
-              console.dir(data.result);
 
               //TODO TCT2003 add logic for deciding the image type
               var upload_file_type = type;
@@ -356,15 +350,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         id = id.substr(17);
         id = parseInt(id);
 
-        console.log('links: ');
-        console.dir(links);
-
-        console.log('id: '+ id);
-
         links.splice( id ,1);
-
-        console.log('links post splice ');
-        console.dir(links);
 
         course.set({
             "field_links": links
@@ -412,10 +398,8 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         var idxEnd = bodyClasses.indexOf(' ', idxStart);
         if(idxEnd >= 0){
           var returnVal = bodyClasses.substring(idxStart, idxEnd);
-          console.log('has an end: '+ returnVal);
         }else{
           var returnVal = bodyClasses.substring(idxStart);
-          console.log('has NO end: '+ returnVal);
         }
         return returnVal;
       }
@@ -506,7 +490,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         if(exception != 'updates'){
           if($('#updates').length > 0){
             if($('#updates').hasClass('span9')){
-              console.log('***');
               $('#updates').switchClass('span9', 'span3 collapsed', ANIMATION_TIME);
               //$('#updates').removeClass('span9').addClass('span3 collapsed');
             }
@@ -581,7 +564,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         clearContentArea('schedule');
 
         if($('#updates').length <= 0){
-          console.log('reappending updates');
           $('#main').append(updates_detached);
         }
         //$('#schedule').removeClass('span3 collapsed').addClass('span9');
@@ -597,7 +579,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
         //if detached, attach first, then open
         if($('#updates').length <= 0){
-          console.log('reappending updates');
           $('#main').append(updates_detached);
           $('#updates').removeClass('span3 collapsed').addClass('span9');
         }else{
@@ -678,8 +659,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
       }
 
       function getState(state){
-        console.log('getState() state: '+state);
-
         state = typeof state !== 'undefined' ? state : '';
 
         switch(state){
@@ -726,9 +705,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             }
             break;
           default:
-            console.log('no state given to check');
             var state = $('#main').attr('class');
-            console.log('state classes: '+state);
 
             var idxStart = state.indexOf('state-');
             var idxEnd = state.indexOf(' ', idxStart+5);
@@ -737,7 +714,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             }else{
               state = state.substring(idxStart);
             }
-            console.log('final state: '+state);
 
             return state;
             break;
@@ -891,10 +867,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           Create an empty question for new question to be asked
         */
         $('#question-submit').bind('click',function(){
-          console.log('clicked #question-submit');
-
           var userUID = extractBodyProperty('user-uid-');
-          console.log('uid: '+userUID);
 
           //var user = Drupal.Backbone.Models.User({ "uid": userUID });
 
@@ -987,8 +960,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
         course = new Course({nid: courseNid });
 
-        console.log('fetching course');
-
         course.fetch({
           success: function(model, response, options){
             populateStudentsCollection();
@@ -1001,6 +972,47 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         ////////////////// TUMBLR  ////////////////////////////////////
         ///////////////////////////////////////////////////////////////
 
+
+        function sortByTumblrGroups(posts){
+          console.log('sortByTumblrGroups()');
+          var groups = course.get('field_tumblr_groups');
+          groups = groups.split(',');
+
+          var rtn = {};
+          rtn.length = groups.length;
+          rtn.groups = groups;
+          rtn.data = [];
+
+          for(var k = 0; k < groups.length; k++){
+            rtn.data[k] = [];
+          }
+
+          posts_loop:
+          for(var i = 0; i < posts.length; i++){
+            
+            groups_loop:
+            for(var j = 0; j < groups.length; j++){
+              var matchString = groups[j];
+              var rslt = null;
+              $.each(posts[i].tags, function(index, value) { 
+                if (rslt == null && (value.toLowerCase() == matchString.toLowerCase() ) ) {
+                  rslt = index;
+                  return false;
+                }
+              });
+
+              if(rslt != null){
+
+                rtn.data[j].push(posts[i]);
+                break groups_loop;
+              }
+            }
+          }
+
+          console.log('returning from sortByTumblrGroups() with');
+          console.dir(rtn);
+          return rtn;
+        }
 
 
         /* Tumblr API functionality, inspired by https://github.com/jokull/tumblr-widget */
@@ -1030,22 +1042,26 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
           initialize: function(opts) {
             Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-            _.bindAll(this, 'show', 'hide', 'enterEditMode', 'exitEditMode');
+            _.bindAll(this, 'show', 'hide', 'enterEditMode', 'exitEditMode', 'deleteTumblrFeed', 'cancelEditTumblrFeed');
           },
 
           editTumblrFeed: function(){
-            console.log('editTumblrFeed()');
 
-            if($(this).text == "Edit"){
+            var tumblrfeedID = this.model.get('nid');
+
+            console.log();
+            console.log('$(this).text(): '+ $(this).text());
+
+            if($(this).text() == "Edit"){
               
               //initTumblrEditorHallo();
 
+              $(this).text('Save');
+              $('.cancel, .delete', '#node-'+tumblrfeedID).show();
+
             }else{
               
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
-                editable: false,
-                placeholder: 'tag1, tag2, tag3'
-              });
+              $('#select2-tumblr-tags').select2('disable');
 
               //TODO TCT2003
               //these variables should be pulled from divs
@@ -1053,18 +1069,12 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-hostname').val();
 
 
-              var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
+              var tags = $('#select2-tumblr-tags').select2('val');
 
-              var group = ($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
 
-              
+              var group = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val();//($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
 
-              var tags = tagStr.split(', ');
               var limit = 20; //set to maximum always
-
-              console.log('calling initTumblrFeed() with hostname: '+ hostname + ', ' + 'tags: ');
-              console.dir(tags);
-
 
               if($('#tumblr-feed-el').children().length > 0){//not first time
                 refreshTumblrFeed();
@@ -1073,26 +1083,31 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
                 this.model.set({
                   "field_tumblr_hostname": hostname,
-                  "field_tumblr_tags": tagStr,
+                  "field_tumblr_tags": tags.toString(),
                   "field_tumblr_limit": limit,
-                  "field_tumblr_group_by_student": 'false',
+                  "field_tumblr_grouping": group,
                 });            
                 
+                this.model.save({}, {silent:true});
 
-                this.model.save();
-
-                initTumblrFeed(tumblr_el, hostname+'.tumblr.com', tags, limit, '');
+                initTumblrFeed(tumblr_el, hostname, tags, limit, '');
               }
+
+              $(this).text('Edit');
+              $('.cancel, .delete', '#node-'+tumblrfeedID).hide();
 
             }
           },
 
           deleteTumblrFeed: function(){
-
+            console.log('deleteTumblrFeed()');
+            console.log('nid: '+ this.model.get('nid'));
+            //this.model.destroy();
+            //this.remove();
           },
 
           cancelEditTumblrFeed: function(){
-
+            console.log('cancelEditTumblrFeed()');
           },
 
           show: function(){
@@ -1140,12 +1155,28 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           params: {
             limit: 1
           },
+          tags: [],
           initialize: function(options){
             this.endpoint = this.endpoint + options.hostname;
             return this.params = _.extend(this.params, options.params || {});
           },
           page: function(){
             console.log('Tumblr.page()');
+            console.log('this.endpoint: '+ this.endpoint);
+
+            var groupByTA = false;
+            switch( this.grouping ){
+              case 'Group by Student UNI':
+                console.log('the grouping: Group by Student UNI');
+
+                break;
+              case 'Group by TA':
+                groupByTA = true;
+                break;
+              default://just get everything
+                //initTumblrFeed(el, hostname, tags, limit, grouping);
+                break;
+            }
 
             var params,
                 _this = this;
@@ -1153,28 +1184,114 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               offset: this.length - 1
             });
 
+          
             console.log('with params: ');
             console.dir(params);
 
-            return $.ajax({
-              url: this.endpoint + '/posts/json?' + ($.param(params)),
-              dataType: "jsonp",
-              jsonp: "jsonp",
-              success: function(data, status){
-                console.log('Tumblr.page.success callback reached wtih data:');
-                console.dir(data);
-                console.log('');
+            if(params.tag != null){
+              console.log('params.tag != null');
 
-                _this.add(data.response.posts);
-                _this.trigger('paged');
-                if(data.response.total_posts === _this.length){
-                  console.log('Tumblr: triggering last');
-                  return _this.trigger('last');
-                }
+              groupByTA = true;
+
+              if(groupByTA == true){
+                console.log('params.tag.length > 1, params.tag: ');
+                console.dir(params.tag);
+
+                var tag2 = params.tag[1];
+
+                params.tag = params.tag[0];
+                
+                console.log('tag2: '+tag2);
+
+                params.tag = params.tag.toString();
+
+                return $.ajax({
+                  url: this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+                  dataType: "jsonp",
+                  jsonp: "jsonp",
+                  success: function(data, status){
+                    console.log('Tumblr.page.success callback reached wtih data:');
+                    console.dir(data);
+                    console.log('');
+
+                    console.dir(data.response.posts);
+
+                    sortByTumblrGroups(data.response.posts);
+
+                    _this.add(data.response.posts);
+                    _this.trigger('paged');
+                    if(data.response.total_posts === _this.length){
+                      console.log('Tumblr: triggering last');
+                      return _this.trigger('last');
+                    }
+                  }
+                });
+
+
+                //insert .when here
+
+
+              }else{
+                console.log('params.tag.length == 1, params.tag: ');
+                console.dir(params.tag);
+
+                params.tag = params.tag.toString();
+
+                return $.ajax({
+                  url: this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+                  dataType: "jsonp",
+                  jsonp: "jsonp",
+                  success: function(data, status){
+                    console.log('Tumblr.page.success callback reached wtih data:');
+                    console.dir(data);
+                    console.log('');
+
+                    _this.add(data.response.posts);
+                    _this.trigger('paged');
+                    if(data.response.total_posts === _this.length){
+                      console.log('Tumblr: triggering last');
+                      return _this.trigger('last');
+                    }
+                  }
+                });
               }
-            });
+            }else{
+              console.log('no tags');
+              return $.ajax({
+                url: this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+                dataType: "jsonp",
+                jsonp: "jsonp",
+                success: function(data, status){
+                  console.log('Tumblr.page.success callback reached wtih data:');
+                  console.dir(data);
+                  console.log('');
+
+                  _this.add(data.response.posts);
+                  _this.trigger('paged');
+                  if(data.response.total_posts === _this.length){
+                    console.log('Tumblr: triggering last');
+                    return _this.trigger('last');
+                  }
+                }
+              });
+            }
           }
         });//end Tumblr
+
+        function getPostsByTag(url, params) {
+           return $.ajax({
+            url: 'http://mypage.tumblr.com/api/read/json?tagged=' + tag,
+            type: 'GET',
+            dataType: 'jsonp'
+          });
+        };
+/*
+        $.when(getPostsByTag('tag1'), getPostsByTag('tag2'), getPostsByTag('tag3'))
+         .then(function() {
+           var posts = $.extend({}, arguments);
+           renderStuff(posts);
+         });
+*/
 
         var TumblrPostView = Backbone.View.extend({
           className: "tumblr-post",
@@ -1213,30 +1330,23 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
 
         function initTumblrFeed(el, hostname, tags, limit, grouping){
+          console.log('initTumblrFeed(): grouping: '+ grouping);
 
-          switch( grouping ){
-                        case 'Group by Student UNI':
-                          console.log('the grouping: Group by Student UNI');
+          console.log('el: '+ el);
+          console.log('hostname: '+ hostname);
+          console.log('limit: '+ limit);
+          console.dir(tags);
 
-                          break;
-                        case '':
-                          break;
-                        default://just get everything
-                          //initTumblrFeed(el, hostname, tags, limit, grouping);
-                          break;
-                      }
-
-
-          var tagCSV = tags.join(', ') || '';//default to none
           limit = limit || 1;
 
           tumblr.collection = new Tumblr({
             hostname: hostname,
             params: {
                 api_key: 'yqwrB2k7eYTxGvQge4S8k9R6wAdQrATjLXhVzGVPgjTXwucNOo'
-               ,tag: tagCSV
                ,limit: limit
-            }
+               ,tag: tags
+            },
+            grouping: grouping
           });
           tumblr.view = new TumblrView({
             el: el,
@@ -1285,8 +1395,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
           },
           testFunction: function(){
-            console.log('testFunction()');
-            console.log('this model nid: '+this.model.get("nid") );
           }
         });
 
@@ -1388,8 +1496,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               openLessonView.initEmbedsCollectionAndView(NID);
               openLessonView.initUploadsCollectionAndView(NID);
 
-              console.log( 'should call initHalloEditorLesson()-------' );
-
               openLessonView.initHalloEditorLesson(false);
 
               //attach any embeds
@@ -1414,7 +1520,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           firstEditLesson: function(){
-            console.log('firstEditLesson()');
             setState(FIRST_EDIT_LESSON);
 
             //can't call edit lesson until finished with openLesson
@@ -1460,7 +1565,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
           render: function(variables, el){
             Drupal.Backbone.Views.Base.prototype.render.call(this, variables, el);
-            this.renderAddons();
+            //this.renderAddons();
           },
 
           initUploadsCollectionAndView: function(lessonID){
@@ -1523,7 +1628,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             this.model.bind('change', this.render, this);//this calls the fetch
 
             _(this).bindAll('editTumblrAddon');
-            console.log('LessonOpenView initialize()');
           },
 
           /*
@@ -1533,7 +1637,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             this.initHalloEditorLesson(true);
 
             $('.lesson-open .lesson-embed-element').each(function(){
-              console.log('trying to enable hallo.js for embed code ****');
               $('.field-embed-edit-code', this).hallo({
                 editable: true
               });
@@ -1567,7 +1670,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             for the first opening of a lesson
           */
           initHalloEditorLesson: function(editmode){
-            console.log( '-------initHalloEditorLesson()-------' );
             //launch Hallo.js
             $('.lesson-open .lesson-title').hallo({
               plugins: {
@@ -1596,7 +1698,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           initQuestionSubmitHalloEditorsLesson: function(){
-            console.log('----initQuestionSubmitHalloEditorsLesson()');
 
             if($('#submit-question-title').text().length > 0){
               $('#submit-question-title').text('');
@@ -1642,8 +1743,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               //newUploadView.firstEditUpload();
             }
 
-
-            console.log('saveUploads() with result: ');
             console.dir(data);
 
             var thisLessonOpenView = this;
@@ -1653,8 +1752,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
             //if the open lesson already has uploads, and therefore an UploadsCollectionView
             if(UploadsCollectionView._itemViews.length > 0){
-              console.log('UploadsCollection.length > 0');
-
               var UCV_iVLength = UploadsCollectionView._itemViews.length;
 
               for(var i = 0; i < UCV_iVLength; i++){
@@ -1681,19 +1778,11 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                   uploadView.model.save({},{
                     
                     success: function(model, response, options){
-
-                      console.log('upload save success');
-                      console.log('re-initializing Uploads collection stuff');
-
                       thisLessonOpenView.initUploadsCollectionAndView(lessonID);
                       thisLessonOpenView.attachUpload();
 
                     },
                     error: function(model, xhr, options){
-
-                      console.log('upload save error');
-                      console.log('re-initializing Uploads collection stuff');
-
                       thisLessonOpenView.initUploadsCollectionAndView(lessonID);
                       thisLessonOpenView.attachUpload();
                     }
@@ -1706,7 +1795,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                   
               }//end for
             }else{
-              console.log('re-initializing Uploads collection stuff');
               thisLessonOpenView.initUploadsCollectionAndView(lessonID);
               thisLessonOpenView.attachUpload();
             }
@@ -1718,16 +1806,12 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           saveEmbeds: function(){
-            console.log('saveEmbeds()');
-
             var thisLessonOpenView = this;
 
             var lessonID = this.model.get('nid');
             var embedsArray = [];
 
             if(EmbedsCollectionView._itemViews.length > 0){
-              console.log('EmbedsCollection.length > 0');
-
               var ECV_iVLength = EmbedsCollectionView._itemViews.length;
 
               for(var i = 0; i < ECV_iVLength; i++){
@@ -1749,21 +1833,12 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 //only fire for the last 
                 if( i == (ECV_iVLength - 1) ){
                   embedView.model.save({},{
-                    
                     success: function(model, response, options){
-
-                      console.log('embed save success');
-                      console.log('re-initializing Embeds collection stuff');
-
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
                       thisLessonOpenView.attachEmbed();
 
                     },
                     error: function(model, xhr, options){
-
-                      console.log('embed save error');
-                      console.log('re-initializing Embeds collection stuff');
-
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
                       thisLessonOpenView.attachEmbed();
                     }
@@ -1771,12 +1846,9 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
                 }else{
                   embedView.model.save();
-                }
-
-                  
+                }              
               }//end for
             }else{
-              console.log('re-initializing Embeds collection stuff');
               thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
               thisLessonOpenView.attachEmbed();
             }
@@ -1787,13 +1859,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           attachUpload: function(){
-
-            console.log('attachUpload()');
-
             var lessonID = this.model.get("nid");
-
-            console.log('attachUpload() for lesson: '+lessonID);
-
             //this.initEmbedsCollectionAndView(lessonID);
 
             //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
@@ -1805,29 +1871,18 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 //remove preloader for lesson for this particular week based on weekID
                 $('.upload.preloader', '#open-node-'+lessonID).hide();
                 $('.attachments-header').removeClass('hidden');
-
-                console.log('upload fetch success');
-
                 //TODO TCT2003 add "remove" button
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.upload.preloader', '#open-node-'+lessonID).hide();
-
-                console.log('upload fetch error');
               }
 
             });
           },
 
           attachEmbed: function(){
-
-            console.log('attachEmbed()');
-
             var lessonID = this.model.get("nid");
-
-            console.log('attachEmbed() for lesson: '+lessonID);
-
             //this.initEmbedsCollectionAndView(lessonID);
 
             //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
@@ -1838,9 +1893,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.embed.preloader', '#open-node-'+lessonID).hide();
-
-                console.log('embed fetch success');
-
                 $('.lesson-embed-element', '#open-node-'+lessonID).each(function(){
                   $('.field-embed-edit-code', this).text( $('.field-embed-content-wrapper', this).html() );
 
@@ -1857,8 +1909,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.embed.preloader', '#open-node-'+lessonID).hide();
-
-                console.log('embed fetch error');
               }
 
             });
@@ -1917,8 +1967,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 description_summary = description_summary.substr(0,180) + '...';
               }
 
-              console.log("saving description_summary: "+description_summary);
-
               this.model.set({
                 "title": theTitle,
                 "field_description": description,
@@ -1942,7 +1990,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 error: function(){
                   $('.embed.preloader', thisLessonOpenView).hide(); 
                   $('.upload.preloader', thisLessonOpenView).hide(); 
-                  console.log('----save lesson error');
                   //dont clear modified state b/c hasn't been modified yet?
                   //TODO TCT2003 need to throw alert
                   //if(getState(MODIFIED)){
@@ -1972,9 +2019,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             //var weekID = $('.open').closest('.week').attr('id');
             //weekID = weekID.substr(5);
             //LessonsCollectionView[weekID].remove(this.model);
-
-            console.log('deleteLesson()');
-
             this.model.destroy();
             this.remove();
 
@@ -1992,9 +2036,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             var this_selector = '#open-node-' + lessonID;
             //disable Hallo.js editors
             //this.disableHalloEditorsLesson();
-
-            console.log('cancelEdit()');
-
             if( getState(FIRST_EDIT_LESSON) ){
               clearState(FIRST_EDIT_LESSON);
               //TODO TCT2003 do I need to save the model first?
@@ -2035,8 +2076,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             var courseID = $('.course').attr('id');
             courseID = courseID.substring(5);
 
-            console.log('Course: '+courseID);
-
             var lessonID = this.model.get('nid');
             var upload_title = "upload-"+result.name;
 
@@ -2060,9 +2099,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             //when the node is new... must be a better way!
             f.url = "/node";
 
-            console.log('***result passed to addUpload():');
-            console.dir(result);
-
             setState(MODIFIED);
 
             var resp = f.save({}, {
@@ -2083,8 +2119,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
                 //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
                 
-                console.log('*****adding new upload to UploadsCollectionView');
-
                 setState(FIRST_EDIT_UPLOAD);
 
 
@@ -2094,19 +2128,12 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 var newUploadView = UploadsCollectionView.addOne(f);
 
                 var uploads = [];
-
-                console.log('about to loop through UploadsCollection');
                 //loop through each upload in UploadsCollection and push it's type into uploads[]
                 _.each(UploadsCollection.models, function(element, index, list){
-
-                  console.log('looping through UploadsCollection');
-                  
                   var type = element.get('field_upload_type');
                   if($.inArray(type, uploads) < 0){
-                    console.log(type+ ' is not in uploads array&&&&&&&&&&&&&&&&&&&&&');
                     uploads.push( element.get('field_upload_type') );
                   }else{
-                    console.log(type+ ' is in uploads array, but still adding&&&&&&&&&&&&&&&&&&&&&');
                     uploads.push( element.get('field_upload_type') );
                   }
                 });
@@ -2116,8 +2143,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 thisLessonOpenView.model.set({
                   "field_uploads": uploads
                 }, {silent: true});
-
-                console.log('JUST SET LESSON VIEW MODEL WITH UPLOADS');
 
                 /*
 
@@ -2143,8 +2168,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             var thisLessonOpenView = this;
             var courseID = $('.course').attr('id');
             courseID = courseID.substring(5);
-
-            console.log('Course: '+courseID);
 
             var lessonID = this.model.get('nid');
             var embed_title = "embeddedTo"+lessonID;
@@ -2182,8 +2205,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 e.save();
 
                 //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
-                
-                console.log('*****adding new embed to EmbedsCollection');
 
                 setState(MODIFIED);
 
@@ -2254,8 +2275,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           addOnQandA: function(){
-            console.log('addOnQandA');
-
             //add tumblr to list of addons
             //TODO TCT2003 move this to a saveAddon() function
             var addons = this.model.get('field_addons');
@@ -2329,18 +2348,9 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               
               
 
-            }else{
+            }else{              
 
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
-                editable: false,
-                placeholder: 'title'
-              });
-              
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
-                editable: false,
-                placeholder: 'tag1, tag2, tag3'
-              });
-
+              $('#select2-tumblr-tags').select2('disable');
               $('#tumblr-wrapper').removeClass('edit-mode');
 
               //TODO TCT2003
@@ -2348,21 +2358,11 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               var tumblr_el = '#tumblr-feed-el';
               var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-hostname').val();
 
-              console.log('HOSTNAME!!!!: '+ hostname);
-
-              var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
+              var tags = $('#select2-tumblr-tags').select2('val');
 
               var group = ($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
-
-              console.log('GROUP: '+ group);
               
-
-              var tags = tagStr.split(', ');
               var limit = 1; //set to maximum always
-
-              console.log('calling initTumblrFeed() with hostname: '+ hostname + ', ' + 'tags: ');
-              console.dir(tags);
-
 
               if($('#tumblr-feed-el').children().length > 0){//not first time
                 refreshTumblrFeed();
@@ -2373,7 +2373,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
                 tumblrFeed.set({
                   "field_tumblr_hostname": hostname,
-                  "field_tumblr_tags": tagStr,
+                  "field_tumblr_tags": tags.toString(),
                   "field_tumblr_limit": limit,
                   "field_tumblr_group_by_student": 'false',
                   "field_parent_lesson_nid": lessionID,
@@ -2382,13 +2382,8 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
                 tumblrFeed.url = "/node";
 
-                
-                
-
                 tumblrFeed.save({},{
                   success: function(model, response, options){
-                    console.log('saved new tumblr_feed');
-
                     tumblrFeed.id = response.id;
                     tumblrFeed.url = "/node/" + response.id + ".json";
                     tumblrFeed.set({
@@ -2409,12 +2404,22 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           initTumblrEditorHallo: function(){
-            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
-              editable: true,
-              placeholder: 'tag1, tag2, tag3'
-            });
+
             $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').text('Save');
-            
+            $('#select2-tumblr-tags').select2({
+              tags:["sketch1"],
+              tokenSeparators: [",", " "]
+            });
+
+            /*
+            $("#select2-tumblr-tags").select2({
+              query:function(query){
+                var data = {results: []};
+                //data.results.push({text: query.term});
+                query.callback(data);
+              }
+          });*/
+
 
           },
 
@@ -2441,7 +2446,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             var lessonID = this.model.get('nid');
             var tumblr_title = "Tumblr Feed for lesson "+lessonID;
 
-            var t = new Embed({
+            var t = new TumblrFeed({
               "title": tumblr_title,
               "type": "tumblr_feed",
               "field_parent_lesson_nid":lessonID
@@ -2482,11 +2487,8 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                       var course_tumblr_blogs_hostnames = course.get('field_tumblr_blogs');
                       var hostnames = [];
 
-                      console.dir(course_tumblr_blogs_hostnames);
-
                       if(course_tumblr_blogs_hostnames != null){
                         $.each(course_tumblr_blogs_hostnames, function(key, value) {   
-                          console.log('adding to select key: '+ key + ' value: ' + value);
                           $('.tumblr-selected-hostname')
                             .append($("<option></option>")
                             .attr("value",value)
@@ -2502,11 +2504,10 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                       });
 
 
+
                       _this.initTumblrEditorHallo();
                     }
 
-                    
-                    console.log('end success');
                   }
                 });           
                 /*
@@ -2622,7 +2623,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           renderTumblrFeed: function( firstAddon ){
-            console.log('adding tumblr addon');
+            console.log('renderTumblrFeed()');
 
             var lessonID = this.model.get('nid');
 
@@ -2647,7 +2648,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               "type": "tumblr_feed"
             }, {
               success: function(model, response, options){
-                console.log('success fetching tumblr feed from drupal');
 
                 $('.preloader.tumblr').hide();
 
@@ -2662,9 +2662,20 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                   var limit = '20';
                   var tagsString = element.model.get('field_tumblr_tags');
                   var tags = [];
-                  if(tagsString != null){
-                    tags = tagsString.split(', ');
+
+                  if(tagsString != null){    
+                    if(tagsString.indexOf(',') >= 0){
+                      tags = tagsString.split(',');
+                    }else if(tagsString.length >= 0){
+                      tags[0] = tagsString;
+                    }
                   }
+
+                  $('#select2-tumblr-tags').select2({
+                    tags:tags,
+                    tokenSeparators: [",", " "]
+                  });
+
                   var grouping = element.model.get('field_tumblr_grouping');
 
                   initTumblrFeed(El, hostname, tags, limit, grouping);
@@ -2677,7 +2688,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
                 });
               },
               error: function(){
-                console.log('error fetching tumblr feed from drupal');
                 $('.preloader.tumblr').hide();
               }
             });
@@ -2694,7 +2704,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             var addons = this.model.get('field_addons');
             
             if(addons != null){
-              console.log('addons =! null, addons: '+ addons);
 
               var lessonID = this.model.get('nid');
               var firstAddon = true;
@@ -2737,7 +2746,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           firstEditEmbed: function(){
-            console.log('firstEditEmbed()');
             var embedID = this.model.get('nid');
             var this_selector = '#node-' + embedID;
 
@@ -2777,7 +2785,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           deleteUpload: function(){
-            console.log('delete upload');
             //delete the actual model from the database and its view
             this.model.destroy();
             this.remove();
@@ -2816,9 +2823,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           //with the appropriate value (eg. +1)
           addLesson: function(){
             var weekID = this.model.get('nid');
-
-            console.log('addLesson() called by week : '+ weekID);
-
             //TODO TCT2003 do I need to default these fields to empty strings?
             var l = new Lesson({
               "title": "",
@@ -2879,7 +2883,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           resortWeekLessons: function(this_selector){
-            console.log('resortWeekLessons');
             var weekNID = this.model.get('nid');
             var this_selector = '#node-' + weekNID;
 
@@ -2932,7 +2935,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           editWeek: function(){
-            console.log('editWeek()');
             var this_selector = '#node-' + this.model.get('nid');
 
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
@@ -3103,25 +3105,19 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           firstEditUpdate: function(){
-            console.log('firstEditUpdate()');
             var this_selector = '#node-' + this.model.get('nid');
-            console.log('this_selector: '+this_selector);
             setState(FIRST_EDIT_UPDATE);
             //$('#main').addClass('first-edit');
             this.editUpdate();
           },
 
           editUpdate: function(){
-            console.log('editUpdate()');
-
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
-              console.log('clicked edit');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
               this.initHalloEditorsUpdate(true);
             }else{
-              console.log('clicked save');
               clearState(FIRST_EDIT_UPDATE);
               this.disableHalloEditorsUpdate();
               //$('#main').removeClass('first-edit');
@@ -3137,7 +3133,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
 
           deleteUpdate: function(){
-            console.log('deleteUpdate()');
 
             UpdatesCollectionView.remove(this.model);
             this.model.destroy();
@@ -3145,11 +3140,9 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           cancelEdit: function(){
-            console.log('cancelUpdate()');
 
             var this_selector = '#node-' + this.model.get('nid');
             if( getState(FIRST_EDIT_UPDATE) ){
-              console.log('first edit - therefore delete');
               // this.model.save();
               this.deleteUpdate();
             }else{
@@ -3236,9 +3229,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         var WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
             //this.el.detach();
-            console.log('unrendering');
             this.collection.reset();
-            console.log('post sort, about to render');
             //this.addAll();
           }
         });
@@ -3277,8 +3268,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               $('#updates-list-el').prepend(tempNode);
             }
             */
-
-            console.log('addOne(), created: '+newItemView.model.get('created'));
             
             if(newItemView.model.get('created') != undefined){
               //convert the created unix date stamp to a JS Date object and print out user readable date
@@ -3419,7 +3408,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
             var order = view.model.get('field_order');
             order = parseInt(order);
-            console.log('index: '+ index + ' order: '+ order);
 
             if( order < min_order ){
               min_order = order;
@@ -3428,9 +3416,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
           min_order = parseInt( min_order ) - 1;
           min_order = '' + min_order;
-
-          console.log('min_order: '+ min_order);
-
 
           var w = new Week({
             "title": "",
@@ -3563,17 +3548,9 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           editPage: function(event){
-            console.log('editPage()');
               var pageID = this.model.get('nid');
 
-              console.log('this: ');
-              console.dir(this);
-
-              console.log('event: ');
-              console.dir(event);
-
               if($(event.currentTarget).text() == "Edit"){
-                console.log('was edit mode');
 
                 $('#page-content-wrapper').addClass('edit-mode');
                 $('.open-page .cancel, .open-page .delete').show();
@@ -3605,16 +3582,12 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
               }else{
 
-                console.log('was save mode');
 
                 if( $('.open-page .page-content').hasClass('isModified')){
 
                   var content = {};
                   content.value = $('.open-page .page-content').html();
                   content.format = "full_html";
-
-                  console.log('content value: ');
-                  console.log(content.value);
 
                   this.model.set({
                     "field_page_content": content
@@ -3676,7 +3649,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
           },
 
           openPage: function(){
-            console.log('openPage()');
             var pageID = this.model.get('nid');
 
 
@@ -3729,12 +3701,10 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             success: function(model, response, options){
               $('#page-preloader').hide();
               $('.course-link-item').removeClass('hidden');
-              console.log('page load success');
             },
             error: function(){
               $('#page-preloader').hide();
               $('.course-link-item').removeClass('hidden');
-              console.log('page load error');
             }
         });
 
@@ -3751,8 +3721,6 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
         }
 
         function savePageToCourse(){
-          console.log('savePageToCourse()');
-
           var title = $('#add-page-popup .new-page-title').text();
 
           var content = {
