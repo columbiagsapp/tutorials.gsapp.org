@@ -1733,18 +1733,28 @@ var MAX_IMAGE_HEIGHT = 500;
 
                 console.log("selector: "+ selector + "  res: "+ res);
 
-
                 var origWidth = resObj.width;
                 var origHeight = resObj.height;
 
-                if((origWidth > MAX_IMAGE_WIDTH) || (origHeight > MAX_IMAGE_HEIGHT)){
-                  var aspectRatio = parseInt(origWidth) / parseInt(origHeight);
-                  
+                var width = origWidth;
+                var height = origHeight;
 
+                if(origWidth > MAX_IMAGE_WIDTH){
+                  var inverseAspectRatio = parseInt(origHeight) / parseInt(origWidth);
+                  var newHeight = MAX_IMAGE_WIDTH * inverseAspectRatio;
+                  height = Math.floor(newHeight);
+                  width = MAX_IMAGE_WIDTH;
+                }
+
+                if(origHeight > MAX_IMAGE_HEIGHT){
+                  var aspectRatio = parseInt(origWidth) / parseInt(origHeight);
+                  var newWidth = MAX_IMAGE_HEIGHT * aspectRatio;
+                  width = Math.floor(newWidth);
+                  height = MAX_IMAGE_HEIGHT;
                 }
 
 
-                var imgHTML = '<img src="' + resObj.url + '">';
+                var imgHTML = '<img width="' + width + '" height="' + height + '" src="' + resObj.url + '">';
 
                 var origHTML = $('.lesson-open .lesson-description').html();
 
@@ -1755,6 +1765,7 @@ var MAX_IMAGE_HEIGHT = 500;
                 var newHTML = origHTML + imgHTML;
 
                 $('.lesson-open .lesson-description').html( newHTML );
+                $('.lesson-open .lesson-description').addClass('isModified');
 
                 return data.success(imageUrl);
               });

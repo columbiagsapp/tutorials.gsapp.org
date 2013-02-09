@@ -49,7 +49,7 @@ function hallo_image_uploader_upload(){
 	print '    basename: '. basename($_FILES['userfile']['name']); 
 	*/
 
-	if(isset( $_FILES )){
+	if(isset( $_FILES['userfile'] )){
 		if( $_FILES['userfile']['error'] == 0 ){//only if no errors
 			if( is_uploaded_file($_FILES['userfile']['tmp_name']) ){
 
