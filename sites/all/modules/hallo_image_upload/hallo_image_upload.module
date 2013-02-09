@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * A module that catches image uploads from the Hallo.js WYSIWYG and stores them in the database.
+ */
+
+
+
+function hallo_image_upload_help($path, $arg) {
+	switch ($path) {
+		case "admin/help#current_posts":
+			return '<p>' . t("Catches image uploads from the Hallo.js WYSIWYG and stores them in the database") . '</p>';
+			break;
+		}
+}
+
+function hallo_image_upload_menu() {
+  $items['hallo_image_upload/upload'] = array(
+      'page callback' => 'hallo_image_uploader_upload',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+
+
+function hallo_image_uploader_upload(){
+
+	$allowed_types = array('image/gif', 'image/png', 'image/jpg', 'image/jpeg');
+
+	$max_filesize = 5242880;//5MB
+
+	$returnJSON['directory'] = null;
+	$returnJSON['filename'] = null;
+
+	error_reporting(E_ALL); 
+	ini_set("display_errors", 1); 
+
+	
+	/*
+	print 'tmp_name: ' . $_FILES['userfile']['tmp_name'];	
+	print ' name: ' . $_FILES['userfile']['name'];
+	print ' size: ' . $_FILES['userfile']['size'];
+	print ' error: ' . $_FILES['userfile']['error'];
+	print ' type: ' . $_FILES['userfile']['type'];
+	print '    basename: '. basename($_FILES['userfile']['name']); 
+	*/
+
+	if(isset( $_FILES )){
+		if( $_FILES['userfile']['error'] == 0 ){//only if no errors
+			if( is_uploaded_file($_FILES['userfile']['tmp_name']) ){
+
+				// Check if the filetype is allowed, if not DIE and inform the user.  
+				if(in_array($_FILES['userfile']['type'], $allowed_types)) {  
+
+					// Now check the filesize, if it is too large then DIE and inform the user.  
+					if($_FILES['userfile']['size'] <= $max_filesize) {  
+						$uploadDir = '/srv/www/tutorial_test7.postfog.org/public_html/sites/default/files/course_uploads/';
+						$pathname = '/sites/default/files/course_uploads/';
+						$uploadFile = $uploadDir . basename($_FILES['userfile']['name']);
+
+						if (!file_exists($uploadDir)) {
+							$oldUMask = umask(0); 
+					    	$result = mkdir($uploadDir, 0777);
+					    	umask($oldUMask);
+						}
+
+						// Check if we can upload to the specified path, if not DIE and inform the user.  
+						if(is_writable($uploadDir)) {  
+							if( move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile) ){
+								list($width, $height, $type, $attr) = getimagesize( $uploadFile );
+
+								//echo 'file saved to ' . $uploadFile;
+								$returnJSON['directory'] = $uploadDir;
+								$returnJSON['filename'] = basename($_FILES['userfile']['name']);
+								$returnJSON['url'] = $pathname . basename($_FILES['userfile']['name']);
+								$returnJSON['error'] = null;
+								$returnJSON['error_message'] = null;
+								$returnJSON['width'] = $width;
+								$returnJSON['height'] = $height;
+
+								//echo '<div id="iframe-response">http://www.google.com</div>';
+							}else{
+								$returnJSON['error'] = $_FILES['userfile']['error'];
+								$returnJSON['error_message'] = 'error moving uploaded file to ' . $uploadFile;
+							}
+						}else{
+							$returnJSON['error'] = $_FILES['userfile']['error'];
+							$returnJSON['error_message'] = 'You cannot upload to the /uploads/ folder. The permissions must be changed.';
+						}
+
+					}else{
+						$returnJSON['error'] = $_FILES['userfile']['error'];
+						$returnJSON['error_message'] = 'The file you attempted to upload is too large.';
+
+					}
+
+				}else{
+					$returnJSON['error'] = $_FILES['userfile']['error'];
+					$returnJSON['error_message'] = 'The file you attempted to upload is not allowed.';
+				}
+
+			}else{
+				$returnJSON['error'] = $_FILES['userfile']['error'];
+				$returnJSON['error_message'] = 'not a file uploaded by the client';
+			}
+		}else{
+			$returnJSON['error'] = $_FILES['userfile']['error'];
+			$returnJSON['error_message'] = 'error with code ' . $_FILES['userfile']['error'];
+		}
+	}
+
+
+
+	drupal_json_output($returnJSON);
+}
+
+
+
+     

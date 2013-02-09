@@ -49,6 +49,10 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
 
+var MAX_IMAGE_WIDTH = 500;
+var MAX_IMAGE_HEIGHT = 500;
+
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
@@ -1670,6 +1674,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             for the first opening of a lesson
           */
           initHalloEditorLesson: function(editmode){
+            console.log('initHalloEditorLesson()');
             //launch Hallo.js
             $('.lesson-open .lesson-title').hallo({
               plugins: {
@@ -1680,13 +1685,122 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               placeholder: 'Optional subtitle'
             });
 
+
+
+            function prepareIframe(widget) {
+              var iframe, iframeName;
+              iframeName = "" + widget.widgetName + "_postframe_" + widget.options.uuid;
+              iframeName = iframeName.replace(/-/g, '_');
+              iframe = jQuery("#" + iframeName);
+              if (iframe.length) {
+                return iframe;
+              }
+              iframe = jQuery("<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\"        class=\"hidden\" style=\"display:none\" />");
+              this.element.append(iframe);
+              iframe.get(0).name = iframeName;
+              return iframe;
+            }
+            function iframeUpload(data) {
+              console.log('YEEESSSSS');
+
+              var iframe, uploadForm, uploadUrl, widget;
+              widget = data.widget;
+              iframe = widget._prepareIframe(widget);
+              uploadForm = jQuery('form.upload', widget.element);
+              if (typeof widget.options.uploadUrl === 'function') {
+                uploadUrl = widget.options.uploadUrl(widget.options.entity);
+              } else {
+                uploadUrl = widget.options.uploadUrl;
+              }
+              iframe.on('load', function(e) {
+                console.log( 'returned from load iframe' );
+                console.dir(iframe);
+
+                var imageUrl;
+                imageUrl = iframe.get(0).contentWindow.location.href;
+                widget.element.hide();
+
+                console.log('imageUrl: '+ imageUrl);
+
+                var selector = '#' + iframe.get(0).id;
+
+                var res = $(selector).contents().find('pre').text();
+
+                var resObj = $.parseJSON(res);
+
+                console.dir(resObj);
+
+
+                console.log("selector: "+ selector + "  res: "+ res);
+
+
+                var origWidth = resObj.width;
+                var origHeight = resObj.height;
+
+                if((origWidth > MAX_IMAGE_WIDTH) || (origHeight > MAX_IMAGE_HEIGHT)){
+                  var aspectRatio = parseInt(origWidth) / parseInt(origHeight);
+                  
+
+                }
+
+
+                var imgHTML = '<img src="' + resObj.url + '">';
+
+                var origHTML = $('.lesson-open .lesson-description').html();
+
+                if( origHTML == "Add description" ){
+                  origHTML = '';
+                }
+
+                var newHTML = origHTML + imgHTML;
+
+                $('.lesson-open .lesson-description').html( newHTML );
+
+                return data.success(imageUrl);
+              });
+              uploadForm.attr('action', uploadUrl);
+              uploadForm.attr('method', 'post');
+              uploadForm.attr('target', iframe.get(0).name);
+              uploadForm.attr('enctype', 'multipart/form-data');
+              uploadForm.attr('encoding', 'multipart/form-data');
+              return uploadForm.submit();
+            }
+
+
+            function jQueryFormUpload(data){
+              var iframe, uploadForm, uploadUrl, widget;
+              widget = data.widget;
+              uploadForm = jQuery('form.upload', widget.element);
+              if (typeof widget.options.uploadUrl === 'function') {
+                uploadUrl = widget.options.uploadUrl(widget.options.entity);
+              } else {
+                uploadUrl = widget.options.uploadUrl;
+              }
+
+
+
+              uploadForm.attr('action', uploadUrl);
+              uploadForm.attr('method', 'post');
+              uploadForm.attr('target', iframe.get(0).name);
+              uploadForm.attr('enctype', 'multipart/form-data');
+              uploadForm.attr('encoding', 'multipart/form-data');
+              return uploadForm.ajaxSubmit();
+
+            }
+
+            //widget.options.imageWidget
+
             $('.lesson-open .lesson-description').hallo({
               plugins: {
                 'halloformat': {},
                 'hallolists': {},
                 'hallojustify': {},
                 'hallolink': {},
-                'halloreundo': {}
+                'halloreundo': {},
+                'halloimage': {
+                  uploadUrl: "http://tutorials-test7.postfog.org/hallo_image_upload/upload",
+                  upload: iframeUpload
+                }
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
