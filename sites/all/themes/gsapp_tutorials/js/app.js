@@ -46,6 +46,9 @@ lessonEditHallo.placeholder.field_video_embed = 'Paste Youtube or Vimeo embed co
 
 var TumblrHostnameOptionsArray = ['api-test-gsapp'];
 
+var MAX_IMAGE_WIDTH = 500;
+var MAX_IMAGE_HEIGHT = 500;
+
 
 (function ($){
   Drupal.behaviors.app = {
@@ -1240,7 +1243,7 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
             for the first opening of a lesson
           */
           initHalloEditorLesson: function(editmode){
-            console.log( '-------initHalloEditorLesson()-------' );
+            console.log('initHalloEditorLesson()');
             //launch Hallo.js
             $('.lesson-open .lesson-title').hallo({
               plugins: {
@@ -1251,18 +1254,136 @@ var TumblrHostnameOptionsArray = ['api-test-gsapp'];
               placeholder: 'Optional subtitle'
             });
 
+
+
+            function prepareIframe(widget) {
+              var iframe, iframeName;
+              iframeName = "" + widget.widgetName + "_postframe_" + widget.options.uuid;
+              iframeName = iframeName.replace(/-/g, '_');
+              iframe = jQuery("#" + iframeName);
+              if (iframe.length) {
+                return iframe;
+              }
+              iframe = jQuery("<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\"        class=\"hidden\" style=\"display:none\" />");
+              this.element.append(iframe);
+              iframe.get(0).name = iframeName;
+              return iframe;
+            }
+            function iframeUpload(data) {
+              console.log('YEEESSSSS');
+
+              var iframe, uploadForm, uploadUrl, widget;
+              widget = data.widget;
+              iframe = widget._prepareIframe(widget);
+              uploadForm = jQuery('form.upload', widget.element);
+              if (typeof widget.options.uploadUrl === 'function') {
+                uploadUrl = widget.options.uploadUrl(widget.options.entity);
+              } else {
+                uploadUrl = widget.options.uploadUrl;
+              }
+              iframe.on('load', function(e) {
+                console.log( 'returned from load iframe' );
+                console.dir(iframe);
+
+                var imageUrl;
+                imageUrl = iframe.get(0).contentWindow.location.href;
+                widget.element.hide();
+
+                console.log('imageUrl: '+ imageUrl);
+
+                var selector = '#' + iframe.get(0).id;
+
+                var res = $(selector).contents().find('pre').text();
+
+                var resObj = $.parseJSON(res);
+
+                console.dir(resObj);
+
+
+                console.log("selector: "+ selector + "  res: "+ res);
+
+                var origWidth = resObj.width;
+                var origHeight = resObj.height;
+
+                var width = origWidth;
+                var height = origHeight;
+
+                if(origWidth > MAX_IMAGE_WIDTH){
+                  var inverseAspectRatio = parseInt(origHeight) / parseInt(origWidth);
+                  var newHeight = MAX_IMAGE_WIDTH * inverseAspectRatio;
+                  height = Math.floor(newHeight);
+                  width = MAX_IMAGE_WIDTH;
+                }
+
+                if(origHeight > MAX_IMAGE_HEIGHT){
+                  var aspectRatio = parseInt(origWidth) / parseInt(origHeight);
+                  var newWidth = MAX_IMAGE_HEIGHT * aspectRatio;
+                  width = Math.floor(newWidth);
+                  height = MAX_IMAGE_HEIGHT;
+                }
+
+
+                var imgHTML = '<img width="' + width + '" height="' + height + '" src="' + resObj.url + '">';
+
+                var origHTML = $('.lesson-open .lesson-description').html();
+
+                if( origHTML == "Add description" ){
+                  origHTML = '';
+                }
+
+                var newHTML = origHTML + imgHTML;
+
+                $('.lesson-open .lesson-description').html( newHTML );
+                $('.lesson-open .lesson-description').addClass('isModified');
+
+                return data.success(imageUrl);
+              });
+              uploadForm.attr('action', uploadUrl);
+              uploadForm.attr('method', 'post');
+              uploadForm.attr('target', iframe.get(0).name);
+              uploadForm.attr('enctype', 'multipart/form-data');
+              uploadForm.attr('encoding', 'multipart/form-data');
+              return uploadForm.submit();
+            }
+
+
+            function jQueryFormUpload(data){
+              var iframe, uploadForm, uploadUrl, widget;
+              widget = data.widget;
+              uploadForm = jQuery('form.upload', widget.element);
+              if (typeof widget.options.uploadUrl === 'function') {
+                uploadUrl = widget.options.uploadUrl(widget.options.entity);
+              } else {
+                uploadUrl = widget.options.uploadUrl;
+              }
+
+              uploadForm.attr('action', uploadUrl);
+              uploadForm.attr('method', 'post');
+              uploadForm.attr('target', iframe.get(0).name);
+              uploadForm.attr('enctype', 'multipart/form-data');
+              uploadForm.attr('encoding', 'multipart/form-data');
+              return uploadForm.ajaxSubmit();
+
+            }
+
+            //widget.options.imageWidget
+
             $('.lesson-open .lesson-description').hallo({
               plugins: {
                 'halloformat': {},
                 'hallolists': {},
                 'hallojustify': {},
                 'hallolink': {},
-                'halloreundo': {}
+                'halloreundo': {},
+                'halloimage': {
+                  uploadUrl: "http://tutorials-test7.postfog.org/hallo_image_upload/upload",
+                  upload: iframeUpload
+                }
               },
               editable: editmode,
               toolbar: 'halloToolbarFixed',
               placeholder: 'Add description'
-            });    
+            });   
 
 
             //$('body #main').append('<div class="field-type-file field-name-field-assignment-attachment field-widget-file-generic form-wrapper" id="edit-field-assignment-attachment"><div id="edit-field-assignment-attachment-und-0-ajax-wrapper"><div class="form-item form-type-managed-file form-item-field-assignment-attachment-und-0"><label for="edit-field-assignment-attachment-und-0">Assignment Attachment </label><div class="file-widget form-managed-file clearfix"><input type="file" id="edit-field-assignment-attachment-und-0-upload" name="files[field_assignment_attachment_und_0]" size="22" class="form-file" /><input type="submit" id="edit-field-assignment-attachment-und-0-upload-button" name="field_assignment_attachment_und_0_upload_button" value="Upload" class="form-submit" /><input type="hidden" name="field_assignment_attachment[und][0][fid]" value="0" /><input type="hidden" name="field_assignment_attachment[und][0][display]" value="1" /></div><div class="description">A PDF of the assignment<br />Files must be less than <strong>5 MB</strong>.<br />Allowed file types: <strong>txt pdf doc</strong>.</div></div></div>');
