@@ -1376,7 +1376,7 @@ var MAX_IMAGE_HEIGHT = 500;
                 'hallolink': {},
                 'halloreundo': {},
                 'halloimage': {
-                  uploadUrl: "http://tutorials-test7.postfog.org/hallo_image_upload/upload",
+                  uploadUrl: "/hallo_image_upload/upload",
                   upload: iframeUpload
                 }
               },

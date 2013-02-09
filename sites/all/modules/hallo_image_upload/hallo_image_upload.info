@@ -1,0 +1,3 @@
+name = Hallo Image Upload
+description = Allows for uploading images through Hallo.js WYSIWYG
+core = 7.x
