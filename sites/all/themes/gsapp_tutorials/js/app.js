@@ -1103,9 +1103,14 @@ var MAX_IMAGE_HEIGHT = 500;
               var limit = 20; //set to maximum always
 
               if($('#tumblr-feed-el').children().length > 0){//not first time
+                console.log('not the first time, calling refreshTumblrFeed()');
                 refreshTumblrFeed();
               }else{
-                var lessionID = this.model.get('nid');
+
+
+                var lessonID = this.model.get('nid');
+
+                console.log('saving tumblr feed information to node with id: '+this.model.get('nid'));
 
                 this.model.set({
                   "field_tumblr_hostname": hostname,
@@ -1232,7 +1237,13 @@ var MAX_IMAGE_HEIGHT = 500;
                     //$('.tumblr-post .content.' + tumblr.groups.keys[i]).show();
                     $('.tumblr-post .content.' + tumblr.groups.keys[i]).closest('.tumblr-post').show();
                     //showTumblrGroup( tumblr.groups.keys[i] );
-                    initializeTumblrFeedMasonry();
+                    $('#tumblr-feed-el').masonry({
+                      itemSelector: '.tumblr-post:visible',
+                      columnWidth: 240,
+                      isAnimated: false,
+                      gutterWidth: 20,
+                      isFitWidth: true
+                    });
                   }
                 }
               }
@@ -1325,13 +1336,10 @@ var MAX_IMAGE_HEIGHT = 500;
                 console.log('params.tag.length > 1, params.tag: ');
                 console.dir(params.tag);
 
-                var tag2 = params.tag[1];
+                if(params.tag.length > 1){
+                  params.tag = params.tag[0];
+                }
 
-                params.tag = params.tag[0];
-                
-                console.log('tag2: '+tag2);
-
-                params.tag = params.tag.toString();
 
                 parseTumblrGroups();//build the tumblr.groups object and its arrays
 

@@ -1,4 +1,4 @@
-<?php dsm($node); ?>
+
 
 <article id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> clearfix lesson"<?php print $attributes; ?>>
 
