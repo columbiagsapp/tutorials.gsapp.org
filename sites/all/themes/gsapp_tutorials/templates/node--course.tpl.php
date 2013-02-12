@@ -550,7 +550,7 @@
 
 <script type="text/template" id="tpl-tumblr-post">
 
-    <div class="content<% if(typeof tags !== 'undefined' && tags.length > 0){ for(var i = 0; i < tags.length; i++){ %><%= ' '+tags[i] %><% } } %>">
+    <div class="content<% if(typeof tags !== 'undefined' && tags.length > 0){ for(var i = 0; i < tags.length; i++){ %><%= ' '+tags[i].toLowerCase() %><% } } %>">
 
       <% if(typeof type !== 'undefined' && type){ %>
         <% if(type == "photo"){ %>
@@ -560,12 +560,13 @@
               <% for (var i=0; i < photos.length; i++) { %>
 
                   <a class="tumblr-img-wrapper" href="<%= photos[i].original_size.url %>" target="_blank">
-                    <img src="<%= photos[i].alt_sizes[2].url %>">
+                    <img class="tumblr-photo-img" src="<%= photos[i].alt_sizes[2].url %>">
                   </a>
-                  <% if(caption){ %>
-                    <%= caption %>
-                  <% } %>
+                  
 
+              <% } %>
+              <% if(caption){ %>
+                <%= caption %>
               <% } %>
             </div><!-- /.row-fluid -->  
           <% } %>
@@ -588,6 +589,10 @@
         <% for(var i = 0; i < tags.length; i++){ %>
           <span class="tag"><%= tags[i] %><% if(i < (tags.length-1)){ %><%= ', ' %><% } %></span>
       <% } } %>
+
+      <% if(typeof post_url !== 'undefined' && post_url){ %>
+        <div><a href="<%= post_url %>" target="_blank">Go to post</a></div>
+      <% } %>
   
     </div><!-- /.content -->
 </script>

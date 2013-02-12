@@ -1219,9 +1219,9 @@ var MAX_IMAGE_HEIGHT = 500;
                 var list = '<div class="tumblr-group-keys">';
                 for(var i = 0; i < tumblr.groups.keys.length; i++){
                   if(i == 0){
-                    list = list + '<h5 class="tumblr-group-key"><a class="active-group" href="#" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
+                    list = list + '<h5 class="tumblr-group-key"><a class="active-group" href="#tumblr-wrapper" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
                   }else{
-                    list = list + '<h5 class="tumblr-group-key"><a href="#" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
+                    list = list + '<h5 class="tumblr-group-key"><a href="#tumblr-wrapper" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
                   }
                   if(i < tumblr.groups.keys.length-1){ list = list + ', '; }
                 }
