@@ -13,6 +13,8 @@ var WeeksCollection,
 var LessonsCollection,
     LessonsCollectionView;
 
+var Student, StudentsCollection, GroupCollection;
+
 var course,
     courseNid;
 
@@ -50,14 +52,66 @@ var MAX_IMAGE_WIDTH = 500;
 var MAX_IMAGE_HEIGHT = 500;
 
 
+var MAX_IMAGE_WIDTH = 500;
+var MAX_IMAGE_HEIGHT = 500;
+
+
 (function ($){
   Drupal.behaviors.app = {
     attach: function() {
+
+      /*
+       *  Checks if the current user should have editor privileges, returns true or false
+      */
+      function isEditor(){
+        if( $('body').hasClass('faculty') || $('body').hasClass('ta')  || $('body').hasClass('administrator')){
+          return true;
+        }else{
+          return false;
+        }
+      }
+
       function strip(html)
       {
          var tmp = document.createElement("DIV");
          tmp.innerHTML = html;
          return tmp.textContent||tmp.innerText;
+      }
+
+      /*
+       *  Populates the StudentsCollection collection with all the students in the course as models
+      */
+      Student = Drupal.Backbone.Models.User.extend();
+      var StudentsCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+        model: Student
+      });
+      StudentsCollection = new StudentsCollectionPrototype();
+
+      function populateStudentsCollection(){
+        var students = course.get('field_course_students');
+
+        StudentsCollection.reset();
+
+        for(var i = 0; i < students.length; i++){
+          var student = new Student({ "name": 'student'});
+          StudentsCollection.add(student);
+          if(i == (students.length - 1)){
+            student.fetch({
+              success: function(){
+                return true;
+              },
+              error: function(){
+                return false;
+              }
+            });
+          }else{
+            student.fetch();
+          }
+        }
+      }
+
+      function populateGroupsCollection(){
+
       }
 
       //Hallo.js seems to apply min-width and min-height to 
@@ -84,7 +138,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
           //save out new order
           $('.week-list-container > li').each(function(i){
-            console.log('*******each .week-list-container li, number: '+ i);
             var thisNID = $(this).find('.week').attr('id');
             thisNID = thisNID.substr(5);
             var WCV_iVLength = WeeksCollectionView._itemViews.length;
@@ -118,8 +171,6 @@ var MAX_IMAGE_HEIGHT = 500;
       }
 
       function init_fileuploader(type){
-        console.log('*******init_fileuploader(), with vars:');
-        console.log(vars);
         space_allowed = vars.space_remaining;
         
         var types = vars.filetypes;
@@ -169,9 +220,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
           completed: 
             function(e, data){
-
-              console.log('first return, data.result: ');
-              console.dir(data.result);
 
               //TODO TCT2003 add logic for deciding the image type
               var upload_file_type = type;
@@ -309,15 +357,7 @@ var MAX_IMAGE_HEIGHT = 500;
         id = id.substr(17);
         id = parseInt(id);
 
-        console.log('links: ');
-        console.dir(links);
-
-        console.log('id: '+ id);
-
         links.splice( id ,1);
-
-        console.log('links post splice ');
-        console.dir(links);
 
         course.set({
             "field_links": links
@@ -365,10 +405,8 @@ var MAX_IMAGE_HEIGHT = 500;
         var idxEnd = bodyClasses.indexOf(' ', idxStart);
         if(idxEnd >= 0){
           var returnVal = bodyClasses.substring(idxStart, idxEnd);
-          console.log('has an end: '+ returnVal);
         }else{
           var returnVal = bodyClasses.substring(idxStart);
-          console.log('has NO end: '+ returnVal);
         }
         return returnVal;
       }
@@ -459,7 +497,6 @@ var MAX_IMAGE_HEIGHT = 500;
         if(exception != 'updates'){
           if($('#updates').length > 0){
             if($('#updates').hasClass('span9')){
-              console.log('***');
               $('#updates').switchClass('span9', 'span3 collapsed', ANIMATION_TIME);
               //$('#updates').removeClass('span9').addClass('span3 collapsed');
             }
@@ -534,7 +571,6 @@ var MAX_IMAGE_HEIGHT = 500;
         clearContentArea('schedule');
 
         if($('#updates').length <= 0){
-          console.log('reappending updates');
           $('#main').append(updates_detached);
         }
         //$('#schedule').removeClass('span3 collapsed').addClass('span9');
@@ -550,7 +586,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
         //if detached, attach first, then open
         if($('#updates').length <= 0){
-          console.log('reappending updates');
           $('#main').append(updates_detached);
           $('#updates').removeClass('span3 collapsed').addClass('span9');
         }else{
@@ -631,8 +666,6 @@ var MAX_IMAGE_HEIGHT = 500;
       }
 
       function getState(state){
-        console.log('getState() state: '+state);
-
         state = typeof state !== 'undefined' ? state : '';
 
         switch(state){
@@ -679,9 +712,7 @@ var MAX_IMAGE_HEIGHT = 500;
             }
             break;
           default:
-            console.log('no state given to check');
             var state = $('#main').attr('class');
-            console.log('state classes: '+state);
 
             var idxStart = state.indexOf('state-');
             var idxEnd = state.indexOf(' ', idxStart+5);
@@ -690,7 +721,6 @@ var MAX_IMAGE_HEIGHT = 500;
             }else{
               state = state.substring(idxStart);
             }
-            console.log('final state: '+state);
 
             return state;
             break;
@@ -844,10 +874,7 @@ var MAX_IMAGE_HEIGHT = 500;
           Create an empty question for new question to be asked
         */
         $('#question-submit').bind('click',function(){
-          console.log('clicked #question-submit');
-
           var userUID = extractBodyProperty('user-uid-');
-          console.log('uid: '+userUID);
 
           //var user = Drupal.Backbone.Models.User({ "uid": userUID });
 
@@ -940,7 +967,518 @@ var MAX_IMAGE_HEIGHT = 500;
 
         course = new Course({nid: courseNid });
 
-        course.fetch();
+        course.fetch({
+          success: function(model, response, options){
+            populateStudentsCollection();
+          }
+        });
+
+
+
+        ///////////////////////////////////////////////////////////////
+        ////////////////// TUMBLR  ////////////////////////////////////
+        ///////////////////////////////////////////////////////////////
+
+        //Fills tumblr.groups_array with each TA group in the form key:value
+        function parseTumblrGroups(){
+          console.log('parseTumblrGroups()');
+
+          tumblr.groups = {};
+
+          tumblr.groups.keys = [];
+          tumblr.groups.posts = [];
+
+
+          var ftg = course.get('field_tumblr_groups');
+          var ftg_array = ftg.split(',');
+
+          for(var i = 0; i < ftg_array.length; i++){
+            var idx = ftg_array[i].indexOf(':');
+            var key = ftg_array[i].substring(0,idx);
+            var value = ftg_array[i].substring( parseInt(idx)+1);
+
+            tumblr.groups.keys.push(key);
+
+            tumblr.groups.posts[ key ] = {};//init object
+            tumblr.groups.posts[ key ].title = value;
+            tumblr.groups.posts[ key ].data = [];
+          }
+        }
+
+        function sortByTumblrGroups(posts){
+          console.log('sortByTumblrGroups()');
+          
+
+          
+
+          console.log('********POSTS*******');
+          console.dir(posts);
+
+
+          posts_loop:
+          for(var i = 0; i < posts.length; i++){
+            
+            groups_loop:
+            for(var j = 0; j < tumblr.groups.keys.length; j++){
+              var matchString = tumblr.groups.keys[j];
+              var rslt = null;
+              $.each(posts[i].tags, function(index, value) { 
+                if (rslt == null && (value.toLowerCase() == matchString.toLowerCase() ) ) {
+                  rslt = index;
+                  return false;
+                }
+              });
+
+              if(rslt != null){
+
+                tumblr.groups.posts[ tumblr.groups.keys[j] ].data.push(posts[i]);
+                break groups_loop;
+              }
+            }
+          }
+
+          return tumblr.groups.posts;
+        }
+
+
+        /* Tumblr API functionality, inspired by https://github.com/jokull/tumblr-widget */
+        var TumblrFeed = Drupal.Backbone.Models.Node.extend({
+          initialize: function(opts){
+            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
+          }
+        });
+
+        var TumblrFeedCollection = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+          model: TumblrFeed
+        });
+
+        var TumblrFeedView = Drupal.Backbone.Views.Base.extend({
+          //the Underscore formated template in node--tutorial.tpl.php stored in a 
+          //<script> tag and identified by its id
+          templateSelector: '#tumblr_feed_attachment',
+          el:'#tumblr-feed-list-el',
+
+          //bind vote up and down events to the buttons and tie these to local functions
+          events: {
+            "click .edit" : "editTumblrFeed",
+            "click .delete": "deleteTumblrFeed",
+            "click .cancel": "cancelEditTumblrFeed"
+          },
+
+          initialize: function(opts) {
+            Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
+            _.bindAll(this, 'show', 'hide', 'enterEditMode', 'exitEditMode', 'deleteTumblrFeed', 'cancelEditTumblrFeed');
+          },
+
+          editTumblrFeed: function(){
+
+            var tumblrfeedID = this.model.get('nid');
+
+            console.log();
+            console.log('$(this).text(): '+ $(this).text());
+
+            if($(this).text() == "Edit"){
+              
+              //initTumblrEditorHallo();
+
+              $(this).text('Save');
+              $('.cancel, .delete', '#node-'+tumblrfeedID).show();
+
+            }else{
+              
+              $('#select2-tumblr-tags').select2('disable');
+
+              //TODO TCT2003
+              //these variables should be pulled from divs
+              var tumblr_el = '#tumblr-feed-el';
+              var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-hostname').val();
+
+
+              var tags = $('#select2-tumblr-tags').select2('val');
+
+
+              var group = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val();//($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
+
+              var limit = 20; //set to maximum always
+
+              if($('#tumblr-feed-el').children().length > 0){//not first time
+                refreshTumblrFeed();
+              }else{
+                var lessionID = this.model.get('nid');
+
+                this.model.set({
+                  "field_tumblr_hostname": hostname,
+                  "field_tumblr_tags": tags.toString(),
+                  "field_tumblr_limit": limit,
+                  "field_tumblr_grouping": group,
+                });            
+                
+                this.model.save({}, {silent:true});
+
+                initTumblrFeed(tumblr_el, hostname, tags, limit, '');
+              }
+
+              $(this).text('Edit');
+              $('.cancel, .delete', '#node-'+tumblrfeedID).hide();
+
+            }
+          },
+
+          deleteTumblrFeed: function(){
+            console.log('deleteTumblrFeed()');
+            console.log('nid: '+ this.model.get('nid'));
+            //this.model.destroy();
+            //this.remove();
+          },
+
+          cancelEditTumblrFeed: function(){
+            console.log('cancelEditTumblrFeed()');
+          },
+
+          show: function(){
+            console.log('showing');
+            var thisID = this.model.get('nid');
+            $('#node-'+thisID).addClass('active');
+          },
+
+          hide: function(){
+            var thisID = this.model.get('nid');
+            $('#node-'+thisID).removeClass('active');
+          },
+          enterEditMode: function(){
+            var thisID = this.model.get('nid');
+            $('.tumblr-feed-edit-wrapper', '#node-'+thisID).addClass('edit-mode');
+          },
+          exitEditMode: function(){
+            var thisID = this.model.get('nid');
+            $('.tumblr-feed-edit-wrapper', '#node-'+thisID).removeClass('edit-mode');
+          }
+        });
+
+        var TumblrPost = Backbone.Model.extend({});
+
+        var NextPage = Backbone.View.extend({
+          el: "#tumblr .pagination .next",
+          events: {
+            "click .next": "click"
+          },
+          initialize: function(options){
+            return this.collection.bind("last", this.hide);
+          },
+          hide: function(){
+            return ($(this.el)).hide();
+          },
+          click: function(e){
+            e.preventDefault();
+            return this.collection.page();
+          }
+        });//end NextPage
+
+
+
+        function fetchFromTumblrAPI(params, _this){
+
+          //insurance against any infinite loops
+          _this.tumblr_api_call_limit = parseInt(tumblr.limit) - 1;
+          if(_this.tumblr_api_call_limit < 0){
+            return false;
+          }
+          console.log('');
+          console.log('fetchFromTumblrAPI() with offset: ' + params.offset + ' and params:');
+          console.dir(params);
+
+          return $.ajax({
+            url: _this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+            dataType: "jsonp",
+            jsonp: "jsonp",
+            success: function(data, status){
+              sortByTumblrGroups(data.response.posts);
+
+              console.log('data for recursion: ');
+              console.dir(data);
+
+              _this.add(data.response.posts);
+
+              console.log("_this.length: " + _this.length);
+              console.log('data.response.total_posts: '+ data.response.total_posts);
+
+              _this.trigger('paged');
+              if(_this.length <= data.response.total_posts){
+                var p = params;
+                p.offset = parseInt(p.offset) + parseInt(p.limit);
+                p.offset = '' + p.offset; //cast to a string
+                fetchFromTumblrAPI(p, _this);
+              }else{
+
+                var list = '<div class="tumblr-group-keys">';
+                for(var i = 0; i < tumblr.groups.keys.length; i++){
+                  if(i == 0){
+                    list = list + '<h5 class="tumblr-group-key"><a class="active-group" href="#" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
+                  }else{
+                    list = list + '<h5 class="tumblr-group-key"><a href="#" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
+                  }
+                  if(i < tumblr.groups.keys.length-1){ list = list + ', '; }
+                }
+                list = list + '</div>';
+
+                $('.tumblr-feed-content').prepend( list );
+
+                for(var i = 0; i < tumblr.groups.keys.length; i++){
+                  //DO BINDINGS!!
+                  var selector = '#' + tumblr.groups.keys[i];
+                  $(selector, '.tumblr-group-keys').bind('click', showTumblrGroup);
+                  if(i == 0){
+                    //$('.tumblr-post .content.' + tumblr.groups.keys[i]).show();
+                    $('.tumblr-post .content.' + tumblr.groups.keys[i]).closest('.tumblr-post').show();
+                    //showTumblrGroup( tumblr.groups.keys[i] );
+                    initializeTumblrFeedMasonry();
+                  }
+                }
+              }
+            }
+          });
+
+        }
+
+        function initializeTumblrFeedMasonry(){
+          console.log("initializeTumblrFeedMasonry()");
+
+          setTimeout(function(){
+
+            $('#tumblr-feed-el').masonry( 'destroy' );
+            $('#tumblr-feed-el').masonry({
+              itemSelector: '.tumblr-post:visible',
+              columnWidth: 240,
+              isAnimated: false,
+              gutterWidth: 20,
+              isFitWidth: true
+            });
+          }, 100);
+
+        }
+
+        function showTumblrGroup(){
+          $('.tumblr-group-key a.active-group').removeClass('active-group');
+          $(this).addClass('active-group');
+
+          var key = $(this).attr('id');
+
+          var selector = '.' + key;
+          $('.tumblr-post').hide();
+
+          console.log('about to show: '+ '.tumblr-post .content' + selector + 'END');
+
+          $('.tumblr-post .content' + selector).closest('.tumblr-post').show();
+          initializeTumblrFeedMasonry();
+        }
+
+        var Tumblr = Backbone.Collection.extend({
+          model: TumblrPost,
+          endpoint: 'http://api.tumblr.com/v2/blog/',
+          params: {
+            limit: 1
+          },
+          tumblr_api_call_limit: 30,
+          tags: [],
+          initialize: function(options){
+            this.endpoint = this.endpoint + options.hostname;
+            return this.params = _.extend(this.params, options.params || {});
+          },
+          page: function(){
+            console.log('Tumblr.page()');
+            console.log('this.endpoint: '+ this.endpoint);
+
+            var groupByTA = false;
+            switch( this.grouping ){
+              case 'Group by Student UNI':
+                console.log('the grouping: Group by Student UNI');
+
+                break;
+              case 'Group by TA':
+                groupByTA = true;
+                break;
+              default://just get everything
+                //initTumblrFeed(el, hostname, tags, limit, grouping);
+                break;
+            }
+
+            var params,
+                _this = this;
+            params = _.extend(this.params, {
+              offset: this.length - 1
+            });
+
+          
+            console.log('with params: ');
+            console.dir(params);
+
+            console.log('!!!*!*!*!*!***!*!**!*!*!*!* this: ');
+            console.dir(this);
+
+            if(params.tag != null){
+              console.log('params.tag != null');
+
+              groupByTA = true;
+
+              if(groupByTA == true){
+                console.log('params.tag.length > 1, params.tag: ');
+                console.dir(params.tag);
+
+                var tag2 = params.tag[1];
+
+                params.tag = params.tag[0];
+                
+                console.log('tag2: '+tag2);
+
+                params.tag = params.tag.toString();
+
+                parseTumblrGroups();//build the tumblr.groups object and its arrays
+
+                fetchFromTumblrAPI(params, _this);
+
+                //insert .when here
+
+
+              }else{
+                console.log('params.tag.length == 1, params.tag: ');
+                console.dir(params.tag);
+
+                params.tag = params.tag.toString();
+
+                return $.ajax({
+                  url: this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+                  dataType: "jsonp",
+                  jsonp: "jsonp",
+                  success: function(data, status){
+                    console.log('Tumblr.page.success callback reached wtih data:');
+                    console.dir(data);
+                    console.log('');
+
+                    _this.add(data.response.posts);
+                    _this.trigger('paged');
+                    if(data.response.total_posts === _this.length){
+                      console.log('Tumblr: triggering last');
+                      return _this.trigger('last');
+                    }
+                  }
+                });
+              }
+            }else{
+              console.log('no tags');
+              return $.ajax({
+                url: this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+                dataType: "jsonp",
+                jsonp: "jsonp",
+                success: function(data, status){
+                  console.log('Tumblr.page.success callback reached wtih data:');
+                  console.dir(data);
+                  console.log('');
+
+                  _this.add(data.response.posts);
+                  _this.trigger('paged');
+                  if(data.response.total_posts === _this.length){
+                    console.log('Tumblr: triggering last');
+                    return _this.trigger('last');
+                  }
+                }
+              });
+            }
+          }
+        });//end Tumblr
+
+        function getPostsByTag(url, params) {
+           return $.ajax({
+            url: 'http://mypage.tumblr.com/api/read/json?tagged=' + tag,
+            type: 'GET',
+            dataType: 'jsonp'
+          });
+        };
+/*
+        $.when(getPostsByTag('tag1'), getPostsByTag('tag2'), getPostsByTag('tag3'))
+         .then(function() {
+           var posts = $.extend({}, arguments);
+           renderStuff(posts);
+         });
+*/
+
+        var TumblrPostView = Backbone.View.extend({
+          className: "tumblr-post",
+          initialize: function(options){
+            if(this.model) return this.model.bind("change", this.render);
+          },
+          render: function(){
+            var tpl;
+            tpl = _.template(($('#tpl-tumblr-post')).html());
+            ($(this.el)).addClass(this.model.get('type'));
+            //($(this.el)).addClass('span4');
+            ($(this.el)).html(tpl(this.model.toJSON()));
+
+            return this;
+          }
+        });//end TumblrPostView
+
+        var TumblrView = Backbone.View.extend({
+          initialize: function(options){
+            this.collection.bind("reset", this.all);
+            //when the Tumblr collection gets added to, call it's view's add too
+            return this.collection.bind('add', this.add, this);
+          },
+          all: function(){
+            ($(this.el)).html('');
+            return this.collection.each(this.add);
+          },
+          add: function(model){
+            model.view = new TumblrPostView({
+              model: model
+            });        
+
+            return ($(this.el)).append(model.view.render().el);
+          }
+        });//end TumblrView
+
+
+        function initTumblrFeed(el, hostname, tags, limit, grouping){
+          console.log('initTumblrFeed(): grouping: '+ grouping);
+
+          console.log('el: '+ el);
+          console.log('hostname: '+ hostname);
+          console.log('limit: '+ limit);
+          console.dir(tags);
+
+          limit = limit || 1;
+
+          tumblr.collection = new Tumblr({
+            hostname: hostname,
+            params: {
+                api_key: 'yqwrB2k7eYTxGvQge4S8k9R6wAdQrATjLXhVzGVPgjTXwucNOo'
+               ,limit: limit
+               ,tag: tags
+            },
+            grouping: grouping
+          });
+          tumblr.view = new TumblrView({
+            el: el,
+            collection: tumblr.collection
+          });
+
+          tumblr.collection.page();
+
+          tumblr.nextPage = new NextPage({
+            collection: tumblr.collection
+          });
+
+        }
+
+
+
+
+
+
+
+
+
+
 
 
         /*
@@ -966,8 +1504,6 @@ var MAX_IMAGE_HEIGHT = 500;
             this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
           },
           testFunction: function(){
-            console.log('testFunction()');
-            console.log('this model nid: '+this.model.get("nid") );
           }
         });
 
@@ -1069,15 +1605,13 @@ var MAX_IMAGE_HEIGHT = 500;
               openLessonView.initEmbedsCollectionAndView(NID);
               openLessonView.initUploadsCollectionAndView(NID);
 
-              console.log( 'should call initHalloEditorLesson()-------' );
-
               openLessonView.initHalloEditorLesson(false);
 
               //attach any embeds
               openLessonView.attachEmbed();
               openLessonView.attachUpload();
 
-              openLessonView.attachAddons();
+              openLessonView.renderAddons();
 
               $('html, body').animate({scrollTop:0}, 'slow');
 
@@ -1095,7 +1629,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           firstEditLesson: function(){
-            console.log('firstEditLesson()');
             setState(FIRST_EDIT_LESSON);
 
             //can't call edit lesson until finished with openLesson
@@ -1137,6 +1670,11 @@ var MAX_IMAGE_HEIGHT = 500;
             "click .button-upload-file": "uploadFileFile",
             "click .button-addon-tumblr": "addOnTumblr",
             "click .button-addon-qanda": "addOnQandA"
+          },
+
+          render: function(variables, el){
+            Drupal.Backbone.Views.Base.prototype.render.call(this, variables, el);
+            //this.renderAddons();
           },
 
           initUploadsCollectionAndView: function(lessonID){
@@ -1199,7 +1737,6 @@ var MAX_IMAGE_HEIGHT = 500;
             this.model.bind('change', this.render, this);//this calls the fetch
 
             _(this).bindAll('editTumblrAddon');
-            console.log('LessonOpenView initialize()');
           },
 
           /*
@@ -1209,7 +1746,6 @@ var MAX_IMAGE_HEIGHT = 500;
             this.initHalloEditorLesson(true);
 
             $('.lesson-open .lesson-embed-element').each(function(){
-              console.log('trying to enable hallo.js for embed code ****');
               $('.field-embed-edit-code', this).hallo({
                 editable: true
               });
@@ -1356,7 +1892,6 @@ var MAX_IMAGE_HEIGHT = 500;
               } else {
                 uploadUrl = widget.options.uploadUrl;
               }
-
               uploadForm.attr('action', uploadUrl);
               uploadForm.attr('method', 'post');
               uploadForm.attr('target', iframe.get(0).name);
@@ -1390,7 +1925,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           initQuestionSubmitHalloEditorsLesson: function(){
-            console.log('----initQuestionSubmitHalloEditorsLesson()');
 
             if($('#submit-question-title').text().length > 0){
               $('#submit-question-title').text('');
@@ -1436,8 +1970,6 @@ var MAX_IMAGE_HEIGHT = 500;
               //newUploadView.firstEditUpload();
             }
 
-
-            console.log('saveUploads() with result: ');
             console.dir(data);
 
             var thisLessonOpenView = this;
@@ -1447,8 +1979,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
             //if the open lesson already has uploads, and therefore an UploadsCollectionView
             if(UploadsCollectionView._itemViews.length > 0){
-              console.log('UploadsCollection.length > 0');
-
               var UCV_iVLength = UploadsCollectionView._itemViews.length;
 
               for(var i = 0; i < UCV_iVLength; i++){
@@ -1475,19 +2005,11 @@ var MAX_IMAGE_HEIGHT = 500;
                   uploadView.model.save({},{
                     
                     success: function(model, response, options){
-
-                      console.log('upload save success');
-                      console.log('re-initializing Uploads collection stuff');
-
                       thisLessonOpenView.initUploadsCollectionAndView(lessonID);
                       thisLessonOpenView.attachUpload();
 
                     },
                     error: function(model, xhr, options){
-
-                      console.log('upload save error');
-                      console.log('re-initializing Uploads collection stuff');
-
                       thisLessonOpenView.initUploadsCollectionAndView(lessonID);
                       thisLessonOpenView.attachUpload();
                     }
@@ -1500,7 +2022,6 @@ var MAX_IMAGE_HEIGHT = 500;
                   
               }//end for
             }else{
-              console.log('re-initializing Uploads collection stuff');
               thisLessonOpenView.initUploadsCollectionAndView(lessonID);
               thisLessonOpenView.attachUpload();
             }
@@ -1512,16 +2033,12 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           saveEmbeds: function(){
-            console.log('saveEmbeds()');
-
             var thisLessonOpenView = this;
 
             var lessonID = this.model.get('nid');
             var embedsArray = [];
 
             if(EmbedsCollectionView._itemViews.length > 0){
-              console.log('EmbedsCollection.length > 0');
-
               var ECV_iVLength = EmbedsCollectionView._itemViews.length;
 
               for(var i = 0; i < ECV_iVLength; i++){
@@ -1543,21 +2060,12 @@ var MAX_IMAGE_HEIGHT = 500;
                 //only fire for the last 
                 if( i == (ECV_iVLength - 1) ){
                   embedView.model.save({},{
-                    
                     success: function(model, response, options){
-
-                      console.log('embed save success');
-                      console.log('re-initializing Embeds collection stuff');
-
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
                       thisLessonOpenView.attachEmbed();
 
                     },
                     error: function(model, xhr, options){
-
-                      console.log('embed save error');
-                      console.log('re-initializing Embeds collection stuff');
-
                       thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
                       thisLessonOpenView.attachEmbed();
                     }
@@ -1565,12 +2073,9 @@ var MAX_IMAGE_HEIGHT = 500;
 
                 }else{
                   embedView.model.save();
-                }
-
-                  
+                }              
               }//end for
             }else{
-              console.log('re-initializing Embeds collection stuff');
               thisLessonOpenView.initEmbedsCollectionAndView(lessonID);
               thisLessonOpenView.attachEmbed();
             }
@@ -1581,13 +2086,7 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           attachUpload: function(){
-
-            console.log('attachUpload()');
-
             var lessonID = this.model.get("nid");
-
-            console.log('attachUpload() for lesson: '+lessonID);
-
             //this.initEmbedsCollectionAndView(lessonID);
 
             //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
@@ -1599,29 +2098,18 @@ var MAX_IMAGE_HEIGHT = 500;
                 //remove preloader for lesson for this particular week based on weekID
                 $('.upload.preloader', '#open-node-'+lessonID).hide();
                 $('.attachments-header').removeClass('hidden');
-
-                console.log('upload fetch success');
-
                 //TODO TCT2003 add "remove" button
               },
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.upload.preloader', '#open-node-'+lessonID).hide();
-
-                console.log('upload fetch error');
               }
 
             });
           },
 
           attachEmbed: function(){
-
-            console.log('attachEmbed()');
-
             var lessonID = this.model.get("nid");
-
-            console.log('attachEmbed() for lesson: '+lessonID);
-
             //this.initEmbedsCollectionAndView(lessonID);
 
             //TODO TCT2003 WED DEC 19, 2012 need to figure out how to get the week nid dynamically?
@@ -1632,9 +2120,6 @@ var MAX_IMAGE_HEIGHT = 500;
               success: function(model, response, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.embed.preloader', '#open-node-'+lessonID).hide();
-
-                console.log('embed fetch success');
-
                 $('.lesson-embed-element', '#open-node-'+lessonID).each(function(){
                   $('.field-embed-edit-code', this).text( $('.field-embed-content-wrapper', this).html() );
 
@@ -1651,8 +2136,6 @@ var MAX_IMAGE_HEIGHT = 500;
               error: function(model, xhr, options){
                 //remove preloader for lesson for this particular week based on weekID
                 $('.embed.preloader', '#open-node-'+lessonID).hide();
-
-                console.log('embed fetch error');
               }
 
             });
@@ -1711,8 +2194,6 @@ var MAX_IMAGE_HEIGHT = 500;
                 description_summary = description_summary.substr(0,180) + '...';
               }
 
-              console.log("saving description_summary: "+description_summary);
-
               this.model.set({
                 "title": theTitle,
                 "field_description": description,
@@ -1736,7 +2217,6 @@ var MAX_IMAGE_HEIGHT = 500;
                 error: function(){
                   $('.embed.preloader', thisLessonOpenView).hide(); 
                   $('.upload.preloader', thisLessonOpenView).hide(); 
-                  console.log('----save lesson error');
                   //dont clear modified state b/c hasn't been modified yet?
                   //TODO TCT2003 need to throw alert
                   //if(getState(MODIFIED)){
@@ -1766,9 +2246,6 @@ var MAX_IMAGE_HEIGHT = 500;
             //var weekID = $('.open').closest('.week').attr('id');
             //weekID = weekID.substr(5);
             //LessonsCollectionView[weekID].remove(this.model);
-
-            console.log('deleteLesson()');
-
             this.model.destroy();
             this.remove();
 
@@ -1786,9 +2263,6 @@ var MAX_IMAGE_HEIGHT = 500;
             var this_selector = '#open-node-' + lessonID;
             //disable Hallo.js editors
             //this.disableHalloEditorsLesson();
-
-            console.log('cancelEdit()');
-
             if( getState(FIRST_EDIT_LESSON) ){
               clearState(FIRST_EDIT_LESSON);
               //TODO TCT2003 do I need to save the model first?
@@ -1829,8 +2303,6 @@ var MAX_IMAGE_HEIGHT = 500;
             var courseID = $('.course').attr('id');
             courseID = courseID.substring(5);
 
-            console.log('Course: '+courseID);
-
             var lessonID = this.model.get('nid');
             var upload_title = "upload-"+result.name;
 
@@ -1854,9 +2326,6 @@ var MAX_IMAGE_HEIGHT = 500;
             //when the node is new... must be a better way!
             f.url = "/node";
 
-            console.log('***result passed to addUpload():');
-            console.dir(result);
-
             setState(MODIFIED);
 
             var resp = f.save({}, {
@@ -1877,8 +2346,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
                 //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
                 
-                console.log('*****adding new upload to UploadsCollectionView');
-
                 setState(FIRST_EDIT_UPLOAD);
 
 
@@ -1888,19 +2355,12 @@ var MAX_IMAGE_HEIGHT = 500;
                 var newUploadView = UploadsCollectionView.addOne(f);
 
                 var uploads = [];
-
-                console.log('about to loop through UploadsCollection');
                 //loop through each upload in UploadsCollection and push it's type into uploads[]
                 _.each(UploadsCollection.models, function(element, index, list){
-
-                  console.log('looping through UploadsCollection');
-                  
                   var type = element.get('field_upload_type');
                   if($.inArray(type, uploads) < 0){
-                    console.log(type+ ' is not in uploads array&&&&&&&&&&&&&&&&&&&&&');
                     uploads.push( element.get('field_upload_type') );
                   }else{
-                    console.log(type+ ' is in uploads array, but still adding&&&&&&&&&&&&&&&&&&&&&');
                     uploads.push( element.get('field_upload_type') );
                   }
                 });
@@ -1910,8 +2370,6 @@ var MAX_IMAGE_HEIGHT = 500;
                 thisLessonOpenView.model.set({
                   "field_uploads": uploads
                 }, {silent: true});
-
-                console.log('JUST SET LESSON VIEW MODEL WITH UPLOADS');
 
                 /*
 
@@ -1937,8 +2395,6 @@ var MAX_IMAGE_HEIGHT = 500;
             var thisLessonOpenView = this;
             var courseID = $('.course').attr('id');
             courseID = courseID.substring(5);
-
-            console.log('Course: '+courseID);
 
             var lessonID = this.model.get('nid');
             var embed_title = "embeddedTo"+lessonID;
@@ -1976,8 +2432,6 @@ var MAX_IMAGE_HEIGHT = 500;
                 e.save();
 
                 //TODO TCT2003 why doesn't this.embedsCollectionView[0] work? it says it's undefined!!
-                
-                console.log('*****adding new embed to EmbedsCollection');
 
                 setState(MODIFIED);
 
@@ -2048,8 +2502,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           addOnQandA: function(){
-            console.log('addOnQandA');
-
             //add tumblr to list of addons
             //TODO TCT2003 move this to a saveAddon() function
             var addons = this.model.get('field_addons');
@@ -2123,18 +2575,9 @@ var MAX_IMAGE_HEIGHT = 500;
               
               
 
-            }else{
+            }else{              
 
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
-                editable: false,
-                placeholder: 'title'
-              });
-              
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
-                editable: false,
-                placeholder: 'tag1, tag2, tag3'
-              });
-
+              $('#select2-tumblr-tags').select2('disable');
               $('#tumblr-wrapper').removeClass('edit-mode');
 
               //TODO TCT2003
@@ -2142,21 +2585,11 @@ var MAX_IMAGE_HEIGHT = 500;
               var tumblr_el = '#tumblr-feed-el';
               var hostname = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-hostname').val();
 
-              console.log('HOSTNAME!!!!: '+ hostname);
-
-              var tagStr = $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').text();
+              var tags = $('#select2-tumblr-tags').select2('val');
 
               var group = ($('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-selected-group').val() == 'Group by Student UNI') ? true : false;
-
-              console.log('GROUP: '+ group);
               
-
-              var tags = tagStr.split(', ');
               var limit = 1; //set to maximum always
-
-              console.log('calling initTumblrFeed() with hostname: '+ hostname + ', ' + 'tags: ');
-              console.dir(tags);
-
 
               if($('#tumblr-feed-el').children().length > 0){//not first time
                 refreshTumblrFeed();
@@ -2167,7 +2600,7 @@ var MAX_IMAGE_HEIGHT = 500;
 
                 tumblrFeed.set({
                   "field_tumblr_hostname": hostname,
-                  "field_tumblr_tags": tagStr,
+                  "field_tumblr_tags": tags.toString(),
                   "field_tumblr_limit": limit,
                   "field_tumblr_group_by_student": 'false',
                   "field_parent_lesson_nid": lessionID,
@@ -2176,13 +2609,8 @@ var MAX_IMAGE_HEIGHT = 500;
 
                 tumblrFeed.url = "/node";
 
-                
-                
-
                 tumblrFeed.save({},{
                   success: function(model, response, options){
-                    console.log('saved new tumblr_feed');
-
                     tumblrFeed.id = response.id;
                     tumblrFeed.url = "/node/" + response.id + ".json";
                     tumblrFeed.set({
@@ -2195,7 +2623,7 @@ var MAX_IMAGE_HEIGHT = 500;
                   }
                 });
 
-                initTumblrFeed(tumblr_el, hostname, tags, limit);
+                initTumblrFeed(tumblr_el, hostname, tags, limit, '');
               }
 
             }
@@ -2203,20 +2631,28 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           initTumblrEditorHallo: function(){
-            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-title').hallo({
-              editable: true,
-              placeholder: 'title'
+
+            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').text('Save');
+            $('#select2-tumblr-tags').select2({
+              tags:["sketch1"],
+              tokenSeparators: [",", " "]
             });
-            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-hostname').hallo({
-              editable: true,
-              placeholder: 'sitename'
-            });
-            $('#tumblr-wrapper .tumblr-feed-edit-wrapper .tumblr-input-tags').hallo({
-              editable: true,
-              placeholder: 'tag1, tag2, tag3'
-            });
+
+            /*
+            $("#select2-tumblr-tags").select2({
+              query:function(query){
+                var data = {results: []};
+                //data.results.push({text: query.term});
+                query.callback(data);
+              }
+          });*/
+
+
           },
 
+          /* 
+           *  Function called when editor choses Tumblr Feed from the Add-ons menu
+          */
           addOnTumblr: function(){
             //Step 1
             //Update the lesson's list of addons to include tumblr
@@ -2234,21 +2670,114 @@ var MAX_IMAGE_HEIGHT = 500;
 
             this.model.save({}, {silent:true});
 
+            var lessonID = this.model.get('nid');
+            var tumblr_title = "Tumblr Feed for lesson "+lessonID;
+
+            var t = new TumblrFeed({
+              "title": tumblr_title,
+              "type": "tumblr_feed",
+              "field_parent_lesson_nid":lessonID
+            });
+
+            //need to set this explicitly for a node create
+            //because the Drupal Backbone module doesn't know
+            //when the node is new... must be a better way!
+            t.url = "/node";
+
+            $('.tumblr.preloader', '#node-'+lessonID).show();
+            var _this = this;
+
+            var resp = t.save({}, {
+              success: function(model, response, options){
+                $('.tumblr.preloader', '#node-'+lessonID).hide();
+                var tumblrFeedSelector = '#node-' + response.id;
+                t.id = response.id;
+                t.url = "/node/" + response.id + ".json";
+                t.set({
+                  "nid":response.id
+                });
+                t.save({}, {
+                  success: function(){
+                    //_this.renderTumblrFeed();
+
+                    var tv = new TumblrFeedView({
+                      model:t
+                    });
+                    if(tv.render()){
+                      $(tumblrFeedSelector).addClass('active');
+
+                      tumblr.groupingOptions = [];
+                      tumblr.groupingOptions.push('Group by Student UNI');
+                      tumblr.groupingOptions.push('Group by TA');
+
+
+                      var course_tumblr_blogs_hostnames = course.get('field_tumblr_blogs');
+                      var hostnames = [];
+
+                      if(course_tumblr_blogs_hostnames != null){
+                        $.each(course_tumblr_blogs_hostnames, function(key, value) {   
+                          $('.tumblr-selected-hostname')
+                            .append($("<option></option>")
+                            .attr("value",value)
+                            .text(value));
+                        });
+                      }
+
+                      $.each(tumblr.groupingOptions, function(key, value) {   
+                        $('.tumblr-selected-group')
+                          .append($("<option></option>")
+                          .attr("value",value)
+                          .text(value));
+                      });
+
+
+
+                      _this.initTumblrEditorHallo();
+                    }
+
+                  }
+                });           
+                /*
+                tumblr.tumblrFeedCollection = new TumblrFeedCollection();
+                tumblr.tumblrFeedCollection.reset();
+
+                tumblr.TumblrFeedCollectionView = new Drupal.Backbone.Views.CollectionView({
+                  collection: tumblr.tumblrFeedCollection,
+                  templateSelector: '#tumblr-feed',
+                  renderer: 'underscore',
+                  el: '#tumblr-feed-list-el',
+                  ItemView: TumblrFeedView,
+                  itemParent: '.tumblr-feed-list-container'
+                });
+
+                tumblr.TumblrFeedCollectionView.render();
+                tumblr.TumblrFeedCollectionView.addOne(t);
+                */
+
+
+              },
+              error: function(){
+                $('.embed.preloader', '#node-'+lessonID).hide();
+              }
+            });
+
+
+
             //Step 2
             //reset active tab and hide other tabs
-            $('#lesson-addon-nav li.active').removeClass('active');
-            $('.addon.active').removeClass('active');
+            //$('#lesson-addon-nav li.active').removeClass('active');
+            //$('.addon.active').removeClass('active');
 
             //Step 3
             //Append tumblr html infrastructure
-            if( this.appendTumblrAddon() ){
+            //if( this.appendTumblrAddon() ){
               //Step 4
               //Init edit mode
-              $('#tumblr-wrapper').addClass('edit-mode active');
-              $('.nav-tumblr').addClass('active');
-              $('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').bind('click', this.editTumblrAddon);
-              this.initTumblrEditorHallo();
-            }
+              //$('#tumblr-wrapper').addClass('edit-mode active');
+              //$('.nav-tumblr').addClass('active');
+              //$('#tumblr-wrapper .tumblr-feed-edit-wrapper .edit').bind('click', this.editTumblrAddon);
+              //this.initTumblrEditorHallo();
+            //}
 
           },
 
@@ -2314,88 +2843,112 @@ var MAX_IMAGE_HEIGHT = 500;
 
             var tumblrHTML = tumblrHTMLarray.join('');
 
-            $('#lesson-attachment-content').append( tumblrHTML );
+            //$('#lesson-attachment-content').append( tumblrHTML );
 
             return true;
 
           },
 
+          renderTumblrFeed: function( firstAddon ){
+            console.log('renderTumblrFeed()');
+
+            var lessonID = this.model.get('nid');
+
+            tumblr.tumblrFeedCollection = new TumblrFeedCollection();
+
+            tumblr.tumblrFeedCollection.reset();
+
+
+            tumblr.TumblrFeedCollectionView = new Drupal.Backbone.Views.CollectionView({
+              collection: tumblr.tumblrFeedCollection,
+              templateSelector: '#tumblr-feed',
+              renderer: 'underscore',
+              el: '#tumblr-feed-list-el',
+              ItemView: TumblrFeedView,
+              itemParent: '.tumblr-feed-list-container'
+            });
+
+            tumblr.TumblrFeedCollectionView.render();
+
+            tumblr.tumblrFeedCollection.fetchQuery({
+              "field_parent_lesson_nid": lessonID,
+              "type": "tumblr_feed"
+            }, {
+              success: function(model, response, options){
+
+                $('.preloader.tumblr').hide();
+
+                _.each(tumblr.TumblrFeedCollectionView._itemViews, function(element, index){
+                  //element.show();
+                  if( isEditor() ){
+                    //element.enterEditMode();
+                  }
+
+                  var El = '#tumblr-feed-el';
+                  var hostname = element.model.get('field_tumblr_hostname');
+                  var limit = '20';
+                  var tagsString = element.model.get('field_tumblr_tags');
+                  var tags = [];
+
+                  if(tagsString != null){    
+                    if(tagsString.indexOf(',') >= 0){
+                      tags = tagsString.split(',');
+                    }else if(tagsString.length >= 0){
+                      tags[0] = tagsString;
+                    }
+                  }
+
+                  $('#select2-tumblr-tags').select2({
+                    tags:tags,
+                    tokenSeparators: [",", " "]
+                  });
+
+                  var grouping = element.model.get('field_tumblr_grouping');
+
+                  initTumblrFeed(El, hostname, tags, limit, grouping);
+
+                  var navHTML = '<li class="inline nav-tumblr"><h2 class="inline">Tumblr Feed</h2></li>';
+                  $('#lesson-addon-nav').append( navHTML );
+
+                  $('#lesson-addon-nav .nav-tumblr').bind('click', element.show);
+
+                });
+              },
+              error: function(){
+                $('.preloader.tumblr').hide();
+              }
+            });
+          },
+
           /*
            * Render the addons in the order added?
           */
-          attachAddons: function(){
+          renderAddons: function(){
             console.log('');
-            console.log('*********************attachAddons()');
+            console.log('*********************renderAddons()');
 
 
             var addons = this.model.get('field_addons');
+            
             if(addons != null){
-              console.log('addons =! null');
 
               var lessonID = this.model.get('nid');
-              var addonsArray = [];
-              addonsArray = addons.split(',');
-
-              //TODO TCT2003 SOON! instead of _each, just do .indexOf for addons
-              //in the order you want them to appear (eg. start with Q&A??)
-
-              var removeAddon = false;
-              var removeAddonArray = [];
-
-              removeAddonArray.push('<div class="btn-group button-group-text float-right">');
-                removeAddonArray.push('<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">');
-                  removeAddonArray.push('<i class="icon-plus"></i>&nbsp;&nbsp;Add-on');
-                  removeAddonArray.push('<span class="caret"></span>');
-                removeAddonArray.push('</a>');
-                removeAddonArray.push('<ul class="dropdown-menu">');
+              var firstAddon = true;
                   
-
               if(addons.indexOf('qanda') >= 0){
                 if( this.appendQandA() ){
 
                   $('.nav-qanda').addClass('active');
                 }
-                removeAddon = true;
-                removeAddonArray.push('<li><a tabindex="-1" href="#" class="button-addon-qanda-remove"><i class="icon-question-sign"></i>&nbsp;&nbsp;Q&amp;A</a></li>');
+                firstAddon = false;
               }
 
-              if(addons.indexOf('tumblr') > 0){
-                var TumblrFeedCollection = Drupal.Backbone.Collections.RestWS.EntityIndex.extend({
-                  model: TumblrFeed
-                });
-
-                var tumblrFeedCollection = new TumblrFeedCollection();
-
-                tumblrFeedCollection.fetch({
-                  "field_parent_lesson_nid": lessonID,
-                  "type": "tumblr_feed"
-                });
-
-                _.each(tumblrFeedCollection.models, function(model, index){
-                  console.log('************* model at index: '+ index);
-                });
-
-                removeAddon = true;
-                removeAddonArray.push('<li><a tabindex="-1" href="#lesson-open-anchor" class="button-addon-tumblr-remove"><i class="icon-rss"></i>&nbsp;&nbsp;Tumblr Feed</a></li>');
-              }
-
-              if(removeAddon){
-                  removeAddonArray.push('</ul>');
-                removeAddonArray.push('</div>');
-                var removeAddonHTML = removeAddonArray.join('');
-
-                $('#lesson-attachment').prepend( )
-
+              if(addons.indexOf('tumblr') >= 0){
+                this.renderTumblrFeed( firstAddon );
               }else{
-                removeAddonArray.length = 0;
+                $('.preloader.tumblr').hide();
               }
-
-                
-
             }
-            console.log('');
-            console.log('');
-
           }
 
         });//end LessonOpenView
@@ -2420,7 +2973,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           firstEditEmbed: function(){
-            console.log('firstEditEmbed()');
             var embedID = this.model.get('nid');
             var this_selector = '#node-' + embedID;
 
@@ -2460,7 +3012,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           deleteUpload: function(){
-            console.log('delete upload');
             //delete the actual model from the database and its view
             this.model.destroy();
             this.remove();
@@ -2499,9 +3050,6 @@ var MAX_IMAGE_HEIGHT = 500;
           //with the appropriate value (eg. +1)
           addLesson: function(){
             var weekID = this.model.get('nid');
-
-            console.log('addLesson() called by week : '+ weekID);
-
             //TODO TCT2003 do I need to default these fields to empty strings?
             var l = new Lesson({
               "title": "",
@@ -2562,7 +3110,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           resortWeekLessons: function(this_selector){
-            console.log('resortWeekLessons');
             var weekNID = this.model.get('nid');
             var this_selector = '#node-' + weekNID;
 
@@ -2615,7 +3162,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           editWeek: function(){
-            console.log('editWeek()');
             var this_selector = '#node-' + this.model.get('nid');
 
             if($('.edit-week-buttons .edit', this_selector).text() == "Edit"){
@@ -2786,25 +3332,19 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           firstEditUpdate: function(){
-            console.log('firstEditUpdate()');
             var this_selector = '#node-' + this.model.get('nid');
-            console.log('this_selector: '+this_selector);
             setState(FIRST_EDIT_UPDATE);
             //$('#main').addClass('first-edit');
             this.editUpdate();
           },
 
           editUpdate: function(){
-            console.log('editUpdate()');
-
             var this_selector = '#node-' + this.model.get('nid');
             if($('.edit', this_selector).text() == "Edit"){
-              console.log('clicked edit');
               $('.edit', this_selector).text('Save');
               $(this_selector).addClass('edit-mode');
               this.initHalloEditorsUpdate(true);
             }else{
-              console.log('clicked save');
               clearState(FIRST_EDIT_UPDATE);
               this.disableHalloEditorsUpdate();
               //$('#main').removeClass('first-edit');
@@ -2820,7 +3360,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
 
           deleteUpdate: function(){
-            console.log('deleteUpdate()');
 
             UpdatesCollectionView.remove(this.model);
             this.model.destroy();
@@ -2828,11 +3367,9 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           cancelEdit: function(){
-            console.log('cancelUpdate()');
 
             var this_selector = '#node-' + this.model.get('nid');
             if( getState(FIRST_EDIT_UPDATE) ){
-              console.log('first edit - therefore delete');
               // this.model.save();
               this.deleteUpdate();
             }else{
@@ -2919,9 +3456,7 @@ var MAX_IMAGE_HEIGHT = 500;
         var WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
           resort: function(opts){
             //this.el.detach();
-            console.log('unrendering');
             this.collection.reset();
-            console.log('post sort, about to render');
             //this.addAll();
           }
         });
@@ -2960,8 +3495,6 @@ var MAX_IMAGE_HEIGHT = 500;
               $('#updates-list-el').prepend(tempNode);
             }
             */
-
-            console.log('addOne(), created: '+newItemView.model.get('created'));
             
             if(newItemView.model.get('created') != undefined){
               //convert the created unix date stamp to a JS Date object and print out user readable date
@@ -3102,7 +3635,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
             var order = view.model.get('field_order');
             order = parseInt(order);
-            console.log('index: '+ index + ' order: '+ order);
 
             if( order < min_order ){
               min_order = order;
@@ -3111,9 +3643,6 @@ var MAX_IMAGE_HEIGHT = 500;
 
           min_order = parseInt( min_order ) - 1;
           min_order = '' + min_order;
-
-          console.log('min_order: '+ min_order);
-
 
           var w = new Week({
             "title": "",
@@ -3210,146 +3739,7 @@ var MAX_IMAGE_HEIGHT = 500;
 
 
 
-        ///////////////////////////////////////////////////////////////
-        ////////////////// TUMBLR  ////////////////////////////////////
-        ///////////////////////////////////////////////////////////////
-
-
-
-        /* Tumblr API functionality, inspired by https://github.com/jokull/tumblr-widget */
-        var TumblrFeed = Drupal.Backbone.Models.Node.extend({
-          initialize: function(opts){
-            Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
-            this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
-          }
-        });
-
-
-        var TumblrPost = Backbone.Model.extend({});
-
-        var NextPage = Backbone.View.extend({
-          el: "#tumblr .pagination .next",
-          events: {
-            "click .next": "click"
-          },
-          initialize: function(options){
-            return this.collection.bind("last", this.hide);
-          },
-          hide: function(){
-            return ($(this.el)).hide();
-          },
-          click: function(e){
-            e.preventDefault();
-            return this.collection.page();
-          }
-        });//end NextPage
-
-        var Tumblr = Backbone.Collection.extend({
-          model: TumblrPost,
-          endpoint: 'http://api.tumblr.com/v2/blog/',
-          params: {
-            limit: 1
-          },
-          initialize: function(options){
-            this.endpoint = this.endpoint + options.hostname;
-            return this.params = _.extend(this.params, options.params || {});
-          },
-          page: function(){
-            console.log('Tumblr.page()');
-
-            var params,
-                _this = this;
-            params = _.extend(this.params, {
-              offset: this.length - 1
-            });
-            return $.ajax({
-              url: this.endpoint + '/posts/json?' + ($.param(params)),
-              dataType: "jsonp",
-              jsonp: "jsonp",
-              success: function(data, status){
-                console.log('Tumblr.page.success callback reached wtih data:');
-                console.dir(data);
-                console.log('');
-
-                _this.add(data.response.posts);
-                _this.trigger('paged');
-                if(data.response.total_posts === _this.length){
-                  console.log('Tumblr: triggering last');
-                  return _this.trigger('last');
-                }
-              }
-            });
-          }
-        });//end Tumblr
-
-        var TumblrPostView = Backbone.View.extend({
-          className: "tumblr-post",
-          initialize: function(options){
-            if(this.model) return this.model.bind("change", this.render);
-          },
-          render: function(){
-            var tpl;
-            tpl = _.template(($('#tpl-tumblr-post')).html());
-            ($(this.el)).addClass(this.model.get('type'));
-            ($(this.el)).html(tpl(this.model.toJSON()));
-
-            return this;
-          }
-        });//end TumblrPostView
-
-        var TumblrView = Backbone.View.extend({
-          initialize: function(options){
-            this.collection.bind("reset", this.all);
-            //when the Tumblr collection gets added to, call it's view's add too
-            return this.collection.bind('add', this.add, this);
-          },
-          all: function(){
-            ($(this.el)).html('');
-            return this.collection.each(this.add);
-          },
-          add: function(model){
-            model.view = new TumblrPostView({
-              model: model
-            });        
-
-            return ($(this.el)).append(model.view.render().el);
-          }
-        });//end TumblrView
-
-
-        function initTumblrFeed(el, hostname, tags, limit){
-          var tagCSV = tags.join(', ') || '';//default to none
-          limit = limit || 1;
-
-          tumblr.collection = new Tumblr({
-            hostname: hostname,
-            params: {
-                api_key: 'yqwrB2k7eYTxGvQge4S8k9R6wAdQrATjLXhVzGVPgjTXwucNOo'
-               ,tag: tagCSV
-               ,limit: limit
-            }
-          });
-          tumblr.view = new TumblrView({
-            el: el,
-            collection: tumblr.collection
-          });
-
-          tumblr.collection.page();
-
-          tumblr.nextPage = new NextPage({
-            collection: tumblr.collection
-          });
-
-        }
-
-
-
-
-
-
-
-
-
+        
 
 
 
@@ -3385,17 +3775,9 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           editPage: function(event){
-            console.log('editPage()');
               var pageID = this.model.get('nid');
 
-              console.log('this: ');
-              console.dir(this);
-
-              console.log('event: ');
-              console.dir(event);
-
               if($(event.currentTarget).text() == "Edit"){
-                console.log('was edit mode');
 
                 $('#page-content-wrapper').addClass('edit-mode');
                 $('.open-page .cancel, .open-page .delete').show();
@@ -3427,16 +3809,12 @@ var MAX_IMAGE_HEIGHT = 500;
 
               }else{
 
-                console.log('was save mode');
 
                 if( $('.open-page .page-content').hasClass('isModified')){
 
                   var content = {};
                   content.value = $('.open-page .page-content').html();
                   content.format = "full_html";
-
-                  console.log('content value: ');
-                  console.log(content.value);
 
                   this.model.set({
                     "field_page_content": content
@@ -3498,7 +3876,6 @@ var MAX_IMAGE_HEIGHT = 500;
           },
 
           openPage: function(){
-            console.log('openPage()');
             var pageID = this.model.get('nid');
 
 
@@ -3551,12 +3928,10 @@ var MAX_IMAGE_HEIGHT = 500;
             success: function(model, response, options){
               $('#page-preloader').hide();
               $('.course-link-item').removeClass('hidden');
-              console.log('page load success');
             },
             error: function(){
               $('#page-preloader').hide();
               $('.course-link-item').removeClass('hidden');
-              console.log('page load error');
             }
         });
 
@@ -3573,8 +3948,6 @@ var MAX_IMAGE_HEIGHT = 500;
         }
 
         function savePageToCourse(){
-          console.log('savePageToCourse()');
-
           var title = $('#add-page-popup .new-page-title').text();
 
           var content = {

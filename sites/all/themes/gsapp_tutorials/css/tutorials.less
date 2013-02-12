@@ -1274,19 +1274,24 @@ textarea[readonly]{
   display: none;
 }
 
-.edit-mode.tumblr-feed-edit-wrapper{
+.administrator .tumblr-feed-edit-wrapper,
+.faculty .tumblr-feed-edit-wrapper{
   display: block;
   background-color:@darkBGColor;
 }
 
 .addon{
-  display:none;
+  /*display:none;*/
 }
 .addon.active{
   display: block;
 }
 .tumblr-input-title{
   float:left;
+}
+
+#tumblr-addon-wrapper{
+  width:100%;
 }
 
 
@@ -1305,6 +1310,44 @@ textarea[readonly]{
   max-width:500px;
 }
 
+
+.tumblr-group-keys{
+  margin-bottom: 40px;
+}
+
+.tumblr-group-key{
+  display:inline;
+}
+
+.tumblr-group-key a.active-group{
+  color:black;
+  border-bottom:1px solid;
+}
+
+.tumblr-group-key a:hover{
+  border-bottom:1px solid;
+  text-decoration: none !important;
+}
+
+
+.tumblr-post{
+  float:left;
+  width:240px;
+  display:none;
+}
+
+.tumblr-post blockquote{
+  font:@baseFont;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.tumblr-post blockquote p{
+  font:@baseFont;
+}
+
+
 /* TEMPORARY */
 #toolbar{
   display:none !important;
@@ -1317,5 +1360,4 @@ body.toolbar-drawer .navbar-fixed-top{
 body.toolbar-drawer{
   padding-top: 0 !important;
 }
-
 
