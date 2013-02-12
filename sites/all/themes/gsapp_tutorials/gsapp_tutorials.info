@@ -33,6 +33,7 @@ scripts[] = js/jquery.form.js
 scripts[] = hallo/deps/rangy-core-1.2.3.js
 scripts[] = hallo/examples/hallo.js
 scripts[] = js/select2.js
+scripts[] = js/jquery.masonry.min.js
 
 scripts[] = js/app.js
 scripts[] = js/script.js

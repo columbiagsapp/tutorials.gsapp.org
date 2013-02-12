@@ -976,27 +976,48 @@ var MAX_IMAGE_HEIGHT = 500;
         ////////////////// TUMBLR  ////////////////////////////////////
         ///////////////////////////////////////////////////////////////
 
+        //Fills tumblr.groups_array with each TA group in the form key:value
+        function parseTumblrGroups(){
+          console.log('parseTumblrGroups()');
+
+          tumblr.groups = {};
+
+          tumblr.groups.keys = [];
+          tumblr.groups.posts = [];
+
+
+          var ftg = course.get('field_tumblr_groups');
+          var ftg_array = ftg.split(',');
+
+          for(var i = 0; i < ftg_array.length; i++){
+            var idx = ftg_array[i].indexOf(':');
+            var key = ftg_array[i].substring(0,idx);
+            var value = ftg_array[i].substring( parseInt(idx)+1);
+
+            tumblr.groups.keys.push(key);
+
+            tumblr.groups.posts[ key ] = {};//init object
+            tumblr.groups.posts[ key ].title = value;
+            tumblr.groups.posts[ key ].data = [];
+          }
+        }
 
         function sortByTumblrGroups(posts){
           console.log('sortByTumblrGroups()');
-          var groups = course.get('field_tumblr_groups');
-          groups = groups.split(',');
+          
 
-          var rtn = {};
-          rtn.length = groups.length;
-          rtn.groups = groups;
-          rtn.data = [];
+          
 
-          for(var k = 0; k < groups.length; k++){
-            rtn.data[k] = [];
-          }
+          console.log('********POSTS*******');
+          console.dir(posts);
+
 
           posts_loop:
           for(var i = 0; i < posts.length; i++){
             
             groups_loop:
-            for(var j = 0; j < groups.length; j++){
-              var matchString = groups[j];
+            for(var j = 0; j < tumblr.groups.keys.length; j++){
+              var matchString = tumblr.groups.keys[j];
               var rslt = null;
               $.each(posts[i].tags, function(index, value) { 
                 if (rslt == null && (value.toLowerCase() == matchString.toLowerCase() ) ) {
@@ -1007,15 +1028,13 @@ var MAX_IMAGE_HEIGHT = 500;
 
               if(rslt != null){
 
-                rtn.data[j].push(posts[i]);
+                tumblr.groups.posts[ tumblr.groups.keys[j] ].data.push(posts[i]);
                 break groups_loop;
               }
             }
           }
 
-          console.log('returning from sortByTumblrGroups() with');
-          console.dir(rtn);
-          return rtn;
+          return tumblr.groups.posts;
         }
 
 
@@ -1153,12 +1172,111 @@ var MAX_IMAGE_HEIGHT = 500;
           }
         });//end NextPage
 
+
+
+        function fetchFromTumblrAPI(params, _this){
+
+          //insurance against any infinite loops
+          _this.tumblr_api_call_limit = parseInt(tumblr.limit) - 1;
+          if(_this.tumblr_api_call_limit < 0){
+            return false;
+          }
+          console.log('');
+          console.log('fetchFromTumblrAPI() with offset: ' + params.offset + ' and params:');
+          console.dir(params);
+
+          return $.ajax({
+            url: _this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
+            dataType: "jsonp",
+            jsonp: "jsonp",
+            success: function(data, status){
+              sortByTumblrGroups(data.response.posts);
+
+              console.log('data for recursion: ');
+              console.dir(data);
+
+              _this.add(data.response.posts);
+
+              console.log("_this.length: " + _this.length);
+              console.log('data.response.total_posts: '+ data.response.total_posts);
+
+              _this.trigger('paged');
+              if(_this.length <= data.response.total_posts){
+                var p = params;
+                p.offset = parseInt(p.offset) + parseInt(p.limit);
+                p.offset = '' + p.offset; //cast to a string
+                fetchFromTumblrAPI(p, _this);
+              }else{
+
+                var list = '<div class="tumblr-group-keys">';
+                for(var i = 0; i < tumblr.groups.keys.length; i++){
+                  if(i == 0){
+                    list = list + '<h5 class="tumblr-group-key"><a class="active-group" href="#" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
+                  }else{
+                    list = list + '<h5 class="tumblr-group-key"><a href="#" id="'+ tumblr.groups.keys[i] +'">' + tumblr.groups.posts[ tumblr.groups.keys[i] ].title + '</a></h5>';
+                  }
+                  if(i < tumblr.groups.keys.length-1){ list = list + ', '; }
+                }
+                list = list + '</div>';
+
+                $('.tumblr-feed-content').prepend( list );
+
+                for(var i = 0; i < tumblr.groups.keys.length; i++){
+                  //DO BINDINGS!!
+                  var selector = '#' + tumblr.groups.keys[i];
+                  $(selector, '.tumblr-group-keys').bind('click', showTumblrGroup);
+                  if(i == 0){
+                    //$('.tumblr-post .content.' + tumblr.groups.keys[i]).show();
+                    $('.tumblr-post .content.' + tumblr.groups.keys[i]).closest('.tumblr-post').show();
+                    //showTumblrGroup( tumblr.groups.keys[i] );
+                    initializeTumblrFeedMasonry();
+                  }
+                }
+              }
+            }
+          });
+
+        }
+
+        function initializeTumblrFeedMasonry(){
+          console.log("initializeTumblrFeedMasonry()");
+
+          setTimeout(function(){
+
+            $('#tumblr-feed-el').masonry( 'destroy' );
+            $('#tumblr-feed-el').masonry({
+              itemSelector: '.tumblr-post:visible',
+              columnWidth: 240,
+              isAnimated: false,
+              gutterWidth: 20,
+              isFitWidth: true
+            });
+          }, 100);
+
+        }
+
+        function showTumblrGroup(){
+          $('.tumblr-group-key a.active-group').removeClass('active-group');
+          $(this).addClass('active-group');
+
+          var key = $(this).attr('id');
+
+          var selector = '.' + key;
+          $('.tumblr-post').hide();
+
+          console.log('about to show: '+ '.tumblr-post .content' + selector + 'END');
+
+          $('.tumblr-post .content' + selector).closest('.tumblr-post').show();
+          initializeTumblrFeedMasonry();
+        }
+
         var Tumblr = Backbone.Collection.extend({
           model: TumblrPost,
           endpoint: 'http://api.tumblr.com/v2/blog/',
           params: {
             limit: 1
           },
+          tumblr_api_call_limit: 30,
           tags: [],
           initialize: function(options){
             this.endpoint = this.endpoint + options.hostname;
@@ -1192,6 +1310,9 @@ var MAX_IMAGE_HEIGHT = 500;
             console.log('with params: ');
             console.dir(params);
 
+            console.log('!!!*!*!*!*!***!*!**!*!*!*!* this: ');
+            console.dir(this);
+
             if(params.tag != null){
               console.log('params.tag != null');
 
@@ -1209,28 +1330,9 @@ var MAX_IMAGE_HEIGHT = 500;
 
                 params.tag = params.tag.toString();
 
-                return $.ajax({
-                  url: this.endpoint + '.tumblr.com/posts/json?' + ($.param(params)),
-                  dataType: "jsonp",
-                  jsonp: "jsonp",
-                  success: function(data, status){
-                    console.log('Tumblr.page.success callback reached wtih data:');
-                    console.dir(data);
-                    console.log('');
+                parseTumblrGroups();//build the tumblr.groups object and its arrays
 
-                    console.dir(data.response.posts);
-
-                    sortByTumblrGroups(data.response.posts);
-
-                    _this.add(data.response.posts);
-                    _this.trigger('paged');
-                    if(data.response.total_posts === _this.length){
-                      console.log('Tumblr: triggering last');
-                      return _this.trigger('last');
-                    }
-                  }
-                });
-
+                fetchFromTumblrAPI(params, _this);
 
                 //insert .when here
 
@@ -1306,7 +1408,7 @@ var MAX_IMAGE_HEIGHT = 500;
             var tpl;
             tpl = _.template(($('#tpl-tumblr-post')).html());
             ($(this.el)).addClass(this.model.get('type'));
-            ($(this.el)).addClass('span4');
+            //($(this.el)).addClass('span4');
             ($(this.el)).html(tpl(this.model.toJSON()));
 
             return this;

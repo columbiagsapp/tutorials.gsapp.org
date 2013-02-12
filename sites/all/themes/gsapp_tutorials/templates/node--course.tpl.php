@@ -550,6 +550,8 @@
 
 <script type="text/template" id="tpl-tumblr-post">
 
+    <div class="content<% if(typeof tags !== 'undefined' && tags.length > 0){ for(var i = 0; i < tags.length; i++){ %><%= ' '+tags[i] %><% } } %>">
+
       <% if(typeof type !== 'undefined' && type){ %>
         <% if(type == "photo"){ %>
 
@@ -557,7 +559,7 @@
             <div class="row-fluid">
               <% for (var i=0; i < photos.length; i++) { %>
 
-                  <a class="tumblr-img-wrapper" href="<%= photos[i].original_size.url %>">
+                  <a class="tumblr-img-wrapper" href="<%= photos[i].original_size.url %>" target="_blank">
                     <img src="<%= photos[i].alt_sizes[2].url %>">
                   </a>
                   <% if(caption){ %>
@@ -580,8 +582,15 @@
       <% if(typeof body !== 'undefined' && body){ %>
         <%= body %>
       <% } %>
+
+      <% if(typeof tags !== 'undefined' && tags.length > 0){ %>
+        <div class="post-tags">Tags:
+        <% for(var i = 0; i < tags.length; i++){ %>
+          <span class="tag"><%= tags[i] %><% if(i < (tags.length-1)){ %><%= ', ' %><% } %></span>
+      <% } } %>
   
-    </script>
+    </div><!-- /.content -->
+</script>
 
 
 <script type="text/template" id="tumblr_feed_attachment">
