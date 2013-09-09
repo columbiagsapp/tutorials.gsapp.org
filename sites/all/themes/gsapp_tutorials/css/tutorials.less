@@ -963,6 +963,7 @@ textarea[readonly]{
 .content{
   float:left;
   width:100%;
+  max-width:650px;
   margin-bottom:@innerPadding;
 }
 
@@ -982,6 +983,7 @@ textarea[readonly]{
 .state-first-edit-lesson #lesson-attachment{
   .hidden;
 }
+
 
 .field-embed-edit-wrapper,
 .field-upload-edit-wrapper{
@@ -1273,14 +1275,14 @@ textarea[readonly]{
   display: none;
 }
 
-.faculty .tumblr-feed-edit-wrapper,
-.administrator .tumblr-feed-edit-wrapper{
-  display: block;
+.administrator .tumblr-feed-edit-wrapper,
+.faculty .tumblr-feed-edit-wrapper{
+  display: none;
   background-color:@darkBGColor;
 }
 
 .addon{
-  display:none;
+  /*display:none;*/
 }
 .addon.active{
   display: block;
@@ -1309,6 +1311,44 @@ textarea[readonly]{
   max-width:500px;
 }
 
+
+.tumblr-group-keys{
+  margin-bottom: 40px;
+}
+
+.tumblr-group-key{
+  display:inline;
+}
+
+.tumblr-group-key a.active-group{
+  color:black;
+  border-bottom:1px solid;
+}
+
+.tumblr-group-key a:hover{
+  border-bottom:1px solid;
+  text-decoration: none !important;
+}
+
+
+.tumblr-post{
+  float:left;
+  width:240px;
+  display:none;
+}
+
+.tumblr-post blockquote{
+  font:@baseFont;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.tumblr-post blockquote p{
+  font:@baseFont;
+}
+
+
 /* TEMPORARY */
 #toolbar{
   display:none !important;
@@ -1320,4 +1360,28 @@ body.toolbar-drawer .navbar-fixed-top{
 
 body.toolbar-drawer{
   padding-top: 0 !important;
+}
+
+.tumblr.preloader{
+  display: none;
+}
+
+#lesson-attachment .btn-group{
+  display: none;
+}
+
+#lesson-addon-nav{
+  display: none;
+}
+
+.tumblr-post{
+  margin-bottom:60px;
+}
+
+#tumblr-wrapper .pagination{
+  display: none;
+}
+
+.tumblr-photo-img{
+  margin-bottom:10px;
 }

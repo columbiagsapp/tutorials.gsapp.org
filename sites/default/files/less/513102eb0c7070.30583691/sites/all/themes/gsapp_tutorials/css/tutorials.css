@@ -1,0 +1,941 @@
+h1 a {
+  border: none !important;
+  color: black !important;
+  text-decoration: none !important;
+}
+h1 a:hover {
+  color: powderblue !important;
+}
+.clearfix {
+  clear: both;
+}
+.glowing-box {
+  box-shadow: 5px 5px rgba(0,0,0,0.1);
+  -webkit-box-shadow: 5px 5px rgba(0,0,0,0.1);
+  -moz-box-shadow: 5px 5px rgba(0,0,0,0.1);
+}
+.glowing-box-inset {
+  box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  -webkit-box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  -moz-box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+}
+.noglow {
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+  -webkit-box-shadow: 0 0 0 rgba(0,0,0,0);
+  -moz-box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+.el {
+  clear: both;
+  width: 100%;
+}
+.title {
+  margin: 0;
+  font: 2em / 1em "AvantGardeGothicITCW01B 731063", Helvetica, Arial, sans-serif;
+}
+.hidden {
+  display: none;
+}
+.theOpenLesson {
+  background-color: powderblue !important;
+}
+.float-left {
+  float: left;
+}
+.float-right {
+  float: right;
+}
+.center {
+  text-align: center;
+  margin: auto;
+}
+.active {
+  color: black !important;
+}
+.active:hover {
+  cursor: default !important;
+  color: black;
+}
+.inline {
+  list-style: none;
+  display: inline;
+  margin-right: 1em;
+}
+.centered {
+  text-align: center;
+}
+.inner {
+  margin: 20px;
+}
+.inner-sides {
+  margin: 0 20px;
+  position: relative;
+}
+.editable {
+  min-width: 20px;
+}
+.student .edit,
+.student .delete,
+.student .cancel {
+  display: none;
+}
+.flatten {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1em;
+}
+.preloader {
+  text-align: center;
+  margin: auto;
+  position: relative;
+  font-size: 1.53846em;
+  margin-bottom: 20px;
+  width: 100%;
+  display: block;
+}
+.state-first-edit-lesson .preloader {
+  display: none;
+}
+.collapsed .collapsible {
+  display: none;
+}
+.heading-button {
+  color: white;
+  background-color: black;
+  min-height: 39px;
+  display: block;
+  position: relative;
+  margin-bottom: 0px;
+  border: solid 2px black;
+}
+.heading {
+  text-transform: uppercase;
+  font: 1.53846em / 1em "AvantGardeGothicITCW01B 731063", Helvetica, Arial, sans-serif;
+  margin: 10px 20px;
+}
+.collapsed .heading-button:hover {
+  text-decoration: none;
+  cursor: pointer;
+  background-color: powderblue;
+  border-color: powderblue;
+  color: black;
+}
+.schedule-button-container,
+.edit-button-container {
+  position: relative;
+  margin: 5px 0;
+}
+.inEditMode {
+  background-color: whitesmoke !important;
+  color: black !important;
+}
+.voteup,
+.votedown {
+  width: 50px;
+  height: 25px;
+  text-align: center;
+  margin: 0 auto;
+  color: black;
+  background: transparent;
+}
+.voteup:hover,
+.votedown:hover {
+  color: powderblue;
+  background: transparent;
+  cursor: pointer;
+}
+.disabled {
+  background: powderblue;
+  color: black;
+}
+.glowing-box.disabledHover {
+  cursor: default !important;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+  -webkit-box-shadow: 0 0 0 rgba(0,0,0,0);
+  -moz-box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+.edit-mode .editable-description {
+  min-height: 150px !important;
+}
+.edit-mode .field-embed-content {
+  display: none;
+}
+.field-embed-edit {
+  display: none;
+}
+.edit-mode .field-embed-edit {
+  display: block !important;
+}
+@media (min-width: 768px) and (max-width: 979px) {
+  .brick.standard {
+    width: 230px;
+    height: 280px;
+    margin: 0 20px 20px 0;
+  }
+}
+@media (max-width: 767px) {
+  .jumbotron h1 {
+    font: 2.3077em / 1em "AvantGardeGothicITCW01B 731063", Helvetica, Arial, sans-serif;
+  }
+  .collapsed {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) {
+  .jumbotron h1 {
+    font: 3.84615em / 1em "AvantGardeGothicITCW01B 731063", Helvetica, Arial, sans-serif;
+  }
+  .brick.standard {
+    width: 230px;
+    height: 280px;
+    margin: 0 20px 20px 0;
+  }
+}
+@media (min-width: 1200px) {
+  .brick.standard {
+    width: 230px;
+    height: 280px;
+    margin: 0 20px 20px 0;
+  }
+}
+@media (max-width: 480px) {
+  .brick.standard {
+    width: 100%;
+    height: auto;
+    margin: 0 0 5px;
+  }
+  .modal {
+    width: 380px;
+    margin-left: -190px;
+  }
+  .list-container > li {
+    width: 100% !important;
+    margin-bottom: 20px;
+  }
+}
+@media (min-width: 481px) and (max-width: 979px) {
+  .brick.standard {
+    width: 230px;
+    height: 280px;
+    margin: 0 20px 20px 0;
+  }
+}
+@media (min-width: 980px) {
+  #wrapper {
+    margin-top: 40px;
+  }
+}
+@media (min-width: 481px) {
+  .modal {
+    width: 700px;
+    margin-left: -350px;
+  }
+}
+body {
+  color: black;
+  font: 13px / 17px "AvantGardeGothicITCW01M 731087", Helvetica, Arial, sans-serif;
+}
+.modal .btn,
+.modal .cancel,
+.modal .edit,
+.modal .delete {
+  display: block !important;
+}
+.container-fluid {
+  padding: 0 20px;
+}
+.brick {
+  min-height: 20px;
+  margin-bottom: 20px;
+  padding: 0;
+  background-color: whitesmoke;
+  display: block;
+  float: left;
+  list-style: none;
+  position: relative;
+  color: black;
+  border: solid 2px whitesmoke;
+}
+.brick.standard {
+  border: solid 2px black;
+  background-color: whiteSmoke;
+}
+.edit-mode {
+  color: whiteSmoke !important;
+  background-color: powderblue;
+  border: solid 2px powderblue !important;
+}
+.roman {
+  width: 100%;
+}
+.mortar-bottom {
+  margin-bottom: 20px;
+}
+.mortar-top {
+  margin-top: 20px;
+}
+.week-header-top {
+  margin-bottom: 20px;
+}
+.week-header-top .week-field {
+  width: 100%;
+}
+.edit-mode .week-header-top {
+  width: 65%;
+}
+.collapsed .week .week-title,
+.collapsed .week .week-description,
+.collapsed .brick.standard {
+  height: auto;
+  width: 100%;
+}
+.week .week-header {
+  width: 100%;
+  margin-bottom: 20px;
+}
+.collapsed .week .week-header-top {
+  width: 100%;
+}
+.collapsed .week .week-header-top div {
+  display: block;
+  margin-left: 0;
+}
+.edit-mode .edit-week-buttons {
+  width: 33%;
+}
+.ajax-submission {
+  display: block;
+  margin: 20px 0;
+  border: 2px solid;
+  color: black;
+}
+.bl {
+  display: block;
+}
+.footer {
+  padding: 70px 0;
+  margin-top: 70px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+iframe {
+  width: 100%;
+  height: auto;
+}
+.ask-a-question input,
+.ask-a-question textarea,
+.ask-a-question button {
+  display: block;
+}
+.ask-a-question textarea {
+  min-width: 450px;
+}
+.jumbotron {
+  position: relative;
+  margin: 60px 0 40px;
+  padding: 0;
+  text-align: left;
+  float: left;
+}
+.jumbotron h1 {
+  text-transform: uppercase;
+}
+.jumbotron p {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.25;
+  margin-bottom: 30px;
+}
+.jumbotron a {
+  color: gray;
+  border-bottom: 1px dotted;
+}
+.jumbotron a:hover {
+  border: none !important;
+}
+.course-index .views-field-field-code,
+.course-index .views-field-field-semester,
+.course-index .views-field-field-year,
+.course-index .views-field-field-instructors {
+  float: left;
+  margin-right: 5px;
+}
+.course .jumbotron .header-left .field {
+  float: left;
+  margin-right: 5px;
+}
+.course .header-left .profile .profile-picture .field-label {
+  display: none;
+}
+.course .header-left .field-name-field-instructors .field-items .field-item {
+  float: left;
+  margin-right: 1em;
+}
+.course .week,
+.course .lesson {
+  position: relative;
+}
+.course .week-list-container,
+.course .lesson-list-container {
+  margin: 0;
+  padding: 0;
+}
+.button {
+  background-color: lightSalmon;
+  padding: 5px 10px 7px;
+  color: white;
+  width: auto;
+  font-weight: 500;
+  font-size: 16px;
+  text-align: center;
+}
+.edit-mode .button {
+  background-color: white;
+  color: lightSalmon;
+}
+.button:hover {
+  cursor: pointer;
+  background-color: powderblue;
+  color: black;
+}
+.secondaryButton {
+  color: black;
+  font: bold 0.75em/2em "AvantGardeGothicITCW01M 731087", Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+}
+.secondaryButtonHover {
+  color: whitesmoke;
+  cursor: pointer;
+}
+.delete,
+.cancel {
+  display: none;
+}
+.edit-mode .delete,
+.edit-mode .cancel {
+  display: block;
+}
+.state-first-edit-week .delete,
+.state-first-edit-lesson .delete,
+.state-first-edit-update .delete {
+  display: none !important;
+}
+.child-edit-mode .button {
+  display: none;
+}
+.course #add-update-container,
+.course #add-week-container,
+.course #resort-week-container,
+.course #edit-schedule-button,
+.course #edit-syllabus-button,
+#edit-page-button,
+#cancel-edit-page-button,
+#delete-edit-page-button,
+.course #cancel-edit-syllabus-button {
+  float: right;
+  margin-right: 20px;
+}
+.course #add-week-container:hover,
+.course #add-update-container:hover {
+  background-color: powderblue;
+  color: black;
+}
+.course .add-lesson {
+  border: solid 2px lightSalmon;
+}
+.course .add-lesson-note-plus {
+  font-size: 120px;
+  line-height: 1em;
+  text-align: center;
+  color: lightSalmon;
+  margin: 60px auto 0;
+}
+textarea,
+textarea[readonly] {
+  background-color: transparent;
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
+  display: inline-block;
+  height: auto;
+  padding: 0;
+  margin-bottom: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  resize: none;
+}
+.administrator .edit-mode textarea,
+.faculty .edit-mode textarea {
+  background-color: transparent;
+  border-bottom: none;
+}
+.course .lesson textarea,
+.course .update textarea {
+  width: 100%;
+}
+.course .update textarea.update-description {
+  min-height: 150px;
+  height: auto;
+}
+.course .edit-week-buttons,
+.course .edit-update-buttons {
+  position: absolute;
+  right: 20px;
+}
+.course .edit-week-buttons,
+.course .edit-update-buttons {
+  top: 20px;
+}
+.edit-lesson-buttons {
+  width: 35%;
+  float: right;
+}
+.course .edit-week-buttons .button,
+.course .edit-lesson-buttons .button,
+.course .edit-update-buttons .button,
+.course .submit-question-buttons .button,
+.edit-tumblr-buttons .button {
+  float: right;
+  margin: 0 0 20px 10px;
+}
+.tumblr-feed-edit-wrapper .edit-tumblr-buttons {
+  float: right;
+}
+.lesson:hover,
+.add-lesson:hover {
+  cursor: pointer;
+  box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  -webkit-box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  -moz-box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  background-color: whiteSmoke;
+}
+.edit-mode .lesson {
+  background: powderblue;
+  color: black;
+}
+.edit-mode .add-lesson {
+  display: none;
+}
+.edit-mode .lesson:hover,
+.edit-mode .add-lesson:hover {
+  box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  -webkit-box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+  -moz-box-shadow: inset 5px 5px rgba(0,0,0,0.1);
+}
+.edit-mode .editable {
+  margin-bottom: 20px;
+  background-color: whitesmoke;
+  color: black;
+  min-height: 30px;
+}
+.edit-mode .lesson .editable {
+  background-color: powderblue;
+  color: black;
+}
+.edit-mode .lesson {
+  background-color: powderblue;
+}
+.lesson .text-wrapper {
+  max-height: 218px;
+  overflow: hidden;
+  word-break: hyphenate;
+}
+.lesson .lesson-title,
+.update .update-title {
+  margin-bottom: 10px;
+}
+.collapsed .lesson .lesson-title {
+  margin-bottom: 0;
+}
+.lesson .icon-wrapper {
+  height: 16px;
+  width: 190px;
+  overflow: hidden;
+  position: absolute;
+  bottom: 20px;
+}
+.lesson .icon-wrapper i {
+  margin-right: 10px;
+  float: left;
+}
+.collapsed .lesson .text-wrapper,
+.collapsed .lesson .icon-wrapper {
+  position: relative;
+  width: 100%;
+  float: left;
+}
+.collapsed .lesson .icon-wrapper {
+  bottom: auto;
+  display: block;
+  height: auto;
+  margin: 10px 0;
+}
+.lesson-open {
+  position: relative;
+  min-height: 200px;
+}
+.lesson-open textarea {
+  width: 100%;
+}
+.lesson-embed-element.Video iframe,
+.lesson-embed-element.Video object,
+.lesson-embed-element.Scribd iframe,
+.lesson-embed-element.Scribd object,
+.lesson-embed-element.Slideshare iframe,
+.lesson-embed-element.Slideshare object {
+  min-height: 420px;
+}
+.lesson-open .lesson-title-container {
+  width: 65%;
+  margin-bottom: 20px;
+  float: left;
+}
+.lesson-open .lesson-description {
+  margin-bottom: 20px;
+}
+.lesson-open .content-edit .btn-group {
+  float: left;
+  margin: 0 10px 10px 0;
+}
+.content-edit {
+  display: none;
+  float: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.content {
+  float: left;
+  width: 100%;
+  max-width: 650px;
+  margin-bottom: 10px;
+}
+.edit-mode .content-edit {
+  display: block !important;
+}
+#lesson-tabs {
+  float: left;
+}
+#lesson-attachment {
+  margin-top: 40px;
+  float: left;
+}
+.state-first-edit-lesson #lesson-attachment {
+  display: none;
+}
+.field-embed-edit-wrapper,
+.field-upload-edit-wrapper {
+  display: none;
+}
+.edit-mode .field-embed-edit-wrapper,
+.edit-mode .field-upload-edit-wrapper {
+  display: block;
+}
+.lesson-embed-wrapper {
+  margin-bottom: 20px;
+}
+.lesson-upload-wrapper {
+  float: left;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.lesson-upload-wrapper i {
+  margin-right: 10px;
+}
+.field-embed-edit-top {
+  width: 100%;
+  float: left;
+  min-height: 20px;
+}
+.field-embed-edit-label {
+  max-width: 70%;
+  float: left;
+}
+.field-embed-edit-buttons {
+  max-width: 30%;
+  float: right;
+}
+.field-embed-edit-buttons div {
+  float: right;
+  margin-left: 10px;
+  color: black;
+  font: bold 0.75em/2em "AvantGardeGothicITCW01M 731087", Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+}
+.field-upload-edit-buttons .remove {
+  color: black;
+  font: bold 0.75em/2em "AvantGardeGothicITCW01M 731087", Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+}
+.field-embed-edit-buttons .remove:hover,
+.field-upload-edit-buttons .remove:hover {
+  color: whitesmoke;
+  cursor: pointer;
+}
+.field-embed-edit-code {
+  float: left;
+  width: 100%;
+}
+.field-upload-content-wrapper {
+  float: left;
+}
+.field-upload-edit-wrapper {
+  float: left;
+  margin-left: 10px;
+}
+.collapsed .edit-update-buttons {
+  display: none;
+}
+.update:hover {
+  cursor: pointer;
+  background-color: whiteSmoke;
+  border: solid 2px black;
+}
+.edit-mode.update:hover {
+  cursor: default !important;
+  background-color: powderblue;
+  border: solid 2px powderblue;
+}
+.date {
+  font: 1em;
+  margin-bottom: 20px;
+}
+.question {
+  margin-bottom: 10px;
+}
+.question .votes-container {
+  width: 7%;
+  float: left;
+  margin-bottom: 20px;
+}
+.question .vote-total {
+  font: 2em / 1em "AvantGardeGothicITCW01B 731063", Helvetica, Arial, sans-serif;
+  font-weight: bold;
+}
+.question .question-container {
+  float: left;
+  width: 67%;
+  margin: 0 3% 20px 3%;
+}
+.question .author-container {
+  float: left;
+  width: 20%;
+}
+.add-question .submit-question-content-container {
+  clear: both;
+  margin: 20px 0;
+}
+.add-question .submit-question-content-container textarea {
+  display: block !important;
+  font-weight: inherit;
+  width: 100%;
+}
+.add-question #submit-question-question {
+  min-height: 300px;
+}
+.response {
+  margin-bottom: 30px;
+  float: left;
+}
+.week .resort-icon,
+.lesson .resort-icon {
+  display: none;
+}
+.resort-mode .resort-icon {
+  display: block !important;
+  text-align: center;
+  margin: 0 auto;
+  font-size: 2em;
+}
+.week.edit-mode .lesson .resort-icon {
+  position: absolute;
+  display: block !important;
+  text-align: center;
+  margin: 0 auto;
+  bottom: 100px;
+  color: whitesmoke;
+  font-size: 2em;
+  width: 100%;
+}
+.resort-mode .lessons-list-el,
+.resort-mode .add-lesson,
+.resort-mode .edit-week-buttons,
+.week.edit-mode .lesson .lesson-description {
+  display: none;
+}
+.list-container {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.list-container > li {
+  list-style-type: none !important;
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+  height: auto;
+  width: auto;
+  float: left;
+  font: inherit;
+}
+.upload-list-container > li {
+  float: none !important;
+}
+.week-list-container > li,
+.update-list-container > li,
+.embed-list-container > li,
+.page-list-container > li,
+.tumblr-feed-list-container > li {
+  width: 100%;
+}
+.embeds-list-el {
+  width: 100%;
+}
+.collapsed .lesson-list-container > li {
+  width: 100%;
+}
+.collapsed .edit-button-container {
+  display: none;
+}
+.ui-state-default {
+  border: inherit !important;
+  background: inherit !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+}
+#add-link,
+#add-page {
+  float: left;
+  margin: 10px 10px 0 0;
+}
+#add-link-popup,
+#add-page-popup {
+  display: none;
+  margin-top: 10px;
+  position: relative;
+  width: 100%;
+  z-index: 1000;
+}
+#add-link-popup .button,
+#add-page-popup .button {
+  float: right;
+  margin-left: 10px;
+}
+#add-link-popup .edit-course-links-buttons,
+#add-page-popup .edit-course-page-buttons {
+  width: 100%;
+  float: left;
+}
+#add-link-popup .editable,
+#add-page-popup .editable {
+  width: 100%;
+  float: left;
+  background: whitesmoke;
+  margin-bottom: 10px;
+}
+#course-links .course-link-item,
+#course-links .course-page-item {
+  width: 100%;
+  float: left;
+}
+.jumbotron .header-right {
+  position: relative;
+}
+#lesson-addon-nav li {
+  color: powderblue;
+}
+#lesson-addon-nav li:hover {
+  cursor: pointer;
+  color: black;
+}
+.tumblr-feed-edit-wrapper {
+  display: none;
+}
+.administrator .tumblr-feed-edit-wrapper,
+.faculty .tumblr-feed-edit-wrapper {
+  display: none;
+  background-color: powderblue;
+}
+.addon.active {
+  display: block;
+}
+.tumblr-input-title {
+  float: left;
+}
+#tumblr-addon-wrapper {
+  width: 100%;
+}
+.pagination {
+  float: right;
+}
+.pagination .next,
+.pagination .prev {
+  float: right;
+  margin-left: 10px;
+}
+#syllabus-content-wrapper .syllabus-content,
+.open-page #page-content-wrapper .page-content {
+  max-width: 500px;
+}
+.tumblr-group-keys {
+  margin-bottom: 40px;
+}
+.tumblr-group-key {
+  display: inline;
+}
+.tumblr-group-key a.active-group {
+  color: black;
+  border-bottom: 1px solid;
+}
+.tumblr-group-key a:hover {
+  border-bottom: 1px solid;
+  text-decoration: none !important;
+}
+.tumblr-post {
+  float: left;
+  width: 240px;
+  display: none;
+}
+.tumblr-post blockquote {
+  font: 13px / 17px "AvantGardeGothicITCW01M 731087", Helvetica, Arial, sans-serif;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+.tumblr-post blockquote p {
+  font: 13px / 17px "AvantGardeGothicITCW01M 731087", Helvetica, Arial, sans-serif;
+}
+#toolbar {
+  display: none !important;
+}
+body.toolbar-drawer .navbar-fixed-top {
+  top: 0 !important;
+}
+body.toolbar-drawer {
+  padding-top: 0 !important;
+}
+.tumblr.preloader {
+  display: none;
+}
+#lesson-attachment .btn-group {
+  display: none;
+}
+#lesson-addon-nav {
+  display: none;
+}
+.tumblr-post {
+  margin-bottom: 60px;
+}
+#tumblr-wrapper .pagination {
+  display: none;
+}
+.tumblr-photo-img {
+  margin-bottom: 10px;
+}

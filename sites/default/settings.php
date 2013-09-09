@@ -205,9 +205,9 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'tutorials_drupal7',
-      'username' => 'tutorials',
-      'password' => 'tut00ri44Z',
+      'database' => 'tutorialslive',
+      'username' => 'tutorialslive',
+      'password' => 'tuT000$$gs',
       'host' => 'localhost',
       'port' => '',
       'driver' => 'mysql',

@@ -1,20 +1,6 @@
 <?php
-/*
-function gsapp_tutorials_api_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items){
-  foreach ($entities as $id => $entity) {
-    if (empty($items[$id]) && $field['settings']['default_image']) {
-      if ($file = file_load($field['settings']['default_image'])) {
-        $items[$id][0] = (array) $file + array(
-          'is_default' => TRUE, 
-          'alt' => '', 
-          'title' => '',
-        );
-      }
-    }
-  }
 
 
-}*/
 
 function gsapp_tutorials_api_node_view($node, $view_mode, $langcode) {
 
@@ -68,4 +54,93 @@ function gsapp_tutorials_api_node_view($node, $view_mode, $langcode) {
   }
 }
 
+/**
+ * Overrides theme_field()
+ * Remove the hard coded classes so we can add them in preprocess functions.
+ 
+ 
+function gsapp_tutorials_api_field($variables) {
+  $output = '';
+  $field = $variables['element']['#field_name'];
+  print '<strong>Troy Field Name:</strong> ' . $field . '<br/>';
 
+  // Render the label, if it's not hidden.
+  // Hardcoded hide video label.
+  if (!$variables['label_hidden'] && ($field != 'field_video_source')) {
+    $output .= '<div ' . $variables['title_attributes'] . '>' . $variables['label'] . ':&nbsp;</div>';
+  }
+ 
+  // Render the items.
+  //$output .= '<div ' . $variables['content_attributes'] . '>';
+  foreach ($variables['items'] as $delta => $item) {
+    $output .= '<div ' . $variables['item_attributes'][$delta] . '>' . drupal_render($item) . '</div>';
+  }
+  //$output .= '</div>';
+ 
+  // Render the top-level DIV.
+  //$output = '<div class="' . $variables['classes'] . '"' . $variables['attributes'] . '>' . $output . '</div>';
+ 
+  return $output;
+} */
+
+/**
+ * Implements hook_preprocess_field()
+ */
+ 
+function gsapp_tutorials_api_preprocess_field(&$vars) {
+  /* Set shortcut variables. Hooray for less typing! */
+  $field = $vars['element']['#field_name'];
+  $bundle = $vars['element']['#bundle'];
+  $mode = $vars['element']['#view_mode'];
+  $classes = &$vars['classes_array'];
+  $title_classes = &$vars['title_attributes_array']['class'];
+  $content_classes = &$vars['content_attributes_array']['class'];
+  $item_classes = array();
+ 
+  /* Global field classes 
+  $classes[] = 'field-wrapper';
+  $title_classes[] = 'field-label';
+  $content_classes[] = 'field-items';
+  $item_classes[] = 'field-item';
+  */
+  
+ 
+  /* Uncomment the lines below to see variables you can use to target a field */
+  // print '<strong>Troy Field Name:</strong> ' . $field . '<br/>';
+  // print '<strong>Bundle:</strong> ' . $bundle  . '<br/>';
+  // print '<strong>Mode:</strong> ' . $mode .'<br/>';
+ 
+  /* Add specific classes to targeted fields */
+  switch ($mode) {
+    /* All teasers */
+    case 'teaser':
+      switch ($field) {
+        /* Teaser read more links */
+        case 'node_link':
+          $item_classes[] = 'more-link';
+          break;
+        /* Teaser descriptions */
+        case 'body':
+        case 'field_description':
+          $item_classes[] = 'description';
+          break;
+      }
+      break;
+  }
+ 
+  switch ($field) {
+    case 'field_video_source':
+      //$title_classes[] = 'inline';
+      //$content_classes[] = 'authors';
+      $item_classes[] = 'embedded-video-container';
+      $title_classes[] = 'hidden';
+      //$vars['label_hidden'] = true;
+      break;
+  }
+ 
+  // Apply odd or even classes along with our custom classes to each item */
+  foreach ($vars['items'] as $delta => $item) {
+    $item_classes[] = $delta % 2 ? 'odd' : 'even';
+    $vars['item_attributes_array'][$delta]['class'] = $item_classes;
+  }
+}

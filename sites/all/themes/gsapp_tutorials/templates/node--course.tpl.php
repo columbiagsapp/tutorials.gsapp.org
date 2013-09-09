@@ -53,7 +53,7 @@
 
 
 <?php
-  if($access == false){
+  if($access == false && false){
     $dest = drupal_get_destination();
     if ($user->uid) { // this user is already logged in
       drupal_set_message("Access Denied: You do not have access to this page.");
@@ -550,6 +550,8 @@
 
 <script type="text/template" id="tpl-tumblr-post">
 
+    <div class="content<% if(typeof tags !== 'undefined' && tags.length > 0){ for(var i = 0; i < tags.length; i++){ %><%= ' '+tags[i].toLowerCase() %><% } } %>">
+
       <% if(typeof type !== 'undefined' && type){ %>
         <% if(type == "photo"){ %>
 
@@ -557,13 +559,14 @@
             <div class="row-fluid">
               <% for (var i=0; i < photos.length; i++) { %>
 
-                  <a class="tumblr-img-wrapper" href="<%= photos[i].original_size.url %>">
-                    <img src="<%= photos[i].alt_sizes[2].url %>">
+                  <a class="tumblr-img-wrapper" href="<%= photos[i].original_size.url %>" target="_blank">
+                    <img class="tumblr-photo-img" src="<%= photos[i].alt_sizes[2].url %>">
                   </a>
-                  <% if(caption){ %>
-                    <%= caption %>
-                  <% } %>
+                  
 
+              <% } %>
+              <% if(caption){ %>
+                <%= caption %>
               <% } %>
             </div><!-- /.row-fluid -->  
           <% } %>
@@ -580,8 +583,19 @@
       <% if(typeof body !== 'undefined' && body){ %>
         <%= body %>
       <% } %>
+
+      <% if(typeof tags !== 'undefined' && tags.length > 0){ %>
+        <div class="post-tags">Tags:
+        <% for(var i = 0; i < tags.length; i++){ %>
+          <span class="tag"><%= tags[i] %><% if(i < (tags.length-1)){ %><%= ', ' %><% } %></span>
+      <% } } %>
+
+      <% if(typeof post_url !== 'undefined' && post_url){ %>
+        <div><a href="<%= post_url %>" target="_blank">Go to post</a></div>
+      <% } %>
   
-    </script>
+    </div><!-- /.content -->
+</script>
 
 
 <script type="text/template" id="tumblr_feed_attachment">
@@ -615,11 +629,7 @@
 
         <div class="row-fluid">
           <div class="span4">
-            <div class="tumblr-input-tags editable">
-              <% if( (typeof(field_tumblr_tags)) != 'undefined'){ %>
-                <%= field_tumblr_tags %>
-              <% } %>
-            </div>
+            <input type="hidden" id="select2-tumblr-tags" class="tumblr-input-tags" style="width: 300px; display: none;" value>
           </div>
           <div class="span5">Enter the tags to sort by separated by a comma</div>
         </div>

@@ -1,0 +1,124 @@
+<?php
+/**
+ * @file
+ * This module is an example of how a standard Drupal Backbone app is structure.
+ * The app is a simple on: it presents a form in which the user enters a node
+ * nid, then retrieves that node from the server via a REST call and presents it
+ * to the user.
+ *
+ * Most of the logic is in the todos_app.js file in the js directory
+ * of the module.  The Drupal code below is mainly responsible for making sure
+ * all the right includes are presented on that page, and the template files for
+ * the Backbone app are managed by the theme layer.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function todos_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#todos':
+      return t("An example Backbone.js app, which mainly showcases node loading and rendering.");
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function todos_permission() {
+  return array(
+    'view todos app' => array(
+      'title' => t('View Todos app'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ *
+ * Our app needs a place to live, so we create a menu callback for it
+ */
+function todos_menu() {
+  $items['todos'] = array(
+    'title' => 'Backbone Todos Example',
+    'description' => 'A basic Backbone Drupal Todos app.',
+    'page callback' => 'todos_admin_page',
+    'access arguments' => array('access content'),
+    'weight' => 0,
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * We use theme functions and template files to generate all Backbone templates.
+ * This allows us to leverage the Drupal theming layer to handle all themes, so
+ * we get all sorts of goodies like theme overrides and pre-process functions,
+ * all effortlessly folded into our Backbone app when the page renders.
+ *
+ * We've used a mix of function and tpl theme function types here, and with a
+ * larger project we'd likely want to organize our tpl files in a theme
+ * subdirectory of the module.
+ */
+function todos_theme($existing, $type, $theme, $path) {
+  $path .= '/theme';
+
+  return array(
+    'todos_item' => array(
+      'path' => $path,
+      'template' => 'item',
+      'variables' => array(),
+    ),
+    'todos_stats' => array(
+      'path' => $path,
+      'template' => 'stats',
+      'variables' => array(),
+    ),
+    'todos_app' => array(
+      'path' => $path,
+      'template' => 'app',
+      'variables' => array(),
+    ),
+  );
+}
+
+/**
+ * Set up the app templates, js and container div.
+ *
+ * This is a pretty minimal function, since all our page needs to contain is an
+ * anchor div for our app to attach to and the correct templates and JavaScript
+ * files to run it.  We use backbone_add_template to include all templates in
+ * the code, and, as noted in the hook_theme documentation we use theme
+ * functions to generate all templates.
+ *
+ * @return Array
+ *   A render array for the tag of the app container.
+ */
+function todos_admin_page() {
+  drupal_set_title('');
+  $path = drupal_get_path('module', 'todos');
+
+  // Add templates to page.
+  backbone_add_template('item-template', theme('todos_item'));
+  backbone_add_template('stats-template', theme('todos_stats'));
+  // backbone_add_template('app-template', theme('todos_app'));
+
+  // Add app js.
+  drupal_add_js($path .'/js/app.js');
+ 
+  // Add app css.
+  drupal_add_css($path .'/todos.css');
+
+  if (!user_is_logged_in()) {
+    drupal_set_message('Create an account and login to save your todos in Drupal', 'error');
+  }
+
+  // Return a container div for the app to anchor itself to. 
+  return array(
+    '#type' => 'markup',
+    '#markup' => theme('todos_app'),
+  );
+
+}

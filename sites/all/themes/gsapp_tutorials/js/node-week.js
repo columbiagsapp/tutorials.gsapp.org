@@ -1,13 +1,12 @@
-define(['jquery', 'underscore-min', 'backbone-min', 'drupalbackbone'],
-    function($, _, Backbone, Drupal) {
-
-    	var week = {};
+(function ($){
+	Drupal.behaviors.app = {
+    	attach: function() {
 
 ///////////////////////////////////////////////////////////////
 ////////////////// WEEK MODEL /////////////////////////////////
 ///////////////////////////////////////////////////////////////
 
-week.Week = Drupal.Backbone.Models.Node.extend({
+var Week = Drupal.Backbone.Models.Node.extend({
   initialize: function(opts){
     Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
     //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
@@ -21,7 +20,7 @@ week.Week = Drupal.Backbone.Models.Node.extend({
 ////////////////// WEEK VIEWS /////////////////////////////////
 ///////////////////////////////////////////////////////////////
 
-week.WeekView = Drupal.Backbone.Views.Base.extend({
+var WeekView = Drupal.Backbone.Views.Base.extend({
   //the Underscore formated template in node--tutorial.tpl.php stored in a 
   //<script> tag and identified by its id
   templateSelector: '#bb_week_template',
@@ -273,8 +272,8 @@ week.WeekView = Drupal.Backbone.Views.Base.extend({
 ////////////////// WEEK COLLECTIONS ///////////////////////////
 ///////////////////////////////////////////////////////////////
 
-week.WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-  model: week.Week,
+var WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+  model: Week,
   comparator: function(question) {
     return question.get("field_order");//add negative value to sort from greatest to least
   }
@@ -284,7 +283,7 @@ week.WeekCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.exte
 ////////////////// WEEK COLLECTION VIEWS //////////////////////
 ///////////////////////////////////////////////////////////////
 
-week.WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
+var WeekCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend({
   resort: function(opts){
     this.collection.reset();
   }

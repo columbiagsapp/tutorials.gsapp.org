@@ -3,36 +3,28 @@
     	attach: function() {
 
 ///////////////////////////////////////////////////////////////
-////////////////// PAGE MODEL ///////////////////////////////
+////////////////// UPLOAD MODEL ///////////////////////////////
 ///////////////////////////////////////////////////////////////
 
-var Page = Drupal.Backbone.Models.Node.extend({
+var Upload = Drupal.Backbone.Models.Node.extend({
   initialize: function(opts){
     Drupal.Backbone.Models.Node.prototype.initialize.call(this, opts);
+    //need to not send any node refs on .save() because it requires { nid: [nid: ## ]} structure
+    //needed to take out a bunch when using REST WS - last_view seems to be the culprit
     this.addNoSaveAttributes(['body', 'views', 'day_views', 'last_view', 'uri', 'resource', 'id']);
   }
 });
 
 ///////////////////////////////////////////////////////////////
-////////////////// PAGE VIEWS ///////////////////////////////
+////////////////// UPLOAD VIEWS ///////////////////////////////
 ///////////////////////////////////////////////////////////////
 
-var PageListView = Drupal.Backbone.Views.Base.extend({
-  templateSelector: '#bb_page_list_template',
-
-  initialize: function(opts) {
-    Drupal.Backbone.Views.Base.prototype.initialize.call(this, opts);
-    this.model.bind('change', this.render, this);//this calls the fetch
-  }
-
-});//end UploadView
-
-var PageView = Drupal.Backbone.Views.Base.extend({
-  templateSelector: '#bb_page_template',
+var UploadView = Drupal.Backbone.Views.Base.extend({
+  templateSelector: '#bb_upload_template',
 
   //bind vote up and down events to the buttons and tie these to local functions
   events: {
-    "click .delete" :  "deletePage"
+    "click .remove" :  "deleteUpload"
   },
 
   initialize: function(opts) {
@@ -40,13 +32,14 @@ var PageView = Drupal.Backbone.Views.Base.extend({
     this.model.bind('change', this.render, this);//this calls the fetch
   },
 
-  deletePage: function(){
+  deleteUpload: function(){
     console.log('delete upload');
     //delete the actual model from the database and its view
     this.model.destroy();
     this.remove();
 
-    transitionSchedule();
+    //TODO TCT2003 do I need this?
+    setState(MODIFIED);
   }
 
 });//end UploadView
@@ -56,41 +49,15 @@ var PageView = Drupal.Backbone.Views.Base.extend({
 ////////////////// UPLOAD COLLECTIONS /////////////////////////
 ///////////////////////////////////////////////////////////////
 
-var PageCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
-	model: Page
+var UploadCollectionPrototype = Drupal.Backbone.Collections.RestWS.NodeIndex.extend({
+	model: Upload
 });
 
 ///////////////////////////////////////////////////////////////
 ////////////////// UPLOAD COLLECTION VIEW /////////////////////
 ///////////////////////////////////////////////////////////////
 
-var PageCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend();
-		
-
-
-PagesCollection = new PageCollectionPrototype();
-
-PagesCollection.reset();
-
-PagesCollectionView = new PageCollectionViewPrototype({
-          collection: PagesCollection,
-          templateSelector: '#page-list',
-          renderer: 'underscore',
-          el: '#pages-list-el',
-          ItemView: PageListView,
-          itemParent: '.page-list-container'
-        });
-
-
-
-
-
-
-
-
-
-
-
-    }//end attach
+var UploadCollectionViewPrototype = Drupal.Backbone.Views.CollectionView.extend();
+		}//end attach
 	}//end behav
 })(jQuery);

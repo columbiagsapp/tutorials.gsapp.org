@@ -1,0 +1,9 @@
+name = Backbone Todos Example
+description = A Drupal Backbone example using the Backbone.js Todos app 
+package = Backbone
+core = 7.x
+
+dependencies[] = backbone
+dependencies[] = backbone_base
+
+files[] = todos.module
