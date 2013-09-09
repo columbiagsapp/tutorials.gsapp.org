@@ -146,7 +146,12 @@ var MAX_IMAGE_HEIGHT = 500;
               var weekView = WeeksCollectionView._itemViews[j];
 
               if(weekView.model.get('nid') == thisNID){
-                var iStr = '' + i;
+                //start at 10 so always double digits
+                var iStr = i + 10;
+                iStr = '' + iStr;
+
+                console.log('setting field order of: '+ iStr);
+
                 weekView.model.set({
                   "field_order": iStr
                 });
