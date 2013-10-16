@@ -53,7 +53,7 @@
 
 
 <?php
-  if($access == false){
+  if($access == false && false){
     $dest = drupal_get_destination();
     if ($user->uid) { // this user is already logged in
       drupal_set_message("Access Denied: You do not have access to this page.");

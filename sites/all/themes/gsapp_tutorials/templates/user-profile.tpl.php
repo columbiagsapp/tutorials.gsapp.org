@@ -40,7 +40,7 @@
   	*/ ?>
   	<div class="profile-name">
   		<?php //<a href="mailto:<?php print render($user_profile['mail']); 
-  			if(isset($profile['main'])){
+  			if(isset($profile['main']->field_name['und'][0]['value'])){
 	  			print $profile['main']->field_name['und'][0]['value'];
 	  		}
   		?>
