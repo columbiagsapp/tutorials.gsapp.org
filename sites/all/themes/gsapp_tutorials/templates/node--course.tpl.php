@@ -2,7 +2,7 @@
   global $user;
 
   $editable = false;
-  $access = false;
+  $access = true;//set to false to protect behind password
 
   if( in_array("administrator", $user->roles) ){
     $editable = true;
@@ -48,12 +48,14 @@
       }
     }
   }
+
+  $access = true;
 ?>
 
 
 
 <?php
-  if($access == false && false){
+  if( ($access == false) && (false) ){//the && false disables this
     $dest = drupal_get_destination();
     if ($user->uid) { // this user is already logged in
       drupal_set_message("Access Denied: You do not have access to this page.");
