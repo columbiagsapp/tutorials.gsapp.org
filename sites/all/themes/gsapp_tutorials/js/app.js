@@ -146,7 +146,12 @@ var MAX_IMAGE_HEIGHT = 500;
               var weekView = WeeksCollectionView._itemViews[j];
 
               if(weekView.model.get('nid') == thisNID){
-                var iStr = '' + i;
+                //start at 10 so always double digits
+                var iStr = i + 10;
+                iStr = '' + iStr;
+
+                console.log('setting field order of: '+ iStr);
+
                 weekView.model.set({
                   "field_order": iStr
                 });
@@ -171,6 +176,8 @@ var MAX_IMAGE_HEIGHT = 500;
       }
 
       function init_fileuploader(type){
+        console.log('vars: '+ vars);
+        console.dir(vars);
         space_allowed = vars.space_remaining;
         
         var types = vars.filetypes;
@@ -179,15 +186,21 @@ var MAX_IMAGE_HEIGHT = 500;
         var total_bytes_cal = 0;
         var added_files = new Array();
         //alert(types);
+
+        console.log('init_fileuploader('+ type + ')');
+        console.log(jQuery('#jquery-file-upload-form').length);
+
         jQuery('#jquery-file-upload-form').fileupload({//gif|jpe?g|png|tiff|asf|avi|mpe?g|wmv|vob|mov|mp4|flv
           sequentialUploads: true,
           acceptFileTypes: pattern,
           previewMaxWidth: 120,
           maxFileSize: vars.max_file_size,
           change: function (e, data) {
-            
+            console.log('change()');
             var total_bytes = 0;
             jQuery.each(data.files, function (index, file) {
+              console.log('each, index: '+ index + ' file: '+ file.name);
+              console.dir(file);
               //alert(file.name);
               added_files.push(index);
               total_bytes = total_bytes + file.size;   
@@ -203,6 +216,7 @@ var MAX_IMAGE_HEIGHT = 500;
             }
           },
           start: function(e, data){
+            console.log('start()');
             //alert(total_bytes_cal);
             if(total_bytes_cal > space_allowed){
               jQuery('button.cancel').trigger('click');
@@ -210,7 +224,7 @@ var MAX_IMAGE_HEIGHT = 500;
             }
           },
           added: function(e, data){
-            
+            console.log('added()');
             if(total_bytes_cal > space_allowed){
               jQuery('button.cancel').trigger('click');
               jQuery('.progress-success').hide();
@@ -220,7 +234,7 @@ var MAX_IMAGE_HEIGHT = 500;
           },
           completed: 
             function(e, data){
-
+              console.log('completed()');
               //TODO TCT2003 add logic for deciding the image type
               var upload_file_type = type;
               openLessonView.addUpload(data.result, upload_file_type);
@@ -238,7 +252,7 @@ var MAX_IMAGE_HEIGHT = 500;
         });
         
         // Load existing files:
-        /*
+        
         jQuery('#jquery-file-upload-form').each(function () {
           var that = this;
           jQuery.getJSON(this.action, function (result) {
@@ -249,7 +263,7 @@ var MAX_IMAGE_HEIGHT = 500;
               });
             }
           });
-        });*/
+        });
         
       }
 
@@ -1892,6 +1906,7 @@ var MAX_IMAGE_HEIGHT = 500;
 
 
             function jQueryFormUpload(data){
+              console.log('jQueryFormUpload()');
               var iframe, uploadForm, uploadUrl, widget;
               widget = data.widget;
               uploadForm = jQuery('form.upload', widget.element);
